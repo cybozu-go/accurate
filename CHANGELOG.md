@@ -9,4 +9,4 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 ### Removed
 
-[Unreleased]: https://github.com/cybozu-go/neco-template/compare/4b825dc642cb6eb9a060e54bf8d69288fbee4904...HEAD
+[Unreleased]: https://github.com/cybozu-go/innu/compare/4b825dc642cb6eb9a060e54bf8d69288fbee4904...HEAD

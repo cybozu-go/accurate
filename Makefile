@@ -1,4 +1,4 @@
-
+# Makefile for Innu
 
 BIN_DIR := $(shell pwd)/bin
 STATICCHECK = $(BIN_DIR)/staticcheck
