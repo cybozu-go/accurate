@@ -1,0 +1,19 @@
+domain: cybozu.com
+layout:
+- go.kubebuilder.io/v3
+projectName: innu
+repo: github.com/cybozu-go/innu
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: cybozu.com
+  group: innu
+  kind: SubNamespace
+  path: github.com/cybozu-go/innu/api/v1
+  version: v1
+  webhooks:
+    validation: true
+    webhookVersion: v1
+version: "3"

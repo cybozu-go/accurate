@@ -1,0 +1,7 @@
+apiVersion: innu.cybozu.com/v1
+kind: SubNamespace
+metadata:
+  name: subnamespace-sample
+spec:
+  # Add fields here
+  foo: bar
