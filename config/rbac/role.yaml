@@ -1,0 +1,46 @@
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - innu.cybozu.com
+  resources:
+  - subnamespaces
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - innu.cybozu.com
+  resources:
+  - subnamespaces/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - innu.cybozu.com
+  resources:
+  - subnamespaces/status
+  verbs:
+  - get
+  - patch
+  - update

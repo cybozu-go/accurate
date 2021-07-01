@@ -68,7 +68,6 @@ func main() {
 
 	if err = (&controllers.SubNamespaceReconciler{
 		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "SubNamespace")
 		os.Exit(1)
@@ -78,6 +77,8 @@ func main() {
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
+
+	innuv1.SetClientForWebhook(mgr.GetClient())
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")

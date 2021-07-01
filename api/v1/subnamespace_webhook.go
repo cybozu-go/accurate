@@ -1,14 +1,23 @@
 package v1
 
 import (
+	"context"
+	"fmt"
+
+	"github.com/cybozu-go/innu/pkg/constants"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
 
-// log is for logging in this package.
-var subnamespacelog = logf.Log.WithName("subnamespace-resource")
+var k8sclient client.Client
+
+func SetClientForWebhook(c client.Client) {
+	k8sclient = c
+}
 
 func (r *SubNamespace) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
@@ -18,31 +27,38 @@ func (r *SubNamespace) SetupWebhookWithManager(mgr ctrl.Manager) error {
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 
-// TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
+//+kubebuilder:webhook:path=/mutate-innu-cybozu-com-v1-subnamespace,mutating=true,failurePolicy=fail,sideEffects=None,groups=innu.cybozu.com,resources=subnamespaces,verbs=create;update,versions=v1,name=msubnamespace.kb.io,admissionReviewVersions={v1,v1beta1}
+
+var _ webhook.Defaulter = &SubNamespace{}
+
+// Default implements webhook.Defaulter so a webhook will be registered for the type
+func (r *SubNamespace) Default() {
+	controllerutil.AddFinalizer(r, constants.Finalizer)
+}
+
 //+kubebuilder:webhook:path=/validate-innu-cybozu-com-v1-subnamespace,mutating=false,failurePolicy=fail,sideEffects=None,groups=innu.cybozu.com,resources=subnamespaces,verbs=create;update,versions=v1,name=vsubnamespace.kb.io,admissionReviewVersions={v1,v1beta1}
 
 var _ webhook.Validator = &SubNamespace{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (r *SubNamespace) ValidateCreate() error {
-	subnamespacelog.Info("validate create", "name", r.Name)
+	ns := &corev1.Namespace{}
+	if err := k8sclient.Get(context.Background(), client.ObjectKey{Name: r.Namespace}, ns); err != nil {
+		return fmt.Errorf("failed to get namespace %s: %w", r.Namespace, err)
+	}
+	if ns.Labels[constants.LabelRoot] == "true" || ns.Labels[constants.LabelParent] != "" {
+		return nil
+	}
 
-	// TODO(user): fill in your validation logic upon object creation.
-	return nil
+	return fmt.Errorf("namespace %s is neither root nor sub namespace", r.Namespace)
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
 func (r *SubNamespace) ValidateUpdate(old runtime.Object) error {
-	subnamespacelog.Info("validate update", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object update.
 	return nil
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (r *SubNamespace) ValidateDelete() error {
-	subnamespacelog.Info("validate delete", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object deletion.
 	return nil
 }

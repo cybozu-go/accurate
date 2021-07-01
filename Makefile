@@ -54,8 +54,7 @@ generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and
 
 .PHONY: apidoc
 apidoc: crd-to-markdown $(wildcard api/*/*_types.go)
-	$(CRD_TO_MARKDOWN) --links docs/links.csv -f api/v1beta1/mysqlcluster_types.go -f api/v1beta1/job_types.go -n MySQLCluster > docs/crd_mysqlcluster.md
-	$(CRD_TO_MARKDOWN) --links docs/links.csv -f api/v1beta1/backuppolicy_types.go -f api/v1beta1/job_types.go -n BackupPolicy > docs/crd_backuppolicy.md
+	$(CRD_TO_MARKDOWN) --links docs/links.csv -f api/v1/subnamespace_types.go -n SubNamespace > docs/crd_subnamespace.md
 
 .PHONY: book
 book: mdbook
@@ -70,27 +69,12 @@ check-generate:
 .PHONY: envtest
 envtest: setup-envtest
 	source <($(SETUP_ENVTEST) use -p env); \
-		export MOCO_CHECK_INTERVAL=100ms; \
-		export MOCO_WAIT_INTERVAL=100ms; \
-		go test -v -count 1 -race ./clustering -ginkgo.progress -ginkgo.v -ginkgo.failFast
+		TEST_CONFIG=1 go test -v -count 1 -race ./pkg/config -ginkgo.progress -ginkgo.v -ginkgo.failFast
 	source <($(SETUP_ENVTEST) use -p env); \
 		export DEBUG_CONTROLLER=1; \
 		go test -v -count 1 -race ./controllers -ginkgo.progress -ginkgo.v -ginkgo.failFast
 	source <($(SETUP_ENVTEST) use -p env); \
 		go test -v -count 1 -race ./api/... -ginkgo.progress -ginkgo.v
-	source <($(SETUP_ENVTEST) use -p env); \
-		go test -v -count 1 -race ./backup -ginkgo.progress -ginkgo.v -ginkgo.failFast
-
-.PHONY: test-dbop
-test-dbop:
-	-docker network create test-moco
-	TEST_MYSQL=1 MYSQL_VERSION=$(MYSQL_VERSION) go test -v -count 1 -race ./pkg/dbop -ginkgo.v
-
-.PHONY: test-bkop
-test-bkop:
-	@if which mysqlsh; then : ; else echo 'Run "make setup" to prepare test tools.'; exit 1; fi
-	-docker network create test-moco
-	TEST_MYSQL=1 MYSQL_VERSION=$(MYSQL_VERSION) go test -v -count 1 -race ./pkg/bkop -ginkgo.v -ginkgo.progress
 
 .PHONY: test
 test: test-tools
@@ -110,19 +94,20 @@ build:
 
 .PHONY: release-build
 release-build: kustomize
+	rm -rf build
 	mkdir -p build
-	$(MAKE) kubectl-moco GOOS=windows GOARCH=amd64 SUFFIX=.exe
-	$(MAKE) kubectl-moco GOOS=darwin GOARCH=amd64
-	$(MAKE) kubectl-moco GOOS=darwin GOARCH=arm64
-	$(MAKE) kubectl-moco GOOS=linux GOARCH=amd64
-	$(MAKE) kubectl-moco GOOS=linux GOARCH=arm64
+	$(MAKE) kubectl-innu GOOS=windows GOARCH=amd64 SUFFIX=.exe
+	$(MAKE) kubectl-innu GOOS=darwin GOARCH=amd64
+	$(MAKE) kubectl-innu GOOS=darwin GOARCH=arm64
+	$(MAKE) kubectl-innu GOOS=linux GOARCH=amd64
+	$(MAKE) kubectl-innu GOOS=linux GOARCH=arm64
 	$(KUSTOMIZE) build . > build/moco.yaml
 
-.PHONY: kubectl-moco
-kubectl-moco: build/kubectl-moco-$(GOOS)-$(GOARCH)$(SUFFIX)
+.PHONY: kubectl-innu
+kubectl-innu: build/kubectl-innu-$(GOOS)-$(GOARCH)$(SUFFIX)
 
-build/kubectl-moco-$(GOOS)-$(GOARCH)$(SUFFIX):
-	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o $@ ./cmd/kubectl-moco
+build/kubectl-innu-$(GOOS)-$(GOARCH)$(SUFFIX):
+	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o $@ ./cmd/kubectl-innu
 
 ##@ Tools
 
@@ -132,7 +117,8 @@ controller-gen: ## Download controller-gen locally if necessary.
 
 SETUP_ENVTEST := $(shell pwd)/bin/setup-envtest
 .PHONY: setup-envtest
-setup-envtest: ## Download setup-envtest locally if necessary
+setup-envtest: $(SETUP_ENVTEST) ## Download setup-envtest locally if necessary
+$(SETUP_ENVTEST):
 	# see https://github.com/kubernetes-sigs/controller-runtime/tree/master/tools/setup-envtest
 	GOBIN=$(shell pwd)/bin go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
 
@@ -152,7 +138,8 @@ crd-to-markdown: ## Download crd-to-markdown locally if necessary.
 
 MDBOOK := $(shell pwd)/bin/mdbook
 .PHONY: mdbook
-mdbook: ## Donwload mdbook locally if necessary
+mdbook: $(MDBOOK) ## Donwload mdbook locally if necessary
+$(MDBOOK):
 	mkdir -p bin
 	curl -fsL https://github.com/rust-lang/mdBook/releases/download/v$(MDBOOK_VERSION)/mdbook-v$(MDBOOK_VERSION)-x86_64-unknown-linux-gnu.tar.gz | tar -C bin -xzf -
 
