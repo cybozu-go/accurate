@@ -75,6 +75,8 @@ envtest: setup-envtest
 		go test -v -count 1 -race ./controllers -ginkgo.progress -ginkgo.v -ginkgo.failFast
 	source <($(SETUP_ENVTEST) use -p env); \
 		go test -v -count 1 -race ./api/... -ginkgo.progress -ginkgo.v
+	source <($(SETUP_ENVTEST) use -p env); \
+		go test -v -count 1 -race ./hooks -ginkgo.progress -ginkgo.v
 
 .PHONY: test
 test: test-tools

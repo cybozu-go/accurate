@@ -5,6 +5,7 @@ Copyright 2021 Cybozu.
 package main
 
 import (
+	"context"
 	"flag"
 	"os"
 
@@ -18,9 +19,13 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	innuv1 "github.com/cybozu-go/innu/api/v1"
 	"github.com/cybozu-go/innu/controllers"
+	"github.com/cybozu-go/innu/hooks"
+	"github.com/cybozu-go/innu/pkg/cluster"
+	"github.com/cybozu-go/innu/pkg/indexing"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -55,6 +60,7 @@ func main() {
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
+		NewClient:              cluster.NewCachingClient,
 		MetricsBindAddress:     metricsAddr,
 		Port:                   9443,
 		HealthProbeBindAddress: probeAddr,
@@ -65,6 +71,25 @@ func main() {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
+
+	dec, err := admission.NewDecoder(scheme)
+	if err != nil {
+		setupLog.Error(err, "unable to create admission decoder")
+		os.Exit(1)
+	}
+
+	if err := indexing.SetupIndexForNamespace(context.Background(), mgr); err != nil {
+		setupLog.Error(err, "failed to setup indexer for namespaces")
+		os.Exit(1)
+	}
+	if err := (&controllers.NamespaceReconciler{
+		Client: mgr.GetClient(),
+		// TODO
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Namespace")
+		os.Exit(1)
+	}
+	hooks.SetupNamespaceWebhook(mgr, dec)
 
 	if err = (&controllers.SubNamespaceReconciler{
 		Client: mgr.GetClient(),
