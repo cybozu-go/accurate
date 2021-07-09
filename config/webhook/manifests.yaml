@@ -42,27 +42,6 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
-      path: /validate-innu-cybozu-com-v1-subnamespace
-  failurePolicy: Fail
-  name: vsubnamespace.kb.io
-  rules:
-  - apiGroups:
-    - innu.cybozu.com
-    apiVersions:
-    - v1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - subnamespaces
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  - v1beta1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
       path: /validate-v1-namespace
   failurePolicy: Fail
   name: vnamespace.kb.io
@@ -77,4 +56,25 @@ webhooks:
     - DELETE
     resources:
     - namespaces
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-innu-cybozu-com-v1-subnamespace
+  failurePolicy: Fail
+  name: vsubnamespace.kb.io
+  rules:
+  - apiGroups:
+    - innu.cybozu.com
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - subnamespaces
   sideEffects: None

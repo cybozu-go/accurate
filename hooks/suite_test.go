@@ -91,8 +91,7 @@ var _ = BeforeSuite(func() {
 	dec, err := admission.NewDecoder(scheme)
 	Expect(err).NotTo(HaveOccurred())
 	SetupNamespaceWebhook(mgr, dec)
-
-	//+kubebuilder:scaffold:webhook
+	SetupSubNamespaceWebhook(mgr, dec)
 
 	go func() {
 		err = mgr.Start(ctx)

@@ -97,13 +97,8 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "SubNamespace")
 		os.Exit(1)
 	}
-	if err = (&innuv1.SubNamespace{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "SubNamespace")
-		os.Exit(1)
-	}
+	hooks.SetupSubNamespaceWebhook(mgr, dec)
 	//+kubebuilder:scaffold:builder
-
-	innuv1.SetClientForWebhook(mgr.GetClient())
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")
