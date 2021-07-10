@@ -19,6 +19,7 @@ const (
 	AnnFrom               = MetaPrefix + "from"
 	AnnPropagate          = MetaPrefix + "propagate"
 	AnnPropagateGenerated = MetaPrefix + "propagate-generated"
+	AnnGenerated          = MetaPrefix + "generated"
 	AnnIsTemplate         = MetaPrefix + "is-template"
 )
 

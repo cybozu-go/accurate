@@ -193,6 +193,7 @@ func (r *NamespaceReconciler) propagateUpdate(ctx context.Context, res *unstruct
 		return nil
 	}
 
+	c2.SetResourceVersion(c.GetResourceVersion())
 	if err := r.Update(ctx, c2); err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"path/filepath"
 	"testing"
 	"time"
@@ -8,6 +9,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"go.uber.org/zap/zapcore"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
@@ -17,6 +19,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	innuv1 "github.com/cybozu-go/innu/api/v1"
+	"github.com/cybozu-go/innu/pkg/constants"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -40,7 +43,11 @@ func TestAPIs(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
-	logf.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.StacktraceLevel(zapcore.DPanicLevel)))
+	logf.SetLogger(zap.New(
+		zap.WriteTo(GinkgoWriter),
+		zap.StacktraceLevel(zapcore.DPanicLevel),
+		zap.Level(zapcore.Level(-5)),
+	))
 
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
@@ -64,6 +71,42 @@ var _ = BeforeSuite(func() {
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme})
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
+
+	// prepare resources
+	ns := &corev1.Namespace{}
+	ns.Name = "prop-root"
+	ns.Labels = map[string]string{constants.LabelRoot: "true"}
+	err = k8sClient.Create(context.Background(), ns)
+	Expect(err).NotTo(HaveOccurred())
+
+	ns = &corev1.Namespace{}
+	ns.Name = "prop-sub1"
+	ns.Labels = map[string]string{constants.LabelParent: "prop-root"}
+	err = k8sClient.Create(context.Background(), ns)
+	Expect(err).NotTo(HaveOccurred())
+
+	ns = &corev1.Namespace{}
+	ns.Name = "prop-sub2"
+	ns.Labels = map[string]string{constants.LabelParent: "prop-root"}
+	err = k8sClient.Create(context.Background(), ns)
+	Expect(err).NotTo(HaveOccurred())
+
+	ns = &corev1.Namespace{}
+	ns.Name = "prop-sub1-sub"
+	ns.Labels = map[string]string{constants.LabelParent: "prop-sub1"}
+	err = k8sClient.Create(context.Background(), ns)
+	Expect(err).NotTo(HaveOccurred())
+
+	ns = &corev1.Namespace{}
+	ns.Name = "prop-tmpl"
+	err = k8sClient.Create(context.Background(), ns)
+	Expect(err).NotTo(HaveOccurred())
+
+	ns = &corev1.Namespace{}
+	ns.Name = "prop-instance"
+	ns.Labels = map[string]string{constants.LabelTemplate: "prop-tmpl"}
+	err = k8sClient.Create(context.Background(), ns)
+	Expect(err).NotTo(HaveOccurred())
 
 }, 60)
 
