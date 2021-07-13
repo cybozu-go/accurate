@@ -1,0 +1,13 @@
+resources:
+- config/default
+
+# Edit config.yaml to customize Innu configurations
+configMapGenerator:
+- name: innu-config
+  namespace: innu
+  files:
+  - config.yaml
+
+images:
+- name: ghcr.io/cybozu-go/innu
+  newTag: 0.0.1

@@ -1,8 +1,6 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  labels:
-    control-plane: controller-manager
   name: system
 ---
 apiVersion: apps/v1
@@ -11,44 +9,50 @@ metadata:
   name: controller-manager
   namespace: system
   labels:
-    control-plane: controller-manager
+    app.kubernetes.io/component: controller
 spec:
   selector:
     matchLabels:
-      control-plane: controller-manager
-  replicas: 1
+      app.kubernetes.io/component: controller
+  replicas: 2
   template:
     metadata:
       labels:
-        control-plane: controller-manager
+        app.kubernetes.io/component: controller
     spec:
       securityContext:
         runAsNonRoot: true
       containers:
-      - command:
-        - /manager
-        args:
-        - --leader-elect
-        image: controller:latest
-        name: manager
+      - name: manager
+        image: ghcr.io/cybozu-go/innu:latest
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         securityContext:
           allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+        ports:
+        - name: health
+          containerPort: 8081
+          protocol: TCP
+        - name: metrics
+          containerPort: 8080
+          protocol: TCP
         livenessProbe:
           httpGet:
             path: /healthz
-            port: 8081
+            port: health
           initialDelaySeconds: 15
           periodSeconds: 20
         readinessProbe:
           httpGet:
             path: /readyz
-            port: 8081
+            port: health
           initialDelaySeconds: 5
           periodSeconds: 10
         resources:
-          limits:
-            cpu: 100m
-            memory: 30Mi
           requests:
             cpu: 100m
             memory: 20Mi
