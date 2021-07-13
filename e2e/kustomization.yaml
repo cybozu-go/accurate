@@ -1,0 +1,16 @@
+resources:
+- ../config/default
+
+patchesStrategicMerge:
+- manager_patch.yaml
+
+configMapGenerator:
+- name: innu-config
+  namespace: innu
+  files:
+  - config.yaml
+
+images:
+- name: ghcr.io/cybozu-go/innu
+  newName: innu
+  newTag: dev

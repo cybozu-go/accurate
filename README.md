@@ -6,6 +6,7 @@
 # Innu
 
 Innu is a Kubernetes controller to help namespace management for multi-tenancy.
+It is similar to [Hierarchical Namespace Controller (HNC)][HNC], but is designed for better accuracy and security.
 
 **Project Status**: Initial development
 
@@ -14,3 +15,4 @@ Innu is a Kubernetes controller to help namespace management for multi-tenancy.
 [docs](docs/) directory contains documents about designs and specifications.
 
 [releases]: https://github.com/cybozu-go/innu/releases
+[HNC]: https://github.com/kubernetes-sigs/hierarchical-namespaces

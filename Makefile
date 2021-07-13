@@ -45,7 +45,7 @@ help: ## Display this help.
 ##@ Development
 
 .PHONY: manifests
-manifests: controller-gen## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 
 .PHONY: generate
@@ -101,7 +101,6 @@ release-build: kustomize
 	$(MAKE) kubectl-innu GOOS=darwin GOARCH=arm64
 	$(MAKE) kubectl-innu GOOS=linux GOARCH=amd64
 	$(MAKE) kubectl-innu GOOS=linux GOARCH=arm64
-	$(KUSTOMIZE) build . > build/moco.yaml
 
 .PHONY: kubectl-innu
 kubectl-innu: build/kubectl-innu-$(GOOS)-$(GOARCH)$(SUFFIX)

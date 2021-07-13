@@ -1,7 +1,7 @@
 Release procedure
 =================
 
-This document describes how to release a new version of innu.
+This document describes how to release a new version of Innu.
 
 ## Versioning
 
@@ -37,16 +37,17 @@ It should look like:
     $ git neco dev "$VERSION"
     ```
 
-3. Edit `CHANGELOG.md` for the new version ([example][]).
-4. Commit the change and push it.
+3. Update version strings in `kustomization.yaml` and `version.go`.
+4. Edit `CHANGELOG.md` for the new version ([example][]).
+5. Commit the change and push it.
 
     ```console
     $ git commit -a -m "Bump version to $VERSION"
     $ git neco review
     ```
 
-5. Merge this branch.
-6. Add a git tag to the main HEAD, then push it.
+6. Merge this branch.
+7. Add a git tag to the main HEAD, then push it.
 
     ```console
     $ git checkout main

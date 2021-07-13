@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: innu-controller-manager
+  namespace: innu
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: manager
+        args:
+        - --zap-log-level=5

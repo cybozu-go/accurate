@@ -1,1 +1,6 @@
-*
+/bin
+/config
+/docs
+/e2e
+/hack
+/.git
