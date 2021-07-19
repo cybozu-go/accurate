@@ -33,7 +33,10 @@ start: $(KIND) $(KUBECTL) $(KUSTOMIZE) $(KUBESEAL) $(KUBECTL_INNU)
 	$(KUBECTL) -n innu wait --for=condition=available --timeout=180s --all deployments
 	$(KUBECTL) apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v$(SEALED_SECRET_VERSION)/controller.yaml
 	$(KUBECTL) -n kube-system wait --for=condition=available --timeout=180s --all deployments
-
+	$(KUBECTL) apply -f clusterrole_for_sealedsecrets.yaml
+	rm -f sealed.json
+	$(KUBECTL) -n root2 create secret generic mysecret --dry-run=client --from-literal=foo=bar -o json | \
+		$(KUBESEAL) | jq '. * {metadata: {annotations: {"innu.cybozu.com/propagate-generated": "create"}}}' > sealed.json
 
 .PHONY: test
 test:

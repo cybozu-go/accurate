@@ -50,30 +50,32 @@ It always take namespace names as positional arguments.
 
 ## Commands
 
+There is an alias for `namespace` sub-command that is `ns`.
+
 ### `list [ROOT]`
 
 List namespace trees hierarchically.
 If `ROOT` is given, only the tree starting from `ROOT` namespace is shown.
 
-### `describe NS`
+### `namespace describe NS`
 
 Describe the information about a namespace `NS` related to Innu.
 
-### `root mark NS`
+### `namespace set-type NS TYPE`
 
-Mark a namespace `NS` as a root namespace.
+Set the type of a namespace `NS` to `TYPE`.
 
-### `root unmark NS`
+Valid types are `root` or `template`.
 
-Unmark a root namespace `NS` and make it an independent namespace.
+To unset the type, specify `none` as the type.
 
-### `template set TEMPLATE NS`
+### `template set NS TEMPLATE`
 
 Set `TEMPLATE` namespace as the template of `NS` namespace.
 
 ### `template unset NS`
 
-Unset the template for `NS` namespace.
+Unset the template of `NS` namespace.
 
 ### `sub create NAME NS`
 
@@ -95,7 +97,7 @@ After that, Innu will create [SubNamespace][] object in the new parent namespace
 
 ### `sub graft NS PARENT`
 
-Like `sub move`, but this converts an independent namespace `NS` to a sub-namespace of `PARENT`.
+Like `sub move`, but this converts a non-sub-namespace `NS` to a sub-namespace of `PARENT`.
 
 `NS` must not be a root namespace or have a template.
 

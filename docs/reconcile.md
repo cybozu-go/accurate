@@ -10,28 +10,30 @@ In addition, it needs to watch any kind of resources specified in its config fil
 
 ## Namespaces
 
-### Namespaces that are not sub-namespaces
+### Namespaces that are labeled with `innu.cybozu.com/template`
 
-These namespaces can set a template namespace.
-Innu reconciles resources as follows only when the namespace is labeled with `innu.cybozu.com/template`.
+These namespaces reference a template namespace and propagate the labels, annotations, and watched resources from the template namespace.
 
-- Innu copies labels and annotations of the template namespace to the reconciling namespace, and
-- annotates the template namespace with `innu.cybozu.com/is-template=true`, and
-- if there are resources annotated with `innu.cybozu.com/propagate=create` in the template namespace, creates copies of them in the reconciling namespace when they are missing, and
-- if there are resources annotated with `innu.cybozu.com/propagate=update` in the template namespace, creates or updates copies of them in the reconciling namespace when they are missing or different from those in the template namespace, and
-- delete resources in the reconciling namespace that are annotated with `innu.cybozu.com/propagate=update` provided that:
+- Innu should propagate labels and/or annotations from the template namespace.
+- Innu should create copies of resources in the template namespace whose `innu.cybozu.com/propagate` annotation is `create` if they are missing.
+- Innu should create or update copies of resources in the template namespace whose `innu.cybozu.com/propagate` annotation is `update` if they are missing or different.
+- Innu should delete resources in the reconciling namespace that are annotated with `innu.cybozu.com/propagate=update` provided that:
     - the value of `innu.cybozu.com/from` annotation is not the template namespace name, or
     - there is not a resource of the same kind and the same name in the template namespace.
 
+### Namespaces w/o `innu.cybozu.com/from` and `innu.cybozu.com/template` labels
+
+If these labels are removed from the Namespace, Innu should delete propagated resources with mode == `update`.
+
 ### Template namespace
 
-Template namespaces are namespaces annotated with `innu.cybozu.com/is-template=true` (see above).
+Template namespaces are namespaces labeled with `innu.cybozu.com/type=template`.
 
 - Innu should propagate labels and/or annotations to namespaces that references the template namespace with `innu.cybozu.com/template` label.
 
 ### Root namespace
 
-Root namespaces are namespaces labeled with `innu.cybozu.com/root=true`.
+Root namespaces are namespaces labeled with `innu.cybozu.com/type=root`.
 
 - Innu should propagate labels and/or annotations to its sub-namespaces.
 
@@ -44,7 +46,9 @@ Sub-namespaces have `innu.cybozu.com/parent` label.
 - Innu should propagate labels and/or annotations of the reconciling namespace to its sub-namespaces, if any.
 - Innu should create copies of resources in the parent namespace whose `innu.cybozu.com/propagate` annotation is `create` if they are missing.
 - Innu should create or update copies of resources in the parent namespace whose `innu.cybozu.com/propagate` annotation is `update` if they are missing or different.
-- Innu should delete resources annotated with `innu.cybozu.com/propagate=update` if the origin resource is missing in the parent namespace.
+- Innu should delete resources in the reconciling namespace that are annotated with `innu.cybozu.com/propagate=update` provided that:
+    - the value of `innu.cybozu.com/from` annotation is not the parent namespace name, or
+    - there is not a resource of the same kind and the same name in the parent namespace.
 
 ## Watched namespace-scoped resources
 

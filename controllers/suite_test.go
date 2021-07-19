@@ -75,7 +75,7 @@ var _ = BeforeSuite(func() {
 	// prepare resources
 	ns := &corev1.Namespace{}
 	ns.Name = "prop-root"
-	ns.Labels = map[string]string{constants.LabelRoot: "true"}
+	ns.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 	err = k8sClient.Create(context.Background(), ns)
 	Expect(err).NotTo(HaveOccurred())
 
@@ -99,6 +99,7 @@ var _ = BeforeSuite(func() {
 
 	ns = &corev1.Namespace{}
 	ns.Name = "prop-tmpl"
+	ns.Labels = map[string]string{constants.LabelType: constants.NSTypeTemplate}
 	err = k8sClient.Create(context.Background(), ns)
 	Expect(err).NotTo(HaveOccurred())
 

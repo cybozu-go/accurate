@@ -6,7 +6,6 @@ import (
 	"os/exec"
 
 	. "github.com/onsi/gomega"
-	dto "github.com/prometheus/client_model/go"
 )
 
 func kubectl(input []byte, args ...string) ([]byte, error) {
@@ -29,26 +28,4 @@ func kubectlSafe(input []byte, args ...string) []byte {
 	out, err := kubectl(input, args...)
 	ExpectWithOffset(1, err).NotTo(HaveOccurred())
 	return out
-}
-
-func runInPod(args ...string) ([]byte, error) {
-	a := append([]string{"exec", "client", "--"}, args...)
-	return kubectl(nil, a...)
-}
-
-func findMetric(mf *dto.MetricFamily, labels map[string]string) *dto.Metric {
-OUTER:
-	for _, m := range mf.Metric {
-		having := make(map[string]string)
-		for _, p := range m.Label {
-			having[*p.Name] = *p.Value
-		}
-		for k, v := range labels {
-			if having[k] != v {
-				continue OUTER
-			}
-		}
-		return m
-	}
-	return nil
 }

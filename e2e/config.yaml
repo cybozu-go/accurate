@@ -2,6 +2,9 @@
 labelKeys:
 - team
 
+annotationKeys:
+- test
+
 # List of GVK for namespace-scoped resources that can be propagated.
 # Any namespace-scoped resource is allowed.
 watches:

@@ -2,9 +2,9 @@ package sub
 
 import (
 	innuv1 "github.com/cybozu-go/innu/api/v1"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -15,7 +15,7 @@ func makeClient(config *genericclioptions.ConfigFlags) (client.Client, error) {
 	}
 
 	scheme := runtime.NewScheme()
-	if err := corev1.AddToScheme(scheme); err != nil {
+	if err := clientgoscheme.AddToScheme(scheme); err != nil {
 		return nil, err
 	}
 	if err := innuv1.AddToScheme(scheme); err != nil {

@@ -67,7 +67,7 @@ func (v *subNamespaceValidator) Handle(ctx context.Context, req admission.Reques
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
 
-	if ns.Labels[constants.LabelRoot] == "true" || ns.Labels[constants.LabelParent] != "" {
+	if ns.Labels[constants.LabelType] == constants.NSTypeRoot || ns.Labels[constants.LabelParent] != "" {
 		return admission.Allowed("")
 	}
 

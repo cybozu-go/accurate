@@ -146,7 +146,7 @@ func (r *PropagateController) getChildren(ctx context.Context, name string) (*co
 
 	children := &corev1.NamespaceList{}
 	mf := client.MatchingFields{constants.NamespaceTemplateKey: name}
-	if ns.Labels[constants.LabelRoot] == "true" || ns.Labels[constants.LabelParent] != "" {
+	if ns.Labels[constants.LabelType] == constants.NSTypeRoot || ns.Labels[constants.LabelParent] != "" {
 		mf = client.MatchingFields{constants.NamespaceParentKey: name}
 	}
 	if err := r.List(ctx, children, mf); err != nil {

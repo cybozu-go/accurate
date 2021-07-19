@@ -2,6 +2,7 @@ package hooks
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/cybozu-go/innu/pkg/constants"
@@ -25,11 +26,14 @@ var _ admission.Handler = &namespaceValidator{}
 
 // Validate Namespace to prevent the following problems:
 //
-// - Circular references among sub-namespaces.
-// - Deleting `innu.cybozu.com/root` label from root namespaces having one or more sub-namespaces.
-// - Dangling sub-namespaces (sub-namespaces whose parent is missing).
-// - Creating a sub-namespace under a non-root and non-sub- namespace.
-// - Changing a sub-namespace that has child sub-namespaces to a non-root namespace.
+// - Circular references among namespaces.
+// - Allowing a sub-namespace to set a template.
+// - Marking a sub-namespace as a root namespace.
+// - Deleting `innu.cybozu.com/type=root` label from root namespaces having one or more sub-namespaces.
+// - Deleting `innu.cybozu.com/type=template` label from template namespaces having one or more instance namespaces.
+// - Dangling sub-namespaces (sub-namespaces whose parent namespace is missing).
+// - Dangling instance namespaces (namespaces whose template namespace is missing).
+// - Changing a sub-namespace to a non-root namespace when it has child sub-namespaces.
 func (v *namespaceValidator) Handle(ctx context.Context, req admission.Request) admission.Response {
 	switch req.Operation {
 	case admissionv1.Create:
@@ -60,44 +64,65 @@ func (v *namespaceValidator) Handle(ctx context.Context, req admission.Request) 
 	return admission.Denied("unknown operation: " + string(req.Operation))
 }
 
-func (v *namespaceValidator) checkParent(ctx context.Context, p string) admission.Response {
-	if p == "" {
-		return admission.Allowed("")
-	}
-
+func (v *namespaceValidator) checkParent(ctx context.Context, name, typ string) *admission.Response {
 	parent := &corev1.Namespace{}
-	err := v.Get(ctx, client.ObjectKey{Name: p}, parent)
+	err := v.Get(ctx, client.ObjectKey{Name: name}, parent)
 	if err != nil {
-		if apierrors.IsNotFound(err) {
-			return admission.Denied("parent namespace does not exist: " + p)
+		if !apierrors.IsNotFound(err) {
+			resp := admission.Errored(http.StatusInternalServerError, err)
+			return &resp
 		}
-		return admission.Errored(http.StatusInternalServerError, err)
+		resp := admission.Denied("namespace does not exist: " + name)
+		return &resp
 	}
 
-	if parent.Labels[constants.LabelRoot] == "true" {
-		return admission.Allowed("")
+	if parent.Labels[constants.LabelType] == typ {
+		return nil
 	}
 	if parent.Labels[constants.LabelParent] != "" {
-		return admission.Allowed("")
+		return nil
 	}
 
-	return admission.Denied("parent must be a root or sub-namespace")
+	resp := admission.Denied(fmt.Sprintf("%s is not a valid %s namespace", name, typ))
+	return &resp
 }
 
 func (v *namespaceValidator) handleCreate(ctx context.Context, ns *corev1.Namespace) admission.Response {
-	p := ns.Labels[constants.LabelParent]
-	if p != "" && ns.Name == p {
-		return admission.Denied("circular reference is not permitted")
+	if p := ns.Labels[constants.LabelParent]; p != "" {
+		if ns.Name == p {
+			return admission.Denied("circular reference is not permitted")
+		}
+		if _, ok := ns.Labels[constants.LabelTemplate]; ok {
+			return admission.Denied("a sub-namespace cannot have a template")
+		}
+		if _, ok := ns.Labels[constants.LabelType]; ok {
+			return admission.Denied("a sub-resource cannot be a root or a template namespace")
+		}
+		if resp := v.checkParent(ctx, p, constants.NSTypeRoot); resp != nil {
+			return *resp
+		}
 	}
-	if p != "" && ns.Labels[constants.LabelTemplate] != "" {
-		return admission.Denied("a sub-namespace cannot have a template")
+	if t := ns.Labels[constants.LabelTemplate]; t != "" {
+		if ns.Name == t {
+			return admission.Denied("circular reference is not permitted")
+		}
+		if resp := v.checkParent(ctx, t, constants.NSTypeTemplate); resp != nil {
+			return *resp
+		}
 	}
-	return v.checkParent(ctx, p)
+	return admission.Allowed("")
+}
+
+func (v *namespaceValidator) getParent(ns *corev1.Namespace) string {
+	if p := ns.Labels[constants.LabelParent]; p != "" {
+		return p
+	}
+	return ns.Labels[constants.LabelTemplate]
 }
 
 func (v *namespaceValidator) handleUpdate(ctx context.Context, nsNew, nsOld *corev1.Namespace) admission.Response {
 	m := map[string]bool{nsNew.Name: true}
-	p := nsNew.Labels[constants.LabelParent]
+	p := v.getParent(nsNew)
 	for pp := p; pp != ""; {
 		if m[pp] {
 			return admission.Denied("circular reference is not permitted")
@@ -105,47 +130,68 @@ func (v *namespaceValidator) handleUpdate(ctx context.Context, nsNew, nsOld *cor
 		parent := &corev1.Namespace{}
 		if err := v.Get(ctx, client.ObjectKey{Name: pp}, parent); err != nil {
 			if apierrors.IsNotFound(err) {
-				return admission.Denied("parent namespace does not exist: " + p)
+				return admission.Denied("parent namespace does not exist: " + pp)
 			}
 			return admission.Errored(http.StatusInternalServerError, err)
 		}
 		m[pp] = true
-		pp = parent.Labels[constants.LabelParent]
+		pp = v.getParent(parent)
 	}
 
-	if p != "" && nsNew.Labels[constants.LabelTemplate] != "" {
-		return admission.Denied("a sub-namespace cannot have a template")
+	oldType := nsOld.Labels[constants.LabelType]
+	newType := nsNew.Labels[constants.LabelType]
+
+	if oldType != newType {
+		if oldType == constants.NSTypeRoot {
+			children := &corev1.NamespaceList{}
+			if err := v.List(ctx, children, client.MatchingFields{constants.NamespaceParentKey: nsNew.Name}); err != nil {
+				return admission.Errored(http.StatusInternalServerError, err)
+			}
+			if len(children.Items) > 0 {
+				return admission.Denied("there are sub-namespaces under " + nsNew.Name)
+			}
+		}
+		if oldType == constants.NSTypeTemplate {
+			children := &corev1.NamespaceList{}
+			if err := v.List(ctx, children, client.MatchingFields{constants.NamespaceTemplateKey: nsNew.Name}); err != nil {
+				return admission.Errored(http.StatusInternalServerError, err)
+			}
+			if len(children.Items) > 0 {
+				return admission.Denied("there are namespaces referencing " + nsNew.Name)
+			}
+		}
 	}
 
-	// those who have sub-namespaces should be either root or a sub-namespace.
-	if p == "" && nsNew.Labels[constants.LabelRoot] != "true" {
+	if p == "" && nsOld.Labels[constants.LabelParent] != "" && newType != constants.NSTypeRoot {
 		children := &corev1.NamespaceList{}
 		if err := v.List(ctx, children, client.MatchingFields{constants.NamespaceParentKey: nsNew.Name}); err != nil {
 			return admission.Errored(http.StatusInternalServerError, err)
 		}
 		if len(children.Items) > 0 {
-			return admission.Denied("sub-namespaces exist")
+			return admission.Denied("there are sub-namespaces under " + nsNew.Name)
 		}
 	}
 
-	if p != nsOld.Labels[constants.LabelParent] {
-		return v.checkParent(ctx, p)
-	}
-
-	return admission.Allowed("")
+	return v.handleCreate(ctx, nsNew)
 }
 
 func (v *namespaceValidator) handleDelete(ctx context.Context, ns *corev1.Namespace) admission.Response {
-	if ns.Labels[constants.LabelRoot] != "true" && ns.Labels[constants.LabelParent] == "" {
+	key := constants.NamespaceParentKey
+	switch {
+	case ns.Labels[constants.LabelType] == constants.NSTypeRoot:
+	case ns.Labels[constants.LabelType] == constants.NSTypeTemplate:
+		key = constants.NamespaceTemplateKey
+	case ns.Labels[constants.LabelParent] != "":
+	default:
 		return admission.Allowed("")
 	}
 
 	children := &corev1.NamespaceList{}
-	if err := v.List(ctx, children, client.MatchingFields{constants.NamespaceParentKey: ns.Name}); err != nil {
+	if err := v.List(ctx, children, client.MatchingFields{key: ns.Name}); err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
 	if len(children.Items) > 0 {
-		return admission.Denied("sub-namespaces exist")
+		return admission.Denied("child namespaces exist")
 	}
 
 	return admission.Allowed("")

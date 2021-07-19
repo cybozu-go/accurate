@@ -62,7 +62,7 @@ func (o *subCutOpts) Run(ctx context.Context) error {
 	}
 
 	delete(ns.Labels, constants.LabelParent)
-	ns.Labels[constants.LabelRoot] = "true"
+	ns.Labels[constants.LabelType] = constants.NSTypeRoot
 	if err := o.client.Update(ctx, ns); err != nil {
 		return fmt.Errorf("failed to update namespace %s: %w", o.name, err)
 	}

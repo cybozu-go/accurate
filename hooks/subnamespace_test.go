@@ -31,7 +31,7 @@ var _ = Describe("SubNamespace webhook", func() {
 	It("should allow creation of SubNamespace in a root namespace", func() {
 		ns := &corev1.Namespace{}
 		ns.Name = "ns2"
-		ns.Labels = map[string]string{constants.LabelRoot: "true"}
+		ns.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 		err := k8sClient.Create(ctx, ns)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -57,7 +57,7 @@ var _ = Describe("SubNamespace webhook", func() {
 	It("should allow creation of SubNamespace in a subnamespace", func() {
 		nsP := &corev1.Namespace{}
 		nsP.Name = "ns-parent"
-		nsP.Labels = map[string]string{constants.LabelRoot: "true"}
+		nsP.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 		err := k8sClient.Create(ctx, nsP)
 		Expect(err).NotTo(HaveOccurred())
 

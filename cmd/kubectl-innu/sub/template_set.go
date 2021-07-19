@@ -14,15 +14,15 @@ import (
 type templateSetOpts struct {
 	streams  genericclioptions.IOStreams
 	client   client.Client
-	template string
 	name     string
+	template string
 }
 
 func newTemplateSetCmd(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
 	opts := &templateSetOpts{}
 
 	cmd := &cobra.Command{
-		Use:   "set TEMPLATE NS",
+		Use:   "set NS TEMPLATE",
 		Short: "Set TEMPLATE as the template of NS namespace",
 		Long: `Set a template namespace for a namespace NS.
 TEMPLATE and NS are namespace names.
@@ -46,8 +46,8 @@ func (o *templateSetOpts) Fill(streams genericclioptions.IOStreams, config *gene
 		return err
 	}
 	o.client = cl
-	o.template = args[0]
-	o.name = args[1]
+	o.name = args[0]
+	o.template = args[1]
 	return nil
 }
 

@@ -26,8 +26,7 @@ func NewCmd(streams genericclioptions.IOStreams) *cobra.Command {
 	config.AddFlags(cmd.Flags())
 
 	cmd.AddCommand(newListCmd(streams, config))
-	cmd.AddCommand(newDescribeCmd(streams, config))
-	cmd.AddCommand(newRootCmd(streams, config))
+	cmd.AddCommand(newNamespaceCmd(streams, config))
 	cmd.AddCommand(newTemplateCmd(streams, config))
 	cmd.AddCommand(newSubCmd(streams, config))
 

@@ -61,7 +61,7 @@ func (o *listOptions) Run(ctx context.Context) error {
 	}
 
 	roots := &corev1.NamespaceList{}
-	if err := o.client.List(ctx, roots, client.MatchingLabels{constants.LabelRoot: "true"}); err != nil {
+	if err := o.client.List(ctx, roots, client.MatchingLabels{constants.LabelType: constants.NSTypeRoot}); err != nil {
 		return fmt.Errorf("failed to list the root namespaces: %w", err)
 	}
 

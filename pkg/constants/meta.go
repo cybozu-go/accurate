@@ -8,8 +8,8 @@ const Finalizer = MetaPrefix + "finalizer"
 
 // Labels
 const (
+	LabelType      = MetaPrefix + "type"
 	LabelTemplate  = MetaPrefix + "template"
-	LabelRoot      = MetaPrefix + "root"
 	LabelParent    = MetaPrefix + "parent"
 	LabelCreatedBy = "app.kubernetes.io/created-by"
 )
@@ -20,12 +20,13 @@ const (
 	AnnPropagate          = MetaPrefix + "propagate"
 	AnnPropagateGenerated = MetaPrefix + "propagate-generated"
 	AnnGenerated          = MetaPrefix + "generated"
-	AnnIsTemplate         = MetaPrefix + "is-template"
 )
 
 // Label or annotation values
 const (
 	CreatedBy       = "innu"
+	NSTypeTemplate  = "template"
+	NSTypeRoot      = "root"
 	PropagateCreate = "create"
 	PropagateUpdate = "update"
 	PropagateAny    = "any" // defined as an in-memory index value

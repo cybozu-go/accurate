@@ -39,33 +39,38 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, nil
 	}
 
-	if parent, ok := ns.Labels[constants.LabelParent]; ok {
-		if err := r.reconcileSubNamespace(ctx, ns, parent); err != nil {
-			logger.Error(err, "failed to reconcile subnamespace")
-			return ctrl.Result{}, fmt.Errorf("failed to reconcile subnamespace: %w", err)
-		}
-	} else {
-		if err := r.reconcileNonSubNamespace(ctx, ns); err != nil {
-			logger.Error(err, "failed to reconcile non-subnamespace")
-			return ctrl.Result{}, fmt.Errorf("failed to reconcile non-subnamespace: %w", err)
-		}
-	}
-
-	if ns.Annotations[constants.AnnIsTemplate] == "true" {
-		if err := r.reconcileTemplateNamespace(ctx, ns); err != nil {
-			logger.Error(err, "failed to reconcile template namespace")
-			return ctrl.Result{}, fmt.Errorf("failed to reconcile template namespace: %w", err)
-		}
-	}
-
-	if ns.Labels[constants.LabelRoot] == "true" {
-		if err := r.reconcileRootNamespace(ctx, ns); err != nil {
-			logger.Error(err, "failed to reconcile root namespace")
-			return ctrl.Result{}, fmt.Errorf("failed to reconcile root namespace: %w", err)
-		}
+	if err := r.reconcile(ctx, ns); err != nil {
+		logger.Error(err, "failed to reconcile a namespace")
+		return ctrl.Result{}, fmt.Errorf("failed to reconcile a namespace: %w", err)
 	}
 
 	return ctrl.Result{}, nil
+}
+
+func (r *NamespaceReconciler) reconcile(ctx context.Context, ns *corev1.Namespace) error {
+	if parent, ok := ns.Labels[constants.LabelParent]; ok {
+		return r.reconcileSubNamespace(ctx, ns, parent)
+	}
+
+	if tmpl, ok := ns.Labels[constants.LabelTemplate]; ok {
+		if err := r.reconcileInstanceNamespace(ctx, ns, tmpl); err != nil {
+			return err
+		}
+		// a template instance may also be a root or a template namespace, so don't return here.
+	} else {
+		if err := r.deletePropagatedResources(ctx, ns); err != nil {
+			return err
+		}
+	}
+
+	switch ns.Labels[constants.LabelType] {
+	case constants.NSTypeTemplate:
+		return r.reconcileTemplateNamespace(ctx, ns)
+	case constants.NSTypeRoot:
+		return r.reconcileRootNamespace(ctx, ns)
+	}
+
+	return nil
 }
 
 func (r *NamespaceReconciler) propagateMeta(ctx context.Context, ns, parent *corev1.Namespace) error {
@@ -202,6 +207,37 @@ func (r *NamespaceReconciler) propagateUpdate(ctx context.Context, res *unstruct
 	return nil
 }
 
+func (r *NamespaceReconciler) deleteResource(ctx context.Context, res *unstructured.Unstructured, ns string) error {
+	logger := log.FromContext(ctx)
+
+	gvk := res.GroupVersionKind()
+	gvkStr := gvk.String()
+	gvk.Kind = gvk.Kind + "List"
+	l := &unstructured.UnstructuredList{}
+	l.SetGroupVersionKind(gvk)
+
+	if err := r.List(ctx, l, client.MatchingFields{constants.PropagateKey: constants.PropagateUpdate}, client.InNamespace(ns)); err != nil {
+		return fmt.Errorf("failed to list %s in %s: %w", gvkStr, ns, err)
+	}
+	for i := range l.Items {
+		obj := &l.Items[i]
+		if err := r.Delete(ctx, obj); err != nil {
+			return fmt.Errorf("failed to delete %s/%s of %s: %w", ns, obj.GetName(), gvkStr, err)
+		}
+		logger.Info("deleted a resource", "namespace", ns, "name", obj.GetName(), "gvk", gvkStr)
+	}
+	return nil
+}
+
+func (r *NamespaceReconciler) deletePropagatedResources(ctx context.Context, ns *corev1.Namespace) error {
+	for _, res := range r.Watched {
+		if err := r.deleteResource(ctx, res, ns.Name); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (r *NamespaceReconciler) reconcileSubNamespace(ctx context.Context, ns *corev1.Namespace, parent string) error {
 	parentNS := &corev1.Namespace{}
 	if err := r.Get(ctx, client.ObjectKey{Name: parent}, parentNS); err != nil {
@@ -231,25 +267,27 @@ func (r *NamespaceReconciler) reconcileSubNamespace(ctx context.Context, ns *cor
 	return nil
 }
 
-func (r *NamespaceReconciler) reconcileNonSubNamespace(ctx context.Context, ns *corev1.Namespace) error {
-	tmpl := ns.Labels[constants.LabelTemplate]
-	if tmpl == "" {
-		return nil
+func (r *NamespaceReconciler) reconcileRootNamespace(ctx context.Context, ns *corev1.Namespace) error {
+	subs := &corev1.NamespaceList{}
+	if err := r.List(ctx, subs, client.MatchingFields{constants.NamespaceParentKey: ns.Name}); err != nil {
+		return fmt.Errorf("failed to list sub namespaces: %w", err)
 	}
 
+	for i := range subs.Items {
+		sub := &subs.Items[i]
+		if err := r.propagateMeta(ctx, sub, ns); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *NamespaceReconciler) reconcileInstanceNamespace(ctx context.Context, ns *corev1.Namespace, tmpl string) error {
 	tmplNS := &corev1.Namespace{}
 	if err := r.Get(ctx, client.ObjectKey{Name: tmpl}, tmplNS); err != nil {
 		return fmt.Errorf("failed to get template namespace %s: %w", tmpl, err)
 	}
-	if tmplNS.Annotations[constants.AnnIsTemplate] != "true" {
-		if tmplNS.Annotations == nil {
-			tmplNS.Annotations = make(map[string]string)
-		}
-		tmplNS.Annotations[constants.AnnIsTemplate] = "true"
-		if err := r.Update(ctx, tmplNS); err != nil {
-			return fmt.Errorf("failed to annotate template namespace %s: %w", tmpl, err)
-		}
-	}
+
 	if err := r.propagateMeta(ctx, ns, tmplNS); err != nil {
 		return err
 	}
@@ -272,21 +310,6 @@ func (r *NamespaceReconciler) reconcileTemplateNamespace(ctx context.Context, ns
 	for i := range instances.Items {
 		instance := &instances.Items[i]
 		if err := r.propagateMeta(ctx, instance, ns); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (r *NamespaceReconciler) reconcileRootNamespace(ctx context.Context, ns *corev1.Namespace) error {
-	subs := &corev1.NamespaceList{}
-	if err := r.List(ctx, subs, client.MatchingFields{constants.NamespaceParentKey: ns.Name}); err != nil {
-		return fmt.Errorf("failed to list sub namespaces: %w", err)
-	}
-
-	for i := range subs.Items {
-		sub := &subs.Items[i]
-		if err := r.propagateMeta(ctx, sub, ns); err != nil {
 			return err
 		}
 	}

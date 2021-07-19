@@ -71,7 +71,6 @@ envtest: setup-envtest
 	source <($(SETUP_ENVTEST) use -p env); \
 		TEST_CONFIG=1 go test -v -count 1 -race ./pkg/config -ginkgo.progress -ginkgo.v -ginkgo.failFast
 	source <($(SETUP_ENVTEST) use -p env); \
-		export DEBUG_CONTROLLER=1; \
 		go test -v -count 1 -race ./controllers -ginkgo.progress -ginkgo.v -ginkgo.failFast
 	source <($(SETUP_ENVTEST) use -p env); \
 		go test -v -count 1 -race ./hooks -ginkgo.progress -ginkgo.v

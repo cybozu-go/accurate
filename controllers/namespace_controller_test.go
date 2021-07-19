@@ -85,9 +85,10 @@ var _ = Describe("Namespace controller", func() {
 		tmpl := &corev1.Namespace{}
 		tmpl.Name = "tmpl"
 		tmpl.Labels = map[string]string{
-			"foo.bar/baz": "baz",
-			"team":        "neco",
-			"memo":        "randum",
+			constants.LabelType: constants.NSTypeTemplate,
+			"foo.bar/baz":       "baz",
+			"team":              "neco",
+			"memo":              "randum",
 		}
 		tmpl.Annotations = map[string]string{
 			"foo.bar/zot": "zot",
@@ -157,14 +158,6 @@ var _ = Describe("Namespace controller", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		Eventually(func() string {
-			tmpl = &corev1.Namespace{}
-			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "tmpl"}, tmpl); err != nil {
-				return ""
-			}
-			return tmpl.Annotations["innu.cybozu.com/is-template"]
-		}).Should(Equal("true"))
-
-		Eventually(func() string {
 			ns1 = &corev1.Namespace{}
 			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "ns1"}, ns1); err != nil {
 				return ""
@@ -223,8 +216,19 @@ var _ = Describe("Namespace controller", func() {
 
 		tmpl2 := &corev1.Namespace{}
 		tmpl2.Name = "tmpl2"
-		tmpl2.Labels = map[string]string{"team": "maneki"}
+		tmpl2.Labels = map[string]string{
+			constants.LabelType: constants.NSTypeTemplate,
+			"team":              "maneki",
+		}
 		err = k8sClient.Create(ctx, tmpl2)
+		Expect(err).NotTo(HaveOccurred())
+
+		sec2 := &corev1.Secret{}
+		sec2.Namespace = "tmpl2"
+		sec2.Name = "sec2"
+		sec2.Annotations = map[string]string{constants.AnnPropagate: constants.PropagateUpdate}
+		sec2.Data = map[string][]byte{"foo": []byte("barbar")}
+		err = k8sClient.Create(ctx, sec2)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("changing the template namespace to tmpl2")
@@ -238,6 +242,11 @@ var _ = Describe("Namespace controller", func() {
 			return apierrors.IsNotFound(err)
 		}).Should(BeTrue())
 
+		Eventually(func() error {
+			secret := &corev1.Secret{}
+			return k8sClient.Get(ctx, client.ObjectKey{Namespace: "ns1", Name: "sec2"}, secret)
+		}).Should(Succeed())
+
 		Eventually(func() string {
 			ns1 = &corev1.Namespace{}
 			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "ns1"}, ns1); err != nil {
@@ -245,13 +254,88 @@ var _ = Describe("Namespace controller", func() {
 			}
 			return ns1.Labels["team"]
 		}).Should(Equal("maneki"))
+
+		By("unsetting the template")
+		ns1 = &corev1.Namespace{}
+		err = k8sClient.Get(ctx, client.ObjectKey{Name: "ns1"}, ns1)
+		Expect(err).NotTo(HaveOccurred())
+
+		delete(ns1.Labels, constants.LabelTemplate)
+		err = k8sClient.Update(ctx, ns1)
+		Expect(err).NotTo(HaveOccurred())
+
+		Eventually(func() bool {
+			secret := &corev1.Secret{}
+			err := k8sClient.Get(ctx, client.ObjectKey{Namespace: "ns1", Name: "sec2"}, secret)
+			return apierrors.IsNotFound(err)
+		}).Should(BeTrue())
+	})
+
+	It("should handle propagation between template namespaces", func() {
+		tmpl1 := &corev1.Namespace{}
+		tmpl1.Name = "tree-tmpl-1"
+		tmpl1.Labels = map[string]string{
+			constants.LabelType: constants.NSTypeTemplate,
+			"team":              "neco",
+		}
+		err := k8sClient.Create(ctx, tmpl1)
+		Expect(err).NotTo(HaveOccurred())
+
+		tmpl2 := &corev1.Namespace{}
+		tmpl2.Name = "tree-tmpl-2"
+		tmpl2.Labels = map[string]string{
+			constants.LabelType:     constants.NSTypeTemplate,
+			constants.LabelTemplate: "tree-tmpl-1",
+		}
+		tmpl2.Annotations = map[string]string{"memo": "mome"}
+		err = k8sClient.Create(ctx, tmpl2)
+		Expect(err).NotTo(HaveOccurred())
+
+		instance := &corev1.Namespace{}
+		instance.Name = "tree-instance"
+		instance.Labels = map[string]string{
+			constants.LabelTemplate: "tree-tmpl-2",
+		}
+		err = k8sClient.Create(ctx, instance)
+		Expect(err).NotTo(HaveOccurred())
+
+		Eventually(func() string {
+			instance = &corev1.Namespace{}
+			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "tree-instance"}, instance); err != nil {
+				return ""
+			}
+			return instance.Labels["team"] + instance.Annotations["memo"]
+		}).Should(Equal("necomome"))
+
+		tmpl2 = &corev1.Namespace{}
+		err = k8sClient.Get(ctx, client.ObjectKey{Name: "tree-tmpl-2"}, tmpl2)
+		Expect(err).NotTo(HaveOccurred())
+		tmpl2.Labels["team"] = "hoge"
+		tmpl2.Annotations["memo"] = "test"
+		err = k8sClient.Update(ctx, tmpl2)
+		Expect(err).NotTo(HaveOccurred())
+
+		Consistently(func() string {
+			instance = &corev1.Namespace{}
+			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "tree-instance"}, instance); err != nil {
+				return ""
+			}
+			return instance.Labels["team"]
+		}).Should(Equal("neco"))
+
+		Expect(instance.Annotations["memo"]).Should(Equal("test"))
+
+		tmpl2 = &corev1.Namespace{}
+		err = k8sClient.Get(ctx, client.ObjectKey{Name: "tree-tmpl-2"}, tmpl2)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(tmpl2.Labels["team"]).Should(Equal("neco"))
 	})
 
 	It("should implement a sub namespace correctly", func() {
 		root := &corev1.Namespace{}
 		root.Name = "root"
 		root.Labels = map[string]string{
-			constants.LabelRoot: "true",
+			constants.LabelType: constants.NSTypeRoot,
 			"team":              "neco",
 		}
 		root.Annotations = map[string]string{
@@ -297,7 +381,7 @@ var _ = Describe("Namespace controller", func() {
 			}
 			return sub1.Labels["team"]
 		}).Should(Equal("neco"))
-		Expect(sub1.Labels).NotTo(HaveKey(constants.LabelRoot))
+		Expect(sub1.Labels).NotTo(HaveKey(constants.LabelType))
 		Expect(sub1.Annotations).NotTo(HaveKey("foo"))
 
 		Eventually(func() error {
@@ -356,7 +440,7 @@ var _ = Describe("Namespace controller", func() {
 		root2 := &corev1.Namespace{}
 		root2.Name = "root2"
 		root2.Labels = map[string]string{
-			constants.LabelRoot: "true",
+			constants.LabelType: constants.NSTypeRoot,
 			"foo.bar/baz":       "baz",
 		}
 		err = k8sClient.Create(ctx, root2)
