@@ -1,5 +1,5 @@
 KIND_VERSION = 0.11.1
-KUBERNETES_VERSION = 1.20.7
+KUBERNETES_VERSION = 1.21.2
 CERT_MANAGER_VERSION = 1.4.0
 SEALED_SECRET_VERSION = 0.16.0
 
@@ -41,11 +41,6 @@ start: $(KIND) $(KUBECTL) $(KUSTOMIZE) $(KUBESEAL) $(KUBECTL_INNU)
 .PHONY: test
 test:
 	env PATH=$$(pwd)/../bin:$$PATH RUN_E2E=1 \
-		go test -v -race . -ginkgo.progress -ginkgo.v -ginkgo.failFast
-
-.PHONY: test-upgrade
-test-upgrade:
-	env PATH=$$(pwd)/../bin:$$PATH RUN_E2E=1 UPGRADE=1 \
 		go test -v -race . -ginkgo.progress -ginkgo.v -ginkgo.failFast
 
 .PHONY: logs
