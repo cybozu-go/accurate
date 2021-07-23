@@ -1,0 +1,10 @@
+[book]
+language = "en"
+multilingual = false
+src = "."
+title = "Accurate Documentation"
+
+[output.html]
+git-repository-url = "https://github.com/cybozu-go/accurate"
+edit-url-template = "https://github.com/cybozu-go/accurate/edit/main/docs/{path}"
+site-url = "/accurate/"

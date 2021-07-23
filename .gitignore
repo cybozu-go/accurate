@@ -18,3 +18,6 @@
 # Binaries
 /bin
 /build
+
+# Generated files
+/docs/book

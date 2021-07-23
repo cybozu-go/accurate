@@ -5,7 +5,7 @@
 
 # Accurate
 
-Accurate is a Kubernetes controller for multi-tenancy.
+Accurate is a Kubernetes controller for soft multi-tenancy environments.
 
 Accurate resembles [Hierarchical Namespace Controller (HNC)][HNC].
 It propagates resources between namespaces and allows tenant users to create/delete sub-namespaces.
@@ -87,7 +87,7 @@ Run and try Accurate on a [kind (Kubernetes-In-Docker)][kind] cluster as follows
 
 ## Documentation
 
-Read the documentation at https://cybozu-go.github.io/accurate .
+Read the documentation at https://cybozu-go.github.io/accurate/ .
 
 [releases]: https://github.com/cybozu-go/accurate/releases
 [HNC]: https://github.com/kubernetes-sigs/hierarchical-namespaces
