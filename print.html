@@ -1,0 +1,743 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Accurate Documentation</title>
+                <meta name="robots" content="noindex" />
+                
+
+        <!-- Custom HTML head -->
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+                <link rel="icon" href="favicon.svg">
+                        <link rel="shortcut icon" href="favicon.png">
+                <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+                <link rel="stylesheet" href="css/print.css" media="print">
+        
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+                <link rel="stylesheet" href="fonts/fonts.css">
+        
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+            </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">Accurate</a></li><li class="chapter-item expanded affix "><li class="part-title">User manual</li><li class="chapter-item expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">2.</strong> Concepts</a></li><li class="chapter-item expanded "><a href="getting_started.html"><strong aria-hidden="true">3.</strong> Getting started</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="config.html"><strong aria-hidden="true">3.1.</strong> Configurations</a></li><li class="chapter-item expanded "><a href="setup.html"><strong aria-hidden="true">3.2.</strong> Deploying Accurate</a></li><li class="chapter-item expanded "><a href="install-plugin.html"><strong aria-hidden="true">3.3.</strong> Installing kubectl plugin</a></li></ol></li><li class="chapter-item expanded "><a href="usage.html"><strong aria-hidden="true">4.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="templates.html"><strong aria-hidden="true">4.1.</strong> Setting up templates</a></li><li class="chapter-item expanded "><a href="subnamespaces.html"><strong aria-hidden="true">4.2.</strong> Sub-namespace operations</a></li><li class="chapter-item expanded "><a href="propagation.html"><strong aria-hidden="true">4.3.</strong> Propagating resources</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">References</li><li class="chapter-item expanded "><a href="crd_subnamespace.html"><strong aria-hidden="true">5.</strong> SubNamespace custom resource</a></li><li class="chapter-item expanded "><a href="commands.html"><strong aria-hidden="true">6.</strong> Commands</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="kubectl-accurate.html"><strong aria-hidden="true">6.1.</strong> kubectl-accurate</a></li><li class="chapter-item expanded "><a href="accurate-controller.html"><strong aria-hidden="true">6.2.</strong> accurate-controller</a></li></ol></li><li class="chapter-item expanded "><a href="labels.html"><strong aria-hidden="true">7.</strong> Labels</a></li><li class="chapter-item expanded "><a href="annotations.html"><strong aria-hidden="true">8.</strong> Annotations</a></li><li class="chapter-item expanded affix "><li class="part-title">Developer documents</li><li class="chapter-item expanded "><a href="design.html"><strong aria-hidden="true">9.</strong> Design notes</a></li><li class="chapter-item expanded "><a href="reconcile.html"><strong aria-hidden="true">10.</strong> Reconciliation rules</a></li><li class="chapter-item expanded "><a href="release.html"><strong aria-hidden="true">11.</strong> Release procedure</a></li></ol>            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                                                <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                                            </div>
+
+                    <h1 class="menu-title">Accurate Documentation</h1>
+
+                    <div class="right-buttons">
+                                                <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                                                                        <a href="https://github.com/cybozu-go/accurate" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                                                
+                    </div>
+                </div>
+
+                                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="accurate-documentation"><a class="header" href="#accurate-documentation">Accurate documentation</a></h1>
+<p>Accurate is a Kubernetes controller for soft multi-tenancy environments.
+It is currently developed and maintained by <a href="https://cybozu-global.com/">Cybozu</a>.</p>
+<p>The repository is at https://github.com/cybozu-go/accurate .</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="overview"><a class="header" href="#overview">Overview</a></h1>
+<p>Accurate is a Kubernetes controller to help operations in large soft multi-tenancy environments.</p>
+<h2 id="soft-multi-tenancy-in-kubernetes"><a class="header" href="#soft-multi-tenancy-in-kubernetes">Soft multi-tenancy in Kubernetes</a></h2>
+<p>Kubernetes does not provide multi-tenancy functions on its own.
+It merely provides <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/">Namespaces</a> along with <a href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/">Role-Based Access Control (RBAC)</a> to isolate resources such as Pods.</p>
+<p><em>Soft multi-tenancy</em> is a kind of technique to implement Namespace-based multi-tenancy on Kubernetes.
+On the other hand, <em>hard multi-tenancy</em> provides a virtual <code>kube-apiserver</code> for each tenant to isolate privileges completely.</p>
+<p>In a soft multi-tenancy environment, a cluster admin grants privileges in a Namespace to a group of tenant users by creating RoleBinding object like this:</p>
+<pre><code class="language-yaml">apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: tenant
+  name: admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin
+subjects:
+- kind: Group
+  name: group-for-tenant
+  apiGroup: rbac.authorization.k8s.io
+</code></pre>
+<p><code>admin</code> ClusterRole is <a href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles">a built-in role</a> to give admin privileges on any kind of namespace-scope resources.
+With this RoleBinding, users in <code>group-for-tenant</code> can freely create/edit/delete namespace-scope resources in <code>tenant</code> Namespace.</p>
+<p>In many cases, a tenant needs to have multiple Namespaces to run multiple independent applications.
+However, tenant users are not allowed to create or delete Namespaces because Namespace is a cluster-scope resource.
+Otherwise, they would be able to delete other tenants' Namespaces!</p>
+<h2 id="what-is-accurate"><a class="header" href="#what-is-accurate">What is Accurate?</a></h2>
+<p>Accurate introduces a namespace-scope custom resource called <strong>SubNamespace</strong>.
+With SubNamespace, tenant users can create a Namespace by creating a SubNamespace, and delete the created Namespace by deleting the SubNamespace.</p>
+<p>The created Namespace is considered a child of the Namespace where the SubNamespace is created.
+The child Namespace may inherit labels and annotations from its parent Namespace.</p>
+<p>Accurate also propagates resources such as Role, RoleBinding, or Secret from a parent Namespace to its children Namespaces.
+Without propagating Role/RoleBinding, the tenant user would be able to do nothing in newly created Namespaces.</p>
+<h2 id="features"><a class="header" href="#features">Features</a></h2>
+<ul>
+<li>
+<p>Resource propagation between namespaces</p>
+<p>Accurate can propagate any namespace-scope resource including custom resources between Namespaces.
+Moreover, Accurate can detect generated resources owned by another resource and propagate them.</p>
+</li>
+<li>
+<p>Inheriting labels and annotations from parent namespaces</p>
+<p>Namespace labels often play important roles.
+For example, <a href="https://github.com/kubernetes/website/blob/dev-1.22/content/en/docs/concepts/security/pod-security-admission.md#pod-security-admission-labels-for-namespaces">Pod Security Admission</a>, a new feature planned for Kubernetes 1.22, use Namespace labels to control security policies.</p>
+</li>
+<li>
+<p>SubNamespace custom resource for tenant users</p>
+<p>This is the feature to allow tenant users to create and delete Namespaces by themselves.
+SubNamespaces can be created in either a root Namespace or a Namespace created by SubNamespace.
+A root Namespace is a Namespace labeled with <code>accurate.cybozu.com/type=root</code>.</p>
+</li>
+<li>
+<p>Template namespaces</p>
+<p>A template Namespace is a Namespace labeled with <code>accurate.cybozu.com/type=template</code>.
+Labels, annotations, and resources can be propagated from a template Namespace to other Namespaces referencing the template with <code>accurate.cybozu.com/template=&lt;name&gt;</code> label.</p>
+<p>This feature is implemented to allow resource propagation between normal Namespaces.</p>
+</li>
+<li>
+<p><code>kubectl</code> plugin</p>
+<p><code>kubectl-accurate</code> is a <code>kubectl</code> plugin to make the operations for Accurate easy.</p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="concepts"><a class="header" href="#concepts">Concepts</a></h1>
+<h2 id="namespace-types"><a class="header" href="#namespace-types">Namespace types</a></h2>
+<p>Accurate defines the following types of Namespaces:</p>
+<ul>
+<li>Template: Namespace labeled with <code>accurate.cybozu.com/type=template</code></li>
+<li>Root: Namespace labeled with <code>accurate.cybozu.com/type=root</code></li>
+<li>Sub-namespace: Namespace labeled with <code>accurate.cybozu.com/parent=&lt;name&gt;</code></li>
+</ul>
+<p>Any Namespace other than sub-namespaces can reference a template Namespace with <code>accurate.cybozu.com/template=&lt;name&gt;</code> label.</p>
+<p>Sub-namespace can reference a root or another sub-namespace as its parent.</p>
+<p>Accurate propagates the Namespace labels, annotations, and namespace-scope resources from a referenced Namespace to referencing Namespaces.</p>
+<p>Circular references are prohibited by an admission webhook.</p>
+<h2 id="resource-propagation"><a class="header" href="#resource-propagation">Resource propagation</a></h2>
+<p>Accurate propagates any namespace-scope resource that are annotated with <code>accurate.cybozu.com/propagate=&lt;mode&gt;</code>.</p>
+<p>Mode is one of the following:</p>
+<ul>
+<li><code>create</code>: the resource will be created in referencing Namespaces if missing.</li>
+<li><code>update</code>: the resource will be created in referencing Namespaces if missing, or will be updated if not identical, or will be deleted when the resource in the referenced Namespace is deleted.</li>
+</ul>
+<h2 id="propagating-generated-resources"><a class="header" href="#propagating-generated-resources">Propagating generated resources</a></h2>
+<p>If a resource annotated with <code>accurate.cybozu.com/propagate-generated=&lt;mode&gt;</code> creates a resource and set an owner reference in the created resource, Accurate automatically adds <code>accurate.cybozu.com/propagate=&lt;mode&gt;</code> to the created resource.</p>
+<p>This can be used, for example, to propagate Secret created from <a href="https://github.com/bitnami-labs/sealed-secrets">SealedSecret</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started"><a class="header" href="#getting-started">Getting started</a></h1>
+<p>Follow these steps to install Accurate on your cluster and start using it.</p>
+<ol>
+<li><a href="config.html">Adjust configurations</a> for your environment</li>
+<li><a href="setup.html">Install cert-manager and apply Accurate manifests</a></li>
+<li><a href="install-plugin.html">Install <code>kubectl-accurate</code> to local machines</a></li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="configurations"><a class="header" href="#configurations">Configurations</a></h1>
+<h2 id="configuration-file"><a class="header" href="#configuration-file">Configuration file</a></h2>
+<p><a href="accurate-controller.html"><code>accurate-controller</code></a> reads its configurations from a configuration file.
+The repository includes an example as follows:</p>
+<pre><code class="language-yaml"># Labels to be propagated to sub-namespaces.
+labelKeys:
+- team
+
+# Annotations to be propagated to sub-namespaces.
+annotationKeys:
+# An example to propagate an annotation for MetalLB
+# https://metallb.universe.tf/usage/#requesting-specific-ips
+- metallb.universe.tf/address-pool
+
+# List of GVK for namespace-scoped resources that can be propagated.
+# Any namespace-scoped resource is allowed.
+watches:
+- group: rbac.authorization.k8s.io
+  version: v1
+  kind: Role
+- group: rbac.authorization.k8s.io
+  version: v1
+  kind: RoleBinding
+- version: v1
+  kind: Secret
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="deploying-accurate"><a class="header" href="#deploying-accurate">Deploying Accurate</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="installing-kubectl-plugin"><a class="header" href="#installing-kubectl-plugin">Installing kubectl plugin</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="usage"><a class="header" href="#usage">Usage</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="setting-up-templates"><a class="header" href="#setting-up-templates">Setting up templates</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="sub-namespace-operations"><a class="header" href="#sub-namespace-operations">Sub-namespace operations</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="propagating-resources"><a class="header" href="#propagating-resources">Propagating resources</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="custom-resources"><a class="header" href="#custom-resources">Custom Resources</a></h3>
+<ul>
+<li><a href="crd_subnamespace.html#subnamespace">SubNamespace</a></li>
+</ul>
+<h3 id="sub-resources"><a class="header" href="#sub-resources">Sub Resources</a></h3>
+<ul>
+<li><a href="crd_subnamespace.html#subnamespacelist">SubNamespaceList</a></li>
+</ul>
+<h4 id="subnamespace"><a class="header" href="#subnamespace">SubNamespace</a></h4>
+<p>SubNamespace is the Schema for the subnamespaces API</p>
+<table><thead><tr><th>Field</th><th>Description</th><th>Scheme</th><th>Required</th></tr></thead><tbody>
+<tr><td>metadata</td><td></td><td>metav1.ObjectMeta</td><td>false</td></tr>
+<tr><td>status</td><td>Status is the status of SubNamespace.</td><td>SubNamespaceStatus</td><td>false</td></tr>
+</tbody></table>
+<p><a href="crd_subnamespace.html#custom-resources">Back to Custom Resources</a></p>
+<h4 id="subnamespacelist"><a class="header" href="#subnamespacelist">SubNamespaceList</a></h4>
+<p>SubNamespaceList contains a list of SubNamespace</p>
+<table><thead><tr><th>Field</th><th>Description</th><th>Scheme</th><th>Required</th></tr></thead><tbody>
+<tr><td>metadata</td><td></td><td>metav1.ListMeta</td><td>false</td></tr>
+<tr><td>items</td><td></td><td>[]<a href="crd_subnamespace.html#subnamespace">SubNamespace</a></td><td>true</td></tr>
+</tbody></table>
+<p><a href="crd_subnamespace.html#custom-resources">Back to Custom Resources</a></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="commands"><a class="header" href="#commands">Commands</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="kubectl-accurate"><a class="header" href="#kubectl-accurate">kubectl-accurate</a></h1>
+<p><code>kubectl-accurate</code> is a <code>kubectl</code> plugin for Accurate.</p>
+<h2 id="features-1"><a class="header" href="#features-1">Features</a></h2>
+<ul>
+<li>Hierarchical view of namespace trees</li>
+<li>Show the information about a namespace.
+<ul>
+<li>List of propagating/propagated resources in the namespace.</li>
+<li>Root or not.</li>
+<li>Template or not.</li>
+<li>The parent namespace, if it is a sub-namespace.</li>
+<li>The template namespace, if set.</li>
+</ul>
+</li>
+<li>Operations for root namespaces
+<ul>
+<li>Make an independent namespace to a root namespace.</li>
+<li>Make a root namespace back to an independent namespace, if it has no child sub-namespaces.</li>
+</ul>
+</li>
+<li>Operations for setting a template namespace</li>
+<li>Operations for sub-namespaces
+<ul>
+<li>Create a sub-namespace under a root namespace or another sub-namespace.</li>
+<li>Deleting a sub-namespace.</li>
+<li>Move a sub-namespace under a different root or sub-namespace.</li>
+<li>Convert an independent namespace to a sub-namespace.</li>
+<li>Convert a sub-namespace to a root namespace.</li>
+</ul>
+</li>
+</ul>
+<h2 id="generic-options"><a class="header" href="#generic-options">Generic options</a></h2>
+<p><code>kubectl-accurate</code> takes the same generic options as <code>kubectl</code> including:</p>
+<pre><code>Flags:
+      --as string                      Username to impersonate for the operation
+      --as-group stringArray           Group to impersonate for the operation, this flag can be repeated to specify multiple groups.
+      --cache-dir string               Default cache directory (default &quot;$HOME/.kube/cache&quot;)
+      --certificate-authority string   Path to a cert file for the certificate authority
+      --client-certificate string      Path to a client certificate file for TLS
+      --client-key string              Path to a client key file for TLS
+      --cluster string                 The name of the kubeconfig cluster to use
+      --context string                 The name of the kubeconfig context to use
+      --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
+      --kubeconfig string              Path to the kubeconfig file to use for CLI requests.
+  -n, --namespace string               If present, the namespace scope for this CLI request
+      --request-timeout string         The length of time to wait before giving up on a single server request. Non-zero values should contain a corresponding time unit (e.g. 1s, 2m, 3h). A value of zero means don't timeout requests. (default &quot;0&quot;)
+  -s, --server string                  The address and port of the Kubernetes API server
+      --tls-server-name string         Server name to use for server certificate validation. If it is not provided, the hostname used to contact the server is used
+      --token string                   Bearer token for authentication to the API server
+      --user string                    The name of the kubeconfig user to use
+</code></pre>
+<p>Note that <code>kubectl-accurate</code> does <em>not</em> use the namespace given by <code>-n</code> / <code>--namespace</code> flag.
+It always take namespace names as positional arguments.</p>
+<h2 id="commands-1"><a class="header" href="#commands-1">Commands</a></h2>
+<p>There is an alias for <code>namespace</code> sub-command that is <code>ns</code>.</p>
+<h3 id="list-root"><a class="header" href="#list-root"><code>list [ROOT]</code></a></h3>
+<p>List namespace trees hierarchically.
+If <code>ROOT</code> is given, only the tree starting from <code>ROOT</code> namespace is shown.</p>
+<h3 id="namespace-describe-ns"><a class="header" href="#namespace-describe-ns"><code>namespace describe NS</code></a></h3>
+<p>Describe the information about a namespace <code>NS</code> related to Accurate.</p>
+<h3 id="namespace-set-type-ns-type"><a class="header" href="#namespace-set-type-ns-type"><code>namespace set-type NS TYPE</code></a></h3>
+<p>Set the type of a namespace <code>NS</code> to <code>TYPE</code>.</p>
+<p>Valid types are <code>root</code> or <code>template</code>.</p>
+<p>To unset the type, specify <code>none</code> as the type.</p>
+<h3 id="template-set-ns-template"><a class="header" href="#template-set-ns-template"><code>template set NS TEMPLATE</code></a></h3>
+<p>Set <code>TEMPLATE</code> namespace as the template of <code>NS</code> namespace.</p>
+<h3 id="template-unset-ns"><a class="header" href="#template-unset-ns"><code>template unset NS</code></a></h3>
+<p>Unset the template of <code>NS</code> namespace.</p>
+<h3 id="sub-create-name-ns"><a class="header" href="#sub-create-name-ns"><code>sub create NAME NS</code></a></h3>
+<p>Create a <a href="./crd_subnamespace.html">SubNamespace</a> named <code>NAME</code> in <code>NS</code> namespace.</p>
+<p>After that, Accurate will create a namespace <code>NAME</code> as a sub-namespace of <code>NS</code>.</p>
+<h3 id="sub-delete-name"><a class="header" href="#sub-delete-name"><code>sub delete NAME</code></a></h3>
+<p>Delete a <a href="./crd_subnamespace.html">SubNamespace</a> named <code>NAME</code> in the parent namespace of <code>NAME</code> namespace.</p>
+<p>After that, Accurate will delete <code>NAME</code> namespace.</p>
+<h3 id="sub-move-ns-parent"><a class="header" href="#sub-move-ns-parent"><code>sub move NS PARENT</code></a></h3>
+<p>Move a sub-namespace <code>NS</code> to a different root or sub-namespace.</p>
+<p>After that, Accurate will create <a href="./crd_subnamespace.html">SubNamespace</a> object in the new parent namespace.</p>
+<h3 id="sub-graft-ns-parent"><a class="header" href="#sub-graft-ns-parent"><code>sub graft NS PARENT</code></a></h3>
+<p>Like <code>sub move</code>, but this converts a non-sub-namespace <code>NS</code> to a sub-namespace of <code>PARENT</code>.</p>
+<p><code>NS</code> must not be a root namespace or have a template.</p>
+<h3 id="sub-cut-ns"><a class="header" href="#sub-cut-ns"><code>sub cut NS</code></a></h3>
+<p>Make a sub-namespace <code>NS</code> a new root namespace.
+The child sub-namespaces under <code>NS</code> will be moved along with it.</p>
+<p>Propagated resources with mode <code>update</code> in <code>NS</code> will be deleted.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="accurate-controller"><a class="header" href="#accurate-controller">accurate-controller</a></h1>
+<p><code>accurate-controller</code> is a Kubernetes controller to manage sub-namespaces and
+to propagate resources from parents to their children namespaces.</p>
+<h2 id="configuration-file-1"><a class="header" href="#configuration-file-1">Configuration file</a></h2>
+<p><code>accurate-controller</code> reads a configuration file on startup.
+The default location is <code>/etc/accurate/config.yaml</code>.
+The location can be changed with <code>--config-file</code> flag.</p>
+<p>The configuration file should be a JSON or YAML file having the following keys:</p>
+<table><thead><tr><th>Key</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>labelKeys</code></td><td><code>[]string</code></td><td>Keys of namespace labels to be propagated.</td></tr>
+<tr><td><code>annotationKeys</code></td><td><code>[]string</code></td><td>Keys of namespace annotations to be propagated.</td></tr>
+<tr><td><code>watches</code></td><td><code>[]object</code></td><td>GroupVersionKind of namespace-scoped objects to be propagated.</td></tr>
+</tbody></table>
+<p>Example:</p>
+<pre><code class="language-yaml">labelKeys:
+- team
+
+annotationKeys:
+- foo.bar/baz
+
+watches:
+- group: rbac.authorization.k8s.io
+  version: v1
+  kind: Role
+- group: rbac.authorization.k8s.io
+  version: v1
+  kind: RoleBinding
+- version: v1
+  kind: Secret
+</code></pre>
+<h2 id="environment-variables"><a class="header" href="#environment-variables">Environment variables</a></h2>
+<table><thead><tr><th>Name</th><th>Required</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>POD_NAMESPACE</code></td><td>Yes</td><td>The namespace name where <code>accurate-controller</code> is running.</td></tr>
+</tbody></table>
+<h2 id="command-line-flags"><a class="header" href="#command-line-flags">Command-line flags</a></h2>
+<pre><code>Flags:
+      --add_dir_header                   If true, adds the file directory to the header
+      --alsologtostderr                  log to standard error as well as files
+      --cert-dir string                  webhook certificate directory
+      --config-file string               Configuration file path (default &quot;/etc/accurate/config.yaml&quot;)
+      --health-probe-addr string         Listen address for health probes (default &quot;:8081&quot;)
+  -h, --help                             help for accurate-controller
+      --leader-election-id string        ID for leader election by controller-runtime (default &quot;accurate&quot;)
+      --log_backtrace_at traceLocation   when logging hits line file:N, emit a stack trace (default :0)
+      --log_dir string                   If non-empty, write log files in this directory
+      --log_file string                  If non-empty, use this log file
+      --log_file_max_size uint           Defines the maximum size a log file can grow to. Unit is megabytes. If the value is 0, the maximum file size is unlimited. (default 1800)
+      --logtostderr                      log to standard error instead of files (default true)
+      --metrics-addr string              The address the metric endpoint binds to (default &quot;:8080&quot;)
+      --skip_headers                     If true, avoid header prefixes in the log messages
+      --skip_log_headers                 If true, avoid headers when opening log files
+      --stderrthreshold severity         logs at or above this threshold go to stderr (default 2)
+  -v, --v Level                          number for the log level verbosity
+      --version                          version for accurate-controller
+      --vmodule moduleSpec               comma-separated list of pattern=N settings for file-filtered logging
+      --webhook-addr string              Listen address for the webhook endpoint (default &quot;:9443&quot;)
+      --zap-devel                        Development Mode defaults(encoder=consoleEncoder,logLevel=Debug,stackTraceLevel=Warn). Production Mode defaults(encoder=jsonEncoder,logLevel=Info,stackTraceLevel=Error)
+      --zap-encoder encoder              Zap log encoding (one of 'json' or 'console')
+      --zap-log-level level              Zap Level to configure the verbosity of logging. Can be one of 'debug', 'info', 'error', or any integer value &gt; 0 which corresponds to custom debug levels of increasing verbosity
+      --zap-stacktrace-level level       Zap Level at and above which stacktraces are captured (one of 'info', 'error', 'panic').
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="labels-used-by-accurate"><a class="header" href="#labels-used-by-accurate">Labels used by Accurate</a></h1>
+<p>The table below is a list of labels used by Accurate.</p>
+<table><thead><tr><th>Key</th><th>Value</th><th>Resource</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>accurate.cybozu.com/type</code></td><td><code>template</code> or <code>root</code></td><td>Namespace</td><td>The type of namespace.</td></tr>
+<tr><td><code>accurate.cybozu.com/template</code></td><td>Namespace name</td><td>Namespace</td><td>The template namespace name.</td></tr>
+<tr><td><code>accurate.cybozu.com/parent</code></td><td>Namespace name</td><td>Namespace</td><td>The parent namespace name.</td></tr>
+<tr><td><code>app.kubernetes.io/created-by</code></td><td><code>accurate</code></td><td>Copied or propagated resources, sub-namespaces</td><td>Informational</td></tr>
+</tbody></table>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="annotations-used-by-accurate"><a class="header" href="#annotations-used-by-accurate">Annotations used by Accurate</a></h1>
+<p>The table below is a list of annotations used by Accurate.</p>
+<table><thead><tr><th>Key</th><th>Value</th><th>Resource</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>accurate.cybozu.com/from</code></td><td>Namespace name</td><td>Copied or propagated resources</td><td>The namespace name from which the source resource was copied.</td></tr>
+<tr><td><code>accurate.cybozu.com/propagate</code></td><td><code>&quot;create&quot;</code> or <code>&quot;update&quot;</code></td><td>Namespace-scoped resources</td><td>Specify propagation mode.</td></tr>
+<tr><td><code>accurate.cybozu.com/propagate-generated</code></td><td><code>&quot;create&quot;</code> or <code>&quot;update&quot;</code></td><td>Namespace-scoped resources</td><td>Specify propagation mode of generated resources.</td></tr>
+<tr><td><code>accurate.cybozu.com/generated</code></td><td><code>false</code></td><td>Namespace-scoped resources</td><td>The result of checking if this is generated from another resource.</td></tr>
+</tbody></table>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="design-notes"><a class="header" href="#design-notes">Design notes</a></h1>
+<ul>
+<li><a href="design.html#overview">Overview</a></li>
+<li><a href="design.html#why-do-we-need-another-namespace-controller-in-the-first-place">Why do we need another namespace controller in the first place?</a></li>
+<li><a href="design.html#goals">Goals</a></li>
+<li><a href="design.html#things-to-be-avoided">Things to be avoided</a>
+<ul>
+<li><a href="design.html#no-webhooks-for-propagated-resources">No webhooks for propagated resources</a></li>
+</ul>
+</li>
+<li><a href="design.html#subnamespaces-are-not-related-to-parent-child-relationships">SubNamespaces are not related to parent-child relationships</a></li>
+</ul>
+<h2 id="overview-1"><a class="header" href="#overview-1">Overview</a></h2>
+<p>Accurate aims to implement functionalities found in <a href="https://github.com/kubernetes-sigs/hierarchical-namespaces">Hierarchical Namespace Controller (HNC)</a>, but in a different way.</p>
+<p>Accurate provides 1) resource-propagation between namespaces, and 2) sub-namespace concept for multi-tenancy.
+Since we consider resource-propagation alone is highly useful, the feature is available between any namespaces.</p>
+<h2 id="why-do-we-need-another-namespace-controller-in-the-first-place"><a class="header" href="#why-do-we-need-another-namespace-controller-in-the-first-place">Why do we need another namespace controller in the first place?</a></h2>
+<p>Some of the HNC designs and specifications contradict our use cases.</p>
+<ul>
+<li>HNC opt-outs resources when propagating them.
+<ul>
+<li>For safety and accuracy, we need opt-in propagation.</li>
+</ul>
+</li>
+<li>HNC opt-outs root namespaces.
+<ul>
+<li>For easier-maintenance, we need opt-in root namespaces.</li>
+</ul>
+</li>
+<li>HNC does not propagate namespace labels and annotations.
+<ul>
+<li>We need to propagate some namespace labels/annotations.</li>
+</ul>
+</li>
+</ul>
+<p>Since these are fundamentally different requirements, we decided to develop our own solution.</p>
+<h2 id="goals"><a class="header" href="#goals">Goals</a></h2>
+<ul>
+<li>Any namespace-scoped resource can be copied or propagated
+<ul>
+<li>The kinds of resources are given by the configuration file of Accurate.</li>
+<li>Only resources annotated with <code>accurate.cybozu.com/propagate: &lt;mode&gt;</code> will be propagated.</li>
+<li>Of course, Accurate controller needs to be privileged to manage them.</li>
+</ul>
+</li>
+<li>Support the following propagation modes:
+<ul>
+<li><code>create</code>: if the resource does not exist, copy the resource from the parent namespace.</li>
+<li><code>update</code>: if the resource is missing or different from the parent namespace, create or update it.  If the parent resource is deleted, the copy will also be deleted.</li>
+</ul>
+</li>
+<li>Propagate generated resources
+<ul>
+<li>Resources created and controlled by another resource can be automatically propagated.</li>
+<li>The generator resource should be annotated with <code>accurate.cybozu.com/propagate-generated: &lt;mode&gt;</code>.</li>
+</ul>
+</li>
+<li>Propagate labels and annotations of parent or template namespaces
+<ul>
+<li>The label/annotation keys are given through the configuration file of Accurate.</li>
+<li>Only labels/annotations specified in the configuration file of Accurate will be propagated.</li>
+</ul>
+</li>
+<li>Opt-in root namespaces
+<ul>
+<li>Only namespaces labeled with <code>accurate.cybozu.com/type: root</code> can be the root of a namespace tree.</li>
+</ul>
+</li>
+<li>Tenant users can create and delete sub-namespaces by creating and deleting a custom resource in a root or a sub-namespace.
+<ul>
+<li>If a namespace has one or more sub-namespaces, Accurate prevents the deletion of the namespace.</li>
+</ul>
+</li>
+<li>Template namespace
+<ul>
+<li>Namespaces that are not a sub-namespace can specify a template from which labels, annotations, and resources can be propagated.</li>
+</ul>
+</li>
+<li>Admins can change the parent namespace of a sub-namespace.</li>
+</ul>
+<h2 id="things-to-be-avoided"><a class="header" href="#things-to-be-avoided">Things to be avoided</a></h2>
+<p>Accurate prevents the following problems by a validating admission webhook for Namespace.</p>
+<ul>
+<li>Circular references among namespaces.</li>
+<li>Allowing a sub-namespace to set a template (sub-namespaces should inherit things only from the parent).</li>
+<li>Marking a sub-namespace as a root namespace.</li>
+<li>Deleting <code>accurate.cybozu.com/type=root</code> label from root namespaces having one or more sub-namespaces.</li>
+<li>Deleting <code>accurate.cybozu.com/type=template</code> label from template namespaces having one or more instance namespaces.</li>
+<li>Dangling sub-namespaces (sub-namespaces whose parent namespace is missing).</li>
+<li>Dangling instance namespaces (namespaces whose template namespace is missing).</li>
+<li>Changing a sub-namespace to a non-root namespace when it has child sub-namespaces.</li>
+</ul>
+<p>Accurate prevents the following problem by a validating admission webhook for SubNamespace.</p>
+<ul>
+<li>Creating a SubNamespace object in a non-root and non-sub- namespace.</li>
+</ul>
+<h3 id="no-webhooks-for-propagated-resources"><a class="header" href="#no-webhooks-for-propagated-resources">No webhooks for propagated resources</a></h3>
+<p>Accurate does not use admission webhooks for resources propagated from a parent namespace to its sub-namespaces.
+The decision was made from the following points:</p>
+<ul>
+<li>
+<p>Since Accurate can propagate any namespace-scoped resource, adding an admission webhook for them might cause troubles.</p>
+<p>For instance, admission webhooks for Pods may cause chicken-and-egg problem upon bootstrapping.</p>
+</li>
+<li>
+<p>Avoid interrupting users who do not expect limitations from Accurate.</p>
+</li>
+</ul>
+<h2 id="subnamespaces-are-not-related-to-parent-child-relationships"><a class="header" href="#subnamespaces-are-not-related-to-parent-child-relationships">SubNamespaces are not related to parent-child relationships</a></h2>
+<p>Accurate does not rely on SubNamespace resources to look up sub-namespaces of a namespace or to find the parent of a sub-namespace.</p>
+<p>By doing so, Accurate can easily restructure existing namespaces.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="how-accurate-reconciles-resources"><a class="header" href="#how-accurate-reconciles-resources">How Accurate reconciles resources</a></h1>
+<p>Accurate primarily watches Namespaces and SubNamespaces.
+In addition, it needs to watch any kind of resources specified in its config file.</p>
+<h2 id="subnamespace-custom-resource"><a class="header" href="#subnamespace-custom-resource">SubNamespace (custom resource)</a></h2>
+<ul>
+<li>For a new SubNamespace, Accurate creates a sub-namespace.</li>
+<li>For a deleting SubNamespace, Accurate deletes the sub-namespace if the sub-namespace exists and its <code>accurate.cybozu.com/parent</code> is the same as <code>metadata.namespace</code> of SubNamespace.</li>
+</ul>
+<h2 id="namespaces"><a class="header" href="#namespaces">Namespaces</a></h2>
+<h3 id="namespaces-that-are-labeled-with-accuratecybozucomtemplate"><a class="header" href="#namespaces-that-are-labeled-with-accuratecybozucomtemplate">Namespaces that are labeled with <code>accurate.cybozu.com/template</code></a></h3>
+<p>These namespaces reference a template namespace and propagate the labels, annotations, and watched resources from the template namespace.</p>
+<ul>
+<li>Accurate should propagate labels and/or annotations from the template namespace.</li>
+<li>Accurate should create copies of resources in the template namespace whose <code>accurate.cybozu.com/propagate</code> annotation is <code>create</code> if they are missing.</li>
+<li>Accurate should create or update copies of resources in the template namespace whose <code>accurate.cybozu.com/propagate</code> annotation is <code>update</code> if they are missing or different.</li>
+<li>Accurate should delete resources in the reconciling namespace that are annotated with <code>accurate.cybozu.com/propagate=update</code> provided that:
+<ul>
+<li>the value of <code>accurate.cybozu.com/from</code> annotation is not the template namespace name, or</li>
+<li>there is not a resource of the same kind and the same name in the template namespace.</li>
+</ul>
+</li>
+</ul>
+<h3 id="namespaces-wo-accuratecybozucomfrom-and-accuratecybozucomtemplate-labels"><a class="header" href="#namespaces-wo-accuratecybozucomfrom-and-accuratecybozucomtemplate-labels">Namespaces w/o <code>accurate.cybozu.com/from</code> and <code>accurate.cybozu.com/template</code> labels</a></h3>
+<p>If these labels are removed from the Namespace, Accurate should delete propagated resources with mode == <code>update</code>.</p>
+<h3 id="template-namespace"><a class="header" href="#template-namespace">Template namespace</a></h3>
+<p>Template namespaces are namespaces labeled with <code>accurate.cybozu.com/type=template</code>.</p>
+<ul>
+<li>Accurate should propagate labels and/or annotations to namespaces that references the template namespace with <code>accurate.cybozu.com/template</code> label.</li>
+</ul>
+<h3 id="root-namespace"><a class="header" href="#root-namespace">Root namespace</a></h3>
+<p>Root namespaces are namespaces labeled with <code>accurate.cybozu.com/type=root</code>.</p>
+<ul>
+<li>Accurate should propagate labels and/or annotations to its sub-namespaces.</li>
+</ul>
+<h3 id="sub-namespace"><a class="header" href="#sub-namespace">Sub-namespace</a></h3>
+<p>Sub-namespaces are namespaces created by Accurate.
+Sub-namespaces have <code>accurate.cybozu.com/parent</code> label.</p>
+<ul>
+<li>Accurate should propagate labels and/or annotations from the parent namespace.</li>
+<li>Accurate should propagate labels and/or annotations of the reconciling namespace to its sub-namespaces, if any.</li>
+<li>Accurate should create copies of resources in the parent namespace whose <code>accurate.cybozu.com/propagate</code> annotation is <code>create</code> if they are missing.</li>
+<li>Accurate should create or update copies of resources in the parent namespace whose <code>accurate.cybozu.com/propagate</code> annotation is <code>update</code> if they are missing or different.</li>
+<li>Accurate should delete resources in the reconciling namespace that are annotated with <code>accurate.cybozu.com/propagate=update</code> provided that:
+<ul>
+<li>the value of <code>accurate.cybozu.com/from</code> annotation is not the parent namespace name, or</li>
+<li>there is not a resource of the same kind and the same name in the parent namespace.</li>
+</ul>
+</li>
+</ul>
+<h2 id="watched-namespace-scoped-resources"><a class="header" href="#watched-namespace-scoped-resources">Watched namespace-scoped resources</a></h2>
+<p>Any namespace-scoped resource can be propagated from a template or from a parent namespace.</p>
+<h3 id="resources-annotated-with-accuratecybozucomfrom"><a class="header" href="#resources-annotated-with-accuratecybozucomfrom">Resources annotated with <code>accurate.cybozu.com/from</code></a></h3>
+<p>These resources are propagated from a parent or a template namespace.
+The annotation value is the parent namespace name.</p>
+<ul>
+<li>If the parent resource exists and is annotated with <code>accurate.cybozu.com/propagate=update</code>, Accurate compares the resource with the parent resource, and if they differ, updates the resource.</li>
+<li>If the resource is annotated with <code>accurate.cybozu.com/propagate=update</code> and there isn't a resource of the same kind and the same name in the parent namespace, Accurate deletes the resource.</li>
+</ul>
+<p>The last rule is for cases where the parent resource is deleted while the controller is stopped.
+With this rule, Accurate can delete such orphaned resources when the controller starts.</p>
+<h3 id="resources-annotated-with-accuratecybozucompropagate"><a class="header" href="#resources-annotated-with-accuratecybozucompropagate">Resources annotated with <code>accurate.cybozu.com/propagate</code></a></h3>
+<p>These resources can be propagated to other namespaces.</p>
+<ul>
+<li>If the resource exists and the annotation value is <code>create</code>, Accurate creates a copy in all sub-namespaces if missing.</li>
+<li>If the resource exists and the annotation value is <code>update</code>, Accurate creates or updates a copy in all sub-namespaces if missing or different.</li>
+<li>When a resource is deleted, Accurate checks sub-namespaces and delete the resource of the same kind and the same name if the resource is annotated with <code>accurate.cybozu.com/propagate=update</code>.</li>
+</ul>
+<h3 id="resources-owned-by-another-resource-that-is-annotated-with-accuratecybozucompropagate-generated"><a class="header" href="#resources-owned-by-another-resource-that-is-annotated-with-accuratecybozucompropagate-generated">Resources owned by another resource that is annotated with <code>accurate.cybozu.com/propagate-generated</code></a></h3>
+<p>Accurate annotates the resource with <code>accurate.cybozu.com/propagate</code>.
+The annotation value is the same as <code>accurate.cybozu.com/propagate-generated</code> annotation.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="release-procedure"><a class="header" href="#release-procedure">Release procedure</a></h1>
+<p>This document describes how to release a new version of accurate.</p>
+<h2 id="versioning"><a class="header" href="#versioning">Versioning</a></h2>
+<p>Follow <a href="https://semver.org/spec/v2.0.0.html">semantic versioning 2.0.0</a> to choose the new version number.</p>
+<h2 id="prepare-change-log-entries"><a class="header" href="#prepare-change-log-entries">Prepare change log entries</a></h2>
+<p>Add notable changes since the last release to <a href="CHANGELOG.html">CHANGELOG.md</a>.
+It should look like:</p>
+<pre><code class="language-markdown">(snip)
+## [Unreleased]
+
+### Added
+- Implement ... (#35)
+
+### Changed
+- Fix a bug in ... (#33)
+
+### Removed
+- Deprecated `-option` is removed ... (#39)
+
+(snip)
+</code></pre>
+<h2 id="bump-version"><a class="header" href="#bump-version">Bump version</a></h2>
+<ol>
+<li>
+<p>Determine a new version number.  Let it write <code>$VERSION</code> as <code>VERSION=x.y.z</code>.</p>
+</li>
+<li>
+<p>Make a branch to release</p>
+<pre><code class="language-console">$ git neco dev &quot;$VERSION&quot;
+</code></pre>
+</li>
+<li>
+<p>Update version strings in <code>kustomization.yaml</code> and <code>version.go</code>.</p>
+</li>
+<li>
+<p>Edit <code>CHANGELOG.md</code> for the new version (<a href="https://github.com/cybozu-go/etcdpasswd/commit/77d95384ac6c97e7f48281eaf23cb94f68867f79">example</a>).</p>
+</li>
+<li>
+<p>Commit the change and push it.</p>
+<pre><code class="language-console">$ git commit -a -m &quot;Bump version to $VERSION&quot;
+$ git neco review
+</code></pre>
+</li>
+<li>
+<p>Merge this branch.</p>
+</li>
+<li>
+<p>Add a git tag to the main HEAD, then push it.</p>
+<pre><code class="language-console">$ git checkout main
+$ git pull
+$ git tag -a -m &quot;Release v$VERSION&quot; &quot;v$VERSION&quot;
+$ git push origin &quot;v$VERSION&quot;
+</code></pre>
+</li>
+</ol>
+<p>GitHub actions will build and push artifacts such as container images and
+create a new GitHub release.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                        
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                            </nav>
+
+        </div>
+
+        
+        
+        
+                <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+        
+                <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+                        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+                
+    </body>
+</html>
