@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	innuv1 "github.com/cybozu-go/innu/api/v1"
-	"github.com/cybozu-go/innu/pkg/constants"
+	accuratev1 "github.com/cybozu-go/accurate/api/v1"
+	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
@@ -25,16 +25,16 @@ type SubNamespaceReconciler struct {
 	client.Client
 }
 
-//+kubebuilder:rbac:groups=innu.cybozu.com,resources=subnamespaces,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=innu.cybozu.com,resources=subnamespaces/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=innu.cybozu.com,resources=subnamespaces/finalizers,verbs=update
+//+kubebuilder:rbac:groups=accurate.cybozu.com,resources=subnamespaces,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=accurate.cybozu.com,resources=subnamespaces/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=accurate.cybozu.com,resources=subnamespaces/finalizers,verbs=update
 //+kubebuilder:rbac:groups="",resources=namespaces,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile implements reconcile.Reconciler interface.
 func (r *SubNamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
-	sn := &innuv1.SubNamespace{}
+	sn := &accuratev1.SubNamespace{}
 	if err := r.Get(ctx, req.NamespacedName, sn); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
@@ -55,7 +55,7 @@ func (r *SubNamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	return ctrl.Result{}, nil
 }
 
-func (r *SubNamespaceReconciler) finalize(ctx context.Context, sn *innuv1.SubNamespace) error {
+func (r *SubNamespaceReconciler) finalize(ctx context.Context, sn *accuratev1.SubNamespace) error {
 	if !controllerutil.ContainsFinalizer(sn, constants.Finalizer) {
 		return nil
 	}
@@ -90,7 +90,7 @@ DELETE:
 	return r.Update(ctx, sn)
 }
 
-func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *innuv1.SubNamespace) error {
+func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev1.SubNamespace) error {
 	logger := log.FromContext(ctx)
 
 	ns := &corev1.Namespace{}
@@ -112,10 +112,10 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *innuv1.Sub
 	}
 
 	if ns.Labels[constants.LabelParent] == sn.Namespace {
-		sn.Status = innuv1.SubNamespaceOK
+		sn.Status = accuratev1.SubNamespaceOK
 	} else {
 		logger.Info("a conflicting namespace already exists")
-		sn.Status = innuv1.SubNamespaceConflict
+		sn.Status = accuratev1.SubNamespaceConflict
 	}
 
 	return r.Update(ctx, sn)
@@ -135,7 +135,7 @@ func (r *SubNamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	}
 
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&innuv1.SubNamespace{}).
+		For(&accuratev1.SubNamespace{}).
 		Watches(&source.Kind{Type: &corev1.Namespace{}}, handler.Funcs{
 			UpdateFunc: func(ev event.UpdateEvent, q workqueue.RateLimitingInterface) {
 				if ev.ObjectNew.GetDeletionTimestamp() != nil {

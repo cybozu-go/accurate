@@ -24,7 +24,7 @@ spec:
         runAsNonRoot: true
       containers:
       - name: manager
-        image: ghcr.io/cybozu-go/innu:latest
+        image: ghcr.io/cybozu-go/accurate:latest
         env:
         - name: POD_NAMESPACE
           valueFrom:

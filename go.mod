@@ -1,4 +1,4 @@
-module github.com/cybozu-go/innu
+module github.com/cybozu-go/accurate
 
 go 1.16
 

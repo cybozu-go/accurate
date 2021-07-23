@@ -1,10 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: innu-controller-manager
-  namespace: innu
+  name: accurate-controller-manager
+  namespace: accurate
 spec:
-  replicas: 1
   template:
     spec:
       containers:

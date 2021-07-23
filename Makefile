@@ -3,7 +3,7 @@ CTRL_TOOLS_VERSION=0.6.1
 CTRL_RUNTIME_VERSION := $(shell awk '/sigs.k8s.io\/controller-runtime/ {print substr($$2, 2)}' go.mod)
 KUSTOMIZE_VERSION = 4.1.3
 CRD_TO_MARKDOWN_VERSION = 0.0.3
-MDBOOK_VERSION = 0.4.9
+MDBOOK_VERSION = 0.4.10
 
 # Test tools
 BIN_DIR := $(shell pwd)/bin
@@ -95,17 +95,17 @@ build:
 release-build: kustomize
 	rm -rf build
 	mkdir -p build
-	$(MAKE) kubectl-innu GOOS=windows GOARCH=amd64 SUFFIX=.exe
-	$(MAKE) kubectl-innu GOOS=darwin GOARCH=amd64
-	$(MAKE) kubectl-innu GOOS=darwin GOARCH=arm64
-	$(MAKE) kubectl-innu GOOS=linux GOARCH=amd64
-	$(MAKE) kubectl-innu GOOS=linux GOARCH=arm64
+	$(MAKE) kubectl-accurate GOOS=windows GOARCH=amd64 SUFFIX=.exe
+	$(MAKE) kubectl-accurate GOOS=darwin GOARCH=amd64
+	$(MAKE) kubectl-accurate GOOS=darwin GOARCH=arm64
+	$(MAKE) kubectl-accurate GOOS=linux GOARCH=amd64
+	$(MAKE) kubectl-accurate GOOS=linux GOARCH=arm64
 
-.PHONY: kubectl-innu
-kubectl-innu: build/kubectl-innu-$(GOOS)-$(GOARCH)$(SUFFIX)
+.PHONY: kubectl-accurate
+kubectl-accurate: build/kubectl-accurate-$(GOOS)-$(GOARCH)$(SUFFIX)
 
-build/kubectl-innu-$(GOOS)-$(GOARCH)$(SUFFIX):
-	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o $@ ./cmd/kubectl-innu
+build/kubectl-accurate-$(GOOS)-$(GOARCH)$(SUFFIX):
+	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o $@ ./cmd/kubectl-accurate
 
 ##@ Tools
 

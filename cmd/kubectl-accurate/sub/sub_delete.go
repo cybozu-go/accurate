@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	innuv1 "github.com/cybozu-go/innu/api/v1"
-	"github.com/cybozu-go/innu/pkg/constants"
+	accuratev1 "github.com/cybozu-go/accurate/api/v1"
+	"github.com/cybozu-go/accurate/pkg/constants"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
@@ -60,7 +60,7 @@ func (o *subDeleteOpts) Run(ctx context.Context) error {
 		return fmt.Errorf("namespace %s is not a sub-namespace", o.name)
 	}
 
-	sn := &innuv1.SubNamespace{}
+	sn := &accuratev1.SubNamespace{}
 	sn.Namespace = parent
 	sn.Name = o.name
 	if err := o.client.Delete(ctx, sn); err != nil {

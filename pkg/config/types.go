@@ -9,7 +9,7 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-// Config represents the configuration file of Innu.
+// Config represents the configuration file of Accurate.
 type Config struct {
 	LabelKeys      []string                  `json:"labelKeys,omitempty"`
 	AnnotationKeys []string                  `json:"annotationKeys,omitempty"`

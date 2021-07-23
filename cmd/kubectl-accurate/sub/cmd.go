@@ -3,19 +3,19 @@ package sub
 import (
 	"os"
 
-	"github.com/cybozu-go/innu"
+	"github.com/cybozu-go/accurate"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
-// NewCmd creates the root *cobra.Command of `kubectl-innu`.
+// NewCmd creates the root *cobra.Command of `kubectl-accurate`.
 func NewCmd(streams genericclioptions.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "innu",
-		Short:   "Subcommand for Innu",
-		Long:    `innu is a subcommand of kubectl to manage Innu features.`,
-		Version: innu.Version,
+		Use:     "accurate",
+		Short:   "Subcommand for Accurate",
+		Long:    `accurate is a subcommand of kubectl to manage Accurate features.`,
+		Version: accurate.Version,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			cmd.SilenceUsage = true
 			return nil
@@ -33,9 +33,9 @@ func NewCmd(streams genericclioptions.IOStreams) *cobra.Command {
 	return cmd
 }
 
-// Execute executes `kubectl-innu` command.
+// Execute executes `kubectl-accurate` command.
 func Execute() {
-	flags := pflag.NewFlagSet("kubectl-innu", pflag.ExitOnError)
+	flags := pflag.NewFlagSet("kubectl-accurate", pflag.ExitOnError)
 	pflag.CommandLine = flags
 
 	cmd := NewCmd(genericclioptions.IOStreams{

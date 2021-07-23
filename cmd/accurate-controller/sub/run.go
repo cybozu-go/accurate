@@ -8,12 +8,12 @@ import (
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	innuv1 "github.com/cybozu-go/innu/api/v1"
-	"github.com/cybozu-go/innu/controllers"
-	"github.com/cybozu-go/innu/hooks"
-	"github.com/cybozu-go/innu/pkg/cluster"
-	"github.com/cybozu-go/innu/pkg/config"
-	"github.com/cybozu-go/innu/pkg/indexing"
+	accuratev1 "github.com/cybozu-go/accurate/api/v1"
+	"github.com/cybozu-go/accurate/controllers"
+	"github.com/cybozu-go/accurate/hooks"
+	"github.com/cybozu-go/accurate/pkg/cluster"
+	"github.com/cybozu-go/accurate/pkg/config"
+	"github.com/cybozu-go/accurate/pkg/indexing"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -32,8 +32,8 @@ func subMain(ns, addr string, port int) error {
 	if err := clientgoscheme.AddToScheme(scheme); err != nil {
 		return fmt.Errorf("unable to add client-go objects: %w", err)
 	}
-	if err := innuv1.AddToScheme(scheme); err != nil {
-		return fmt.Errorf("unable to add Innu objects: %w", err)
+	if err := accuratev1.AddToScheme(scheme); err != nil {
+		return fmt.Errorf("unable to add Accurate objects: %w", err)
 	}
 
 	cfgData, err := os.ReadFile(options.configFile)

@@ -9,9 +9,9 @@
 
 ## Overview
 
-Innu aims to implement functionalities found in [Hierarchical Namespace Controller (HNC)][HNC], but in a different way.
+Accurate aims to implement functionalities found in [Hierarchical Namespace Controller (HNC)][HNC], but in a different way.
 
-Innu provides 1) resource-propagation between namespaces, and 2) sub-namespace concept for multi-tenancy.
+Accurate provides 1) resource-propagation between namespaces, and 2) sub-namespace concept for multi-tenancy.
 Since we consider resource-propagation alone is highly useful, the feature is available between any namespaces.
 
 ## Why do we need another namespace controller in the first place?
@@ -30,58 +30,58 @@ Since these are fundamentally different requirements, we decided to develop our 
 ## Goals
 
 - Any namespace-scoped resource can be copied or propagated
-    - The kinds of resources are given by the configuration file of Innu.
-    - Only resources annotated with `innu.cybozu.com/propagate: <mode>` will be propagated.
-    - Of course, Innu controller needs to be privileged to manage them.
+    - The kinds of resources are given by the configuration file of Accurate.
+    - Only resources annotated with `accurate.cybozu.com/propagate: <mode>` will be propagated.
+    - Of course, Accurate controller needs to be privileged to manage them.
 - Support the following propagation modes:
     - `create`: if the resource does not exist, copy the resource from the parent namespace.
     - `update`: if the resource is missing or different from the parent namespace, create or update it.  If the parent resource is deleted, the copy will also be deleted.
 - Propagate generated resources
     - Resources created and controlled by another resource can be automatically propagated.
-    - The generator resource should be annotated with `innu.cybozu.com/propagate-generated: <mode>`.
+    - The generator resource should be annotated with `accurate.cybozu.com/propagate-generated: <mode>`.
 - Propagate labels and annotations of parent or template namespaces
-    - The label/annotation keys are given through the configuration file of Innu.
-    - Only labels/annotations specified in the configuration file of Innu will be propagated.
+    - The label/annotation keys are given through the configuration file of Accurate.
+    - Only labels/annotations specified in the configuration file of Accurate will be propagated.
 - Opt-in root namespaces
-    - Only namespaces labeled with `innu.cybozu.com/type: root` can be the root of a namespace tree.
+    - Only namespaces labeled with `accurate.cybozu.com/type: root` can be the root of a namespace tree.
 - Tenant users can create and delete sub-namespaces by creating and deleting a custom resource in a root or a sub-namespace.
-    - If a namespace has one or more sub-namespaces, Innu prevents the deletion of the namespace.
+    - If a namespace has one or more sub-namespaces, Accurate prevents the deletion of the namespace.
 - Template namespace
     - Namespaces that are not a sub-namespace can specify a template from which labels, annotations, and resources can be propagated.
 - Admins can change the parent namespace of a sub-namespace.
 
 ## Things to be avoided
 
-Innu prevents the following problems by a validating admission webhook for Namespace.
+Accurate prevents the following problems by a validating admission webhook for Namespace.
 
 - Circular references among namespaces.
 - Allowing a sub-namespace to set a template (sub-namespaces should inherit things only from the parent).
 - Marking a sub-namespace as a root namespace.
-- Deleting `innu.cybozu.com/type=root` label from root namespaces having one or more sub-namespaces.
-- Deleting `innu.cybozu.com/type=template` label from template namespaces having one or more instance namespaces.
+- Deleting `accurate.cybozu.com/type=root` label from root namespaces having one or more sub-namespaces.
+- Deleting `accurate.cybozu.com/type=template` label from template namespaces having one or more instance namespaces.
 - Dangling sub-namespaces (sub-namespaces whose parent namespace is missing).
 - Dangling instance namespaces (namespaces whose template namespace is missing).
 - Changing a sub-namespace to a non-root namespace when it has child sub-namespaces.
 
-Innu prevents the following problem by a validating admission webhook for SubNamespace.
+Accurate prevents the following problem by a validating admission webhook for SubNamespace.
 
 - Creating a SubNamespace object in a non-root and non-sub- namespace.
 
 ### No webhooks for propagated resources
 
-Innu does not use admission webhooks for resources propagated from a parent namespace to its sub-namespaces.
+Accurate does not use admission webhooks for resources propagated from a parent namespace to its sub-namespaces.
 The decision was made from the following points:
 
-- Since Innu can propagate any namespace-scoped resource, adding an admission webhook for them might cause troubles.
+- Since Accurate can propagate any namespace-scoped resource, adding an admission webhook for them might cause troubles.
 
     For instance, admission webhooks for Pods may cause chicken-and-egg problem upon bootstrapping.
 
-- Avoid interrupting users who do not expect limitations from Innu.
+- Avoid interrupting users who do not expect limitations from Accurate.
 
 ## SubNamespaces are not related to parent-child relationships
 
-Innu does not rely on SubNamespace resources to look up sub-namespaces of a namespace or to find the parent of a sub-namespace.
+Accurate does not rely on SubNamespace resources to look up sub-namespaces of a namespace or to find the parent of a sub-namespace.
 
-By doing so, Innu can easily restructure existing namespaces.
+By doing so, Accurate can easily restructure existing namespaces.
 
 [HNC]: https://github.com/kubernetes-sigs/hierarchical-namespaces

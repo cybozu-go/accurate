@@ -1,6 +1,6 @@
-# kubectl-innu
+# kubectl-accurate
 
-`kubectl-innu` is a `kubectl` plugin for Innu.
+`kubectl-accurate` is a `kubectl` plugin for Accurate.
 
 ## Features
 
@@ -8,8 +8,9 @@
 - Show the information about a namespace.
     - List of propagating/propagated resources in the namespace.
     - Root or not.
-    - Sub-namespace or not.
-    - The name of the template namespace, if set.
+    - Template or not.
+    - The parent namespace, if it is a sub-namespace.
+    - The template namespace, if set.
 - Operations for root namespaces
     - Make an independent namespace to a root namespace.
     - Make a root namespace back to an independent namespace, if it has no child sub-namespaces.
@@ -23,7 +24,7 @@
 
 ## Generic options
 
-`kubectl-innu` takes the same generic options as `kubectl` including:
+`kubectl-accurate` takes the same generic options as `kubectl` including:
 
 ```
 Flags:
@@ -45,7 +46,7 @@ Flags:
       --user string                    The name of the kubeconfig user to use
 ```
 
-Note that `kubectl-innu` does _not_ use the namespace given by `-n` / `--namespace` flag.
+Note that `kubectl-accurate` does _not_ use the namespace given by `-n` / `--namespace` flag.
 It always take namespace names as positional arguments.
 
 ## Commands
@@ -59,7 +60,7 @@ If `ROOT` is given, only the tree starting from `ROOT` namespace is shown.
 
 ### `namespace describe NS`
 
-Describe the information about a namespace `NS` related to Innu.
+Describe the information about a namespace `NS` related to Accurate.
 
 ### `namespace set-type NS TYPE`
 
@@ -81,19 +82,19 @@ Unset the template of `NS` namespace.
 
 Create a [SubNamespace][] named `NAME` in `NS` namespace.
 
-After that, Innu will create a namespace `NAME` as a sub-namespace of `NS`.
+After that, Accurate will create a namespace `NAME` as a sub-namespace of `NS`.
 
 ### `sub delete NAME`
 
 Delete a [SubNamespace][] named `NAME` in the parent namespace of `NAME` namespace.
 
-After that, Innu will delete `NAME` namespace.
+After that, Accurate will delete `NAME` namespace.
 
 ### `sub move NS PARENT`
 
 Move a sub-namespace `NS` to a different root or sub-namespace.
 
-After that, Innu will create [SubNamespace][] object in the new parent namespace.
+After that, Accurate will create [SubNamespace][] object in the new parent namespace.
 
 ### `sub graft NS PARENT`
 

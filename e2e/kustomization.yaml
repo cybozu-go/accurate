@@ -5,12 +5,12 @@ patchesStrategicMerge:
 - manager_patch.yaml
 
 configMapGenerator:
-- name: innu-config
-  namespace: innu
+- name: accurate-config
+  namespace: accurate
   files:
   - config.yaml
 
 images:
-- name: ghcr.io/cybozu-go/innu
-  newName: innu
+- name: ghcr.io/cybozu-go/accurate
+  newName: accurate
   newTag: dev

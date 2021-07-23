@@ -6,9 +6,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.6.1
   creationTimestamp: null
-  name: subnamespaces.innu.cybozu.com
+  name: subnamespaces.accurate.cybozu.com
 spec:
-  group: innu.cybozu.com
+  group: accurate.cybozu.com
   names:
     kind: SubNamespace
     listKind: SubNamespaceList

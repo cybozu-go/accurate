@@ -4,7 +4,7 @@ metadata:
   namespace: tmpl2
   name: role1
   annotations:
-    innu.cybozu.com/propagate: create
+    accurate.cybozu.com/propagate: create
 rules:
 - apiGroups:
   - ""

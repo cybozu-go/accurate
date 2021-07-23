@@ -14,8 +14,8 @@ import (
 
 	admissionv1beta1 "k8s.io/api/admission/v1beta1"
 	//+kubebuilder:scaffold:imports
-	innuv1 "github.com/cybozu-go/innu/api/v1"
-	"github.com/cybozu-go/innu/pkg/indexing"
+	accuratev1 "github.com/cybozu-go/accurate/api/v1"
+	"github.com/cybozu-go/accurate/pkg/indexing"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -59,7 +59,7 @@ var _ = BeforeSuite(func() {
 	Expect(cfg).NotTo(BeNil())
 
 	scheme := runtime.NewScheme()
-	err = innuv1.AddToScheme(scheme)
+	err = accuratev1.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())
 	err = clientgoscheme.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())

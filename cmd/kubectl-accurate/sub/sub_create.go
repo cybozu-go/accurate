@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	innuv1 "github.com/cybozu-go/innu/api/v1"
+	accuratev1 "github.com/cybozu-go/accurate/api/v1"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -61,7 +61,7 @@ func (o *subCreateOpts) Run(ctx context.Context) error {
 		return fmt.Errorf("failed to get namespace %s: %w", o.name, err)
 	}
 
-	sn := &innuv1.SubNamespace{}
+	sn := &accuratev1.SubNamespace{}
 	sn.Namespace = o.parent
 	sn.Name = o.name
 

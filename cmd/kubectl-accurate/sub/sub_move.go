@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	innuv1 "github.com/cybozu-go/innu/api/v1"
-	"github.com/cybozu-go/innu/pkg/constants"
+	accuratev1 "github.com/cybozu-go/accurate/api/v1"
+	"github.com/cybozu-go/accurate/pkg/constants"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -85,7 +85,7 @@ func (o *subMoveOpts) Run(ctx context.Context) error {
 	fmt.Fprintf(o.streams.Out, "the parent has changed to %s\n", o.parent)
 
 	if !o.orphan {
-		oldSN := &innuv1.SubNamespace{}
+		oldSN := &accuratev1.SubNamespace{}
 		oldSN.Namespace = orig
 		oldSN.Name = o.name
 		err := o.client.Delete(ctx, oldSN)
@@ -98,7 +98,7 @@ func (o *subMoveOpts) Run(ctx context.Context) error {
 		}
 	}
 
-	sn := &innuv1.SubNamespace{}
+	sn := &accuratev1.SubNamespace{}
 	sn.Namespace = o.parent
 	sn.Name = o.name
 	if err := o.client.Create(ctx, sn); err != nil {

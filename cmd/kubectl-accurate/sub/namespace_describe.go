@@ -7,8 +7,8 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/cybozu-go/innu/pkg/config"
-	"github.com/cybozu-go/innu/pkg/constants"
+	"github.com/cybozu-go/accurate/pkg/config"
+	"github.com/cybozu-go/accurate/pkg/constants"
 	"github.com/spf13/cobra"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -20,10 +20,10 @@ import (
 )
 
 type nsDescribeOpts struct {
-	streams genericclioptions.IOStreams
-	client  client.Client
-	name    string
-	innuNS  string
+	streams    genericclioptions.IOStreams
+	client     client.Client
+	name       string
+	accurateNS string
 }
 
 func newNSDescribeCmd(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
@@ -41,7 +41,7 @@ func newNSDescribeCmd(streams genericclioptions.IOStreams, config *genericcliopt
 		},
 	}
 
-	cmd.Flags().StringVar(&opts.innuNS, "innu-namespace", "innu", "the namespace of Innu controller")
+	cmd.Flags().StringVar(&opts.accurateNS, "accurate-namespace", "accurate", "the namespace of accurate-controller")
 	return cmd
 }
 
@@ -79,8 +79,8 @@ func (o *nsDescribeOpts) getChildren(ctx context.Context, k string) ([]string, e
 
 func (o *nsDescribeOpts) getConfig(ctx context.Context) (*config.Config, error) {
 	deployment := &appsv1.Deployment{}
-	if err := o.client.Get(ctx, client.ObjectKey{Namespace: o.innuNS, Name: "innu-controller-manager"}, deployment); err != nil {
-		return nil, fmt.Errorf("failed to get deployment %s/%s: %w", o.innuNS, "innu-controller-manager", err)
+	if err := o.client.Get(ctx, client.ObjectKey{Namespace: o.accurateNS, Name: "accurate-controller-manager"}, deployment); err != nil {
+		return nil, fmt.Errorf("failed to get deployment %s/%s: %w", o.accurateNS, "accurate-controller-manager", err)
 	}
 
 	var cmName string
@@ -89,14 +89,14 @@ func (o *nsDescribeOpts) getConfig(ctx context.Context) (*config.Config, error) 
 			continue
 		}
 		if vol.ConfigMap == nil {
-			return nil, fmt.Errorf("invalid config volume in Deployment %s/%s", o.innuNS, "innu-controller-manager")
+			return nil, fmt.Errorf("invalid config volume in Deployment %s/%s", o.accurateNS, "accurate-controller-manager")
 		}
 		cmName = vol.ConfigMap.Name
 	}
 
 	cm := &corev1.ConfigMap{}
-	if err := o.client.Get(ctx, client.ObjectKey{Namespace: o.innuNS, Name: cmName}, cm); err != nil {
-		return nil, fmt.Errorf("failed to get configmap %s/%s: %w", o.innuNS, cmName, err)
+	if err := o.client.Get(ctx, client.ObjectKey{Namespace: o.accurateNS, Name: cmName}, cm); err != nil {
+		return nil, fmt.Errorf("failed to get configmap %s/%s: %w", o.accurateNS, cmName, err)
 	}
 
 	cfg := &config.Config{}

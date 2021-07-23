@@ -1,7 +1,7 @@
 Release procedure
 =================
 
-This document describes how to release a new version of Innu.
+This document describes how to release a new version of accurate.
 
 ## Versioning
 

@@ -3,7 +3,7 @@ package hooks
 import (
 	"context"
 
-	"github.com/cybozu-go/innu/pkg/constants"
+	"github.com/cybozu-go/accurate/pkg/constants"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -39,7 +39,7 @@ var _ = Describe("Namespace webhook", func() {
 		err = k8sClient.Create(ctx, instance)
 		Expect(err).NotTo(HaveOccurred())
 
-		By("removing innu.cybozu.com/type label from tmpl1")
+		By("removing accurate.cybozu.com/type label from tmpl1")
 		ns.Labels = nil
 		err = k8sClient.Update(ctx, ns)
 		Expect(err).To(HaveOccurred())

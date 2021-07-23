@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/cybozu-go/innu/pkg/cluster"
-	"github.com/cybozu-go/innu/pkg/constants"
-	"github.com/cybozu-go/innu/pkg/indexing"
+	"github.com/cybozu-go/accurate/pkg/cluster"
+	"github.com/cybozu-go/accurate/pkg/constants"
+	"github.com/cybozu-go/accurate/pkg/indexing"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"

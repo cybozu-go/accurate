@@ -13,12 +13,12 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
-      path: /mutate-innu-cybozu-com-v1-subnamespace
+      path: /mutate-accurate-cybozu-com-v1-subnamespace
   failurePolicy: Fail
   name: msubnamespace.kb.io
   rules:
   - apiGroups:
-    - innu.cybozu.com
+    - accurate.cybozu.com
     apiVersions:
     - v1
     operations:
@@ -64,12 +64,12 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
-      path: /validate-innu-cybozu-com-v1-subnamespace
+      path: /validate-accurate-cybozu-com-v1-subnamespace
   failurePolicy: Fail
   name: vsubnamespace.kb.io
   rules:
   - apiGroups:
-    - innu.cybozu.com
+    - accurate.cybozu.com
     apiVersions:
     - v1
     operations:

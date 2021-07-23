@@ -19,7 +19,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - innu.cybozu.com
+  - accurate.cybozu.com
   resources:
   - subnamespaces
   verbs:
@@ -31,13 +31,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - innu.cybozu.com
+  - accurate.cybozu.com
   resources:
   - subnamespaces/finalizers
   verbs:
   - update
 - apiGroups:
-  - innu.cybozu.com
+  - accurate.cybozu.com
   resources:
   - subnamespaces/status
   verbs:

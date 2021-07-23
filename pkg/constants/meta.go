@@ -1,9 +1,9 @@
 package constants
 
-// MetaPrefix is the MetaPrefix for labels, annotations, and finalizers of Innu.
-const MetaPrefix = "innu.cybozu.com/"
+// MetaPrefix is the MetaPrefix for labels, annotations, and finalizers of Accurate.
+const MetaPrefix = "accurate.cybozu.com/"
 
-// Finalizer is the finalizer ID of Innu.
+// Finalizer is the finalizer ID of Accurate.
 const Finalizer = MetaPrefix + "finalizer"
 
 // Labels
@@ -24,7 +24,7 @@ const (
 
 // Label or annotation values
 const (
-	CreatedBy       = "innu"
+	CreatedBy       = "accurate"
 	NSTypeTemplate  = "template"
 	NSTypeRoot      = "root"
 	PropagateCreate = "create"

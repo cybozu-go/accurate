@@ -7,7 +7,7 @@ metadata:
     rbac.authorization.k8s.io/aggregate-to-view: "true"
 rules:
 - apiGroups:
-  - innu.cybozu.com
+  - accurate.cybozu.com
   resources:
   - subnamespaces
   verbs:
@@ -15,7 +15,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - innu.cybozu.com
+  - accurate.cybozu.com
   resources:
   - subnamespaces/status
   verbs:

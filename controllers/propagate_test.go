@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/cybozu-go/innu/pkg/constants"
-	"github.com/cybozu-go/innu/pkg/indexing"
+	"github.com/cybozu-go/accurate/pkg/constants"
+	"github.com/cybozu-go/accurate/pkg/indexing"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -138,7 +138,7 @@ var _ = Describe("SubNamespace controller", func() {
 		err = k8sClient.Get(ctx, client.ObjectKey{Namespace: sub1NS, Name: "svc2"}, svc2Sub1)
 		Expect(apierrors.IsNotFound(err)).To(BeTrue())
 
-		By("deleting a sub-resource to check that Innu re-creates it")
+		By("deleting a sub-resource to check that Accurate re-creates it")
 		uid := svc1Sub2.UID
 		err = k8sClient.Delete(ctx, svc1Sub2)
 		Expect(err).NotTo(HaveOccurred())
@@ -150,7 +150,7 @@ var _ = Describe("SubNamespace controller", func() {
 			return svc.UID
 		}).ShouldNot(Equal(uid))
 
-		By("updating a sub-resource to check that Innu won't fix it")
+		By("updating a sub-resource to check that Accurate won't fix it")
 		svc1Sub1.Annotations["hoge"] = "fuga"
 		err = k8sClient.Update(ctx, svc1Sub1)
 		Expect(err).NotTo(HaveOccurred())
@@ -244,7 +244,7 @@ var _ = Describe("SubNamespace controller", func() {
 		err = k8sClient.Get(ctx, client.ObjectKey{Namespace: instanceNS, Name: "svc2"}, svc2Instance)
 		Expect(apierrors.IsNotFound(err)).To(BeTrue())
 
-		By("deleting a sub-resource to check that Innu re-creates it")
+		By("deleting a sub-resource to check that Accurate re-creates it")
 		uid := svc1Instance.UID
 		err = k8sClient.Delete(ctx, svc1Instance)
 		Expect(err).NotTo(HaveOccurred())
@@ -300,7 +300,7 @@ var _ = Describe("SubNamespace controller", func() {
 		Expect(svc1Sub1Sub.Spec.Ports).To(HaveLen(1))
 		Expect(svc1Sub1Sub.Spec.Ports[0].Port).To(BeNumerically("==", 3333))
 
-		By("deleting a sub-resource to check that Innu re-creates it")
+		By("deleting a sub-resource to check that Accurate re-creates it")
 		uid := svc1Sub2.UID
 		err = k8sClient.Delete(ctx, svc1Sub2)
 		Expect(err).NotTo(HaveOccurred())
@@ -312,7 +312,7 @@ var _ = Describe("SubNamespace controller", func() {
 			return svc.UID
 		}).ShouldNot(Equal(uid))
 
-		By("updating a sub-resource to check that Innu fixes it")
+		By("updating a sub-resource to check that Accurate fixes it")
 		svc1Sub1.Annotations[constants.AnnPropagate] = constants.PropagateCreate
 		err = k8sClient.Update(ctx, svc1Sub1)
 		Expect(err).NotTo(HaveOccurred())
@@ -329,7 +329,7 @@ var _ = Describe("SubNamespace controller", func() {
 		time.Sleep(100 * time.Millisecond)
 		Expect(svc1Sub1Sub.ResourceVersion).To(Equal(rv2))
 
-		By("updating a root resource to check that Innu propagates the change to sub-resources")
+		By("updating a root resource to check that Accurate propagates the change to sub-resources")
 		svc1.Labels = map[string]string{"foo": "bar"}
 		err = k8sClient.Update(ctx, svc1)
 		Expect(err).NotTo(HaveOccurred())
@@ -344,7 +344,7 @@ var _ = Describe("SubNamespace controller", func() {
 			}).Should(Equal("bar"))
 		}
 
-		By("deleting a root resource to check that Innu cascades the deletion")
+		By("deleting a root resource to check that Accurate cascades the deletion")
 		err = k8sClient.Delete(ctx, svc1)
 		Expect(err).NotTo(HaveOccurred())
 

@@ -1,4 +1,4 @@
-package innu
+package accurate
 
-// Version represents the version of Innu.
+// Version represents the version of accurate.
 const Version = "0.0.1"

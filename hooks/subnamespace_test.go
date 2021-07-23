@@ -3,8 +3,8 @@ package hooks
 import (
 	"context"
 
-	innuv1 "github.com/cybozu-go/innu/api/v1"
-	"github.com/cybozu-go/innu/pkg/constants"
+	accuratev1 "github.com/cybozu-go/accurate/api/v1"
+	"github.com/cybozu-go/accurate/pkg/constants"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -21,7 +21,7 @@ var _ = Describe("SubNamespace webhook", func() {
 		err := k8sClient.Create(ctx, ns)
 		Expect(err).NotTo(HaveOccurred())
 
-		sn := &innuv1.SubNamespace{}
+		sn := &accuratev1.SubNamespace{}
 		sn.Namespace = "ns1"
 		sn.Name = "foo"
 		err = k8sClient.Create(ctx, sn)
@@ -35,7 +35,7 @@ var _ = Describe("SubNamespace webhook", func() {
 		err := k8sClient.Create(ctx, ns)
 		Expect(err).NotTo(HaveOccurred())
 
-		sn := &innuv1.SubNamespace{}
+		sn := &accuratev1.SubNamespace{}
 		sn.Namespace = "ns2"
 		sn.Name = "foo"
 		err = k8sClient.Create(ctx, sn)
@@ -48,7 +48,7 @@ var _ = Describe("SubNamespace webhook", func() {
 		err = k8sClient.Update(ctx, sn)
 		Expect(err).NotTo(HaveOccurred())
 
-		sn = &innuv1.SubNamespace{}
+		sn = &accuratev1.SubNamespace{}
 		err = k8sClient.Get(ctx, client.ObjectKey{Namespace: "ns2", Name: "foo"}, sn)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(sn.Finalizers).To(BeEmpty())
@@ -67,7 +67,7 @@ var _ = Describe("SubNamespace webhook", func() {
 		err = k8sClient.Create(ctx, ns)
 		Expect(err).NotTo(HaveOccurred())
 
-		sn := &innuv1.SubNamespace{}
+		sn := &accuratev1.SubNamespace{}
 		sn.Namespace = "ns3"
 		sn.Name = "bar"
 		err = k8sClient.Create(ctx, sn)

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/cybozu-go/innu/pkg/constants"
+	"github.com/cybozu-go/accurate/pkg/constants"
 	admissionv1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -29,8 +29,8 @@ var _ admission.Handler = &namespaceValidator{}
 // - Circular references among namespaces.
 // - Allowing a sub-namespace to set a template.
 // - Marking a sub-namespace as a root namespace.
-// - Deleting `innu.cybozu.com/type=root` label from root namespaces having one or more sub-namespaces.
-// - Deleting `innu.cybozu.com/type=template` label from template namespaces having one or more instance namespaces.
+// - Deleting `accurate.cybozu.com/type=root` label from root namespaces having one or more sub-namespaces.
+// - Deleting `accurate.cybozu.com/type=template` label from template namespaces having one or more instance namespaces.
 // - Dangling sub-namespaces (sub-namespaces whose parent namespace is missing).
 // - Dangling instance namespaces (namespaces whose template namespace is missing).
 // - Changing a sub-namespace to a non-root namespace when it has child sub-namespaces.

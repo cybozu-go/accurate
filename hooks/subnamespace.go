@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
-	innuv1 "github.com/cybozu-go/innu/api/v1"
-	"github.com/cybozu-go/innu/pkg/constants"
+	accuratev1 "github.com/cybozu-go/accurate/api/v1"
+	"github.com/cybozu-go/accurate/pkg/constants"
 	admissionv1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -16,7 +16,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
-//+kubebuilder:webhook:path=/mutate-innu-cybozu-com-v1-subnamespace,mutating=true,failurePolicy=fail,sideEffects=None,groups=innu.cybozu.com,resources=subnamespaces,verbs=create;update,versions=v1,name=msubnamespace.kb.io,admissionReviewVersions={v1,v1beta1}
+//+kubebuilder:webhook:path=/mutate-accurate-cybozu-com-v1-subnamespace,mutating=true,failurePolicy=fail,sideEffects=None,groups=accurate.cybozu.com,resources=subnamespaces,verbs=create;update,versions=v1,name=msubnamespace.kb.io,admissionReviewVersions={v1,v1beta1}
 
 type subNamespaceMutator struct {
 	dec *admission.Decoder
@@ -29,7 +29,7 @@ func (m *subNamespaceMutator) Handle(ctx context.Context, req admission.Request)
 		return admission.Allowed("")
 	}
 
-	sn := &innuv1.SubNamespace{}
+	sn := &accuratev1.SubNamespace{}
 	if err := m.dec.Decode(req, sn); err != nil {
 		return admission.Errored(http.StatusBadRequest, err)
 	}
@@ -43,7 +43,7 @@ func (m *subNamespaceMutator) Handle(ctx context.Context, req admission.Request)
 	return admission.PatchResponseFromRaw(req.Object.Raw, data)
 }
 
-//+kubebuilder:webhook:path=/validate-innu-cybozu-com-v1-subnamespace,mutating=false,failurePolicy=fail,sideEffects=None,groups=innu.cybozu.com,resources=subnamespaces,verbs=create;update,versions=v1,name=vsubnamespace.kb.io,admissionReviewVersions={v1,v1beta1}
+//+kubebuilder:webhook:path=/validate-accurate-cybozu-com-v1-subnamespace,mutating=false,failurePolicy=fail,sideEffects=None,groups=accurate.cybozu.com,resources=subnamespaces,verbs=create;update,versions=v1,name=vsubnamespace.kb.io,admissionReviewVersions={v1,v1beta1}
 
 type subNamespaceValidator struct {
 	client.Client
@@ -57,7 +57,7 @@ func (v *subNamespaceValidator) Handle(ctx context.Context, req admission.Reques
 		return admission.Allowed("")
 	}
 
-	sn := &innuv1.SubNamespace{}
+	sn := &accuratev1.SubNamespace{}
 	if err := v.dec.Decode(req, sn); err != nil {
 		return admission.Errored(http.StatusBadRequest, err)
 	}
@@ -81,11 +81,11 @@ func SetupSubNamespaceWebhook(mgr manager.Manager, dec *admission.Decoder) {
 	m := &subNamespaceMutator{
 		dec: dec,
 	}
-	serv.Register("/mutate-innu-cybozu-com-v1-subnamespace", &webhook.Admission{Handler: m})
+	serv.Register("/mutate-accurate-cybozu-com-v1-subnamespace", &webhook.Admission{Handler: m})
 
 	v := &subNamespaceValidator{
 		Client: mgr.GetClient(),
 		dec:    dec,
 	}
-	serv.Register("/validate-innu-cybozu-com-v1-subnamespace", &webhook.Admission{Handler: v})
+	serv.Register("/validate-accurate-cybozu-com-v1-subnamespace", &webhook.Admission{Handler: v})
 }

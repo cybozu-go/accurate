@@ -1,17 +1,17 @@
 domain: cybozu.com
 layout:
 - go.kubebuilder.io/v3
-projectName: innu
-repo: github.com/cybozu-go/innu
+projectName: accurate
+repo: github.com/cybozu-go/accurate
 resources:
 - api:
     crdVersion: v1
     namespaced: true
   controller: true
   domain: cybozu.com
-  group: innu
+  group: accurate
   kind: SubNamespace
-  path: github.com/cybozu-go/innu/api/v1
+  path: github.com/cybozu-go/accurate/api/v1
   version: v1
   webhooks:
     defaulting: true

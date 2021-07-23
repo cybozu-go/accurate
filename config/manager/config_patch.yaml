@@ -10,8 +10,8 @@ spec:
       - name: manager
         volumeMounts:
         - name: config
-          mountPath: /etc/innu
+          mountPath: /etc/accurate
       volumes:
       - name: config
         configMap:
-          name: innu-config
+          name: accurate-config
