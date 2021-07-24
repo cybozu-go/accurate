@@ -16,12 +16,12 @@ It is strongly recommended to install `kubectl-accurate` though Accurate can be 
 
 1. Set `ARCH` to the operating system name
 
-    OS is one of `amd64` or `arm64`.
+    ARCH is one of `amd64` or `arm64`.
 
     If Go is available, `ARCH` can be set automatically as follows:
 
     ```console
-    $ OS=$(go env GOARCH)
+    $ ARCH=$(go env GOARCH)
     ```
 
 2. Download the binary and put it in a directory of your `PATH`.

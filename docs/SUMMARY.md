@@ -13,8 +13,8 @@
 - [Usage](usage.md)
     - [Showing information](info.md)
     - [Setting up templates](templates.md)
-    - [Sub-namespace operations](subnamespaces.md)
     - [Propagating resources](propagation.md)
+    - [Sub-namespace operations](subnamespaces.md)
 
 # References
 
