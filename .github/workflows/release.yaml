@@ -1,0 +1,42 @@
+name: Release
+on:
+  push:
+    tags:
+    - 'v*'
+env:
+  go-version: 1.16
+jobs:
+  image:
+    name: Push Container Image
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build images
+      run: |
+        docker build -t accurate:dev .
+    - name: Login to ghcr.io
+      run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+    - name: Push images
+      run: |
+        TAG=${GITHUB_REF#refs/tags/v}
+        docker tag accurate:dev ghcr.io/cybozu-go/accurate:$TAG
+        docker push ghcr.io/cybozu-go/accurate:$TAG
+  release:
+    name: Release on GitHub
+    needs: image
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.go-version }}
+    - run: make release-build
+    - name: Create Release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        tagname="${GITHUB_REF#refs/tags/}"
+        if echo ${{ github.ref }} | grep -q -e '-'; then prerelease=-p; fi
+        gh release create -t "Release $tagname" $prerelease \
+          -n "See [CHANGELOG.md](./CHANGELOG.md) for details." \
+          "$tagname" build/*
