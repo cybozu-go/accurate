@@ -150,6 +150,39 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="deploying-accurate"><a class="header" href="#deploying-accurate">Deploying Accurate</a></h1>
+<ol>
+<li>
+<p>(Optional) Prepare cert-manager</p>
+<p>Accurate depends on <a href="https://cert-manager.io/">cert-manager</a> to issue TLS certificate for admission webhooks.
+If cert-manager is not installed on your cluster, install it as follows:</p>
+<pre><code class="language-console">$ curl -fsLO https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
+$ kubectl apply -f cert-manager.yaml
+</code></pre>
+</li>
+<li>
+<p>Download the release tar ball</p>
+<p>Visit https://github.com/cybozu-go/accurate/releases/latest and download the source tar ball.</p>
+</li>
+<li>
+<p>Unpack the tar ball and edit <code>config.yaml</code> in the top directory</p>
+<p>Read <a href="config.html">Configurations</a> for details.</p>
+</li>
+<li>
+<p>Download <code>kustomize</code></p>
+<p>In the top directory of unpacked source code, run <code>make kustomize</code>.</p>
+<pre><code class="language-console">$ make kustomize
+</code></pre>
+</li>
+<li>
+<p>Apply the manifest of Accurate</p>
+<pre><code class="language-console">$ ./bin/kustomize build . | kubectl apply -f -
+</code></pre>
+</li>
+<li>
+<p>(Optional) Apply additional RBAC resources</p>
+<p>Read <a href="config.html">Configurations</a> for details.</p>
+</li>
+</ol>
 
                     </main>
 

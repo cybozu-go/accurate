@@ -150,6 +150,38 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="propagating-resources"><a class="header" href="#propagating-resources">Propagating resources</a></h1>
+<p>Accurate propagates only resources annotated with <code>accurate.cybozu.com/propagate=&lt;mode&gt;</code>.</p>
+<p>The Group/Version/Kind of the resource must be listed in the <a href="config.html">configuration file</a>.</p>
+<p>In the following examples, <code>&lt;mode&gt;</code> represents either <code>create</code> or <code>update</code>.
+Read <a href="concepts.html">Concepts</a> about the propagation modes.</p>
+<h2 id="annotating-a-resource-for-propagation"><a class="header" href="#annotating-a-resource-for-propagation">Annotating a resource for propagation</a></h2>
+<p>The following is an example to propagate Secrets.</p>
+<p>Using <code>kubectl</code>:</p>
+<pre><code class="language-console">$ kubectl annotate secrets &lt;name&gt; accurate.cybozu.com/propagate=&lt;mode&gt;
+</code></pre>
+<p>Applying YAML manifests:</p>
+<pre><code class="language-console">apiVersion: v1
+kind: Secret
+metadata:
+  namespace: default
+  name: &lt;name&gt;
+  annotations:
+    accurate.cybozu.com/propagate: &lt;mode&gt;
+</code></pre>
+<h2 id="annotating-a-resource-to-propagate-resources-created-from-it"><a class="header" href="#annotating-a-resource-to-propagate-resources-created-from-it">Annotating a resource to propagate resources created from it</a></h2>
+<p>For example, a Secret created from cert-manager's Certificate can automatically be propagated.</p>
+<p>To do this, Certificate should be annotated with <code>accurate.cybozu.com/propagate-generated=&lt;mode&gt;</code> at the time of creation.</p>
+<pre><code class="language-yaml">apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  namespace: default
+  name: example-cert
+  annotations:
+    accurate.cybozu.com/propagate-generated: &lt;mode&gt;
+spec:
+  ...
+</code></pre>
+<p><code>accurate-controller</code> needs to be able to get Certificate objects.</p>
 
                     </main>
 

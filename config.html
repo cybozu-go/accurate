@@ -151,8 +151,8 @@
                     <main>
                         <h1 id="configurations"><a class="header" href="#configurations">Configurations</a></h1>
 <h2 id="configuration-file"><a class="header" href="#configuration-file">Configuration file</a></h2>
-<p><a href="accurate-controller.html"><code>accurate-controller</code></a> reads its configurations from a configuration file.
-The repository includes an example as follows:</p>
+<p><a href="accurate-controller.html"><code>accurate-controller</code></a> reads its configurations from a configuration file.</p>
+<p>The repository includes an example as follows:</p>
 <pre><code class="language-yaml"># Labels to be propagated to sub-namespaces.
 labelKeys:
 - team
@@ -174,6 +174,46 @@ watches:
   kind: RoleBinding
 - version: v1
   kind: Secret
+</code></pre>
+<p>Only labels and annotations specified in the configuration file will be inherited.</p>
+<p>Likewise, Accurate watches only namespace-scope resources specified in the configuration file.</p>
+<p>Edit <code>config.yaml</code> in the top directory of the repository.
+The file will be embedded in ConfigMap laster using <code>kustomize</code>.</p>
+<h2 id="clusterrolebindings"><a class="header" href="#clusterrolebindings">ClusterRoleBindings</a></h2>
+<p><code>config/rbac/role_binding.yaml</code> contains ClusterRoleBindings for <code>accurate-controller</code>.</p>
+<p>A built-in ClusterRole <code>admin</code> is bound by default to allow <code>accurate-controller</code> to watch and propagate namespace-scope resources.  However, <code>admin</code> does not contain verbs for <a href="https://kubernetes.io/docs/concepts/policy/resource-quotas/">ResourceQuota</a> and may not contain custom resources.</p>
+<p>If you need to watch and propagate resources not included in <code>admin</code> ClusterRole, add additional ClusterRole/ClusterRoleBinding to <code>accurate-controller-manager</code> ServiceAccount in <code>accurate</code> namespace.</p>
+<p>The following example is to watch and propagate ResourceQuotas.</p>
+<pre><code class="language-yaml">apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: accurate-additional-resources
+rules:
+- apiGroups:
+  - &quot;&quot;
+  resources:
+  - resourcequotas
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: accurate-additional-resources
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: accurate-additional-resources
+subjects:
+- kind: ServiceAccount
+  name: accurate-controller-manager
+  namespace: accurate
 </code></pre>
 
                     </main>

@@ -150,6 +150,85 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="sub-namespace-operations"><a class="header" href="#sub-namespace-operations">Sub-namespace operations</a></h1>
+<p>Sub-namespaces is a feature of Accurate to allow tenant users to create Namespaces and delete the created Namespaces.</p>
+<p>Sub-namespaces can be created in either a root Namespace or a sub-namespace.</p>
+<p>In the following examples, <code>&lt;name&gt;</code> represents a Namespace name to be changed.
+Likewise, <code>&lt;parent&gt;</code> represents a root or another sub-namespace.</p>
+<h2 id="setting-a-namespace-as-a-root-namespace"><a class="header" href="#setting-a-namespace-as-a-root-namespace">Setting a Namespace as a root Namespace</a></h2>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate ns set-type &lt;name&gt; root
+</code></pre>
+<p>Applying YAML manifests:</p>
+<pre><code class="language-console">apiVersion: v1
+kind: Namespace
+metadata:
+  name: &lt;name&gt;
+  labels:
+    accurate.cybozu.com/type: root
+</code></pre>
+<h2 id="reverting-a-root-namespace-to-a-normal-one"><a class="header" href="#reverting-a-root-namespace-to-a-normal-one">Reverting a root Namespace to a normal one</a></h2>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate ns set-type &lt;name&gt; none
+</code></pre>
+<p>Applying YAML manifests:</p>
+<p>Remove <code>accurate.cybozu.com/type</code> label.</p>
+<h2 id="creating-a-sub-namespace"><a class="header" href="#creating-a-sub-namespace">Creating a sub-namespace</a></h2>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate sub create &lt;name&gt; &lt;parent&gt;
+</code></pre>
+<p>Applying YAML manifests:</p>
+<pre><code class="language-console">apiVersion: accurate.cybozu.com/v1
+kind: SubNamespace
+metadata:
+  namespace: &lt;parent&gt;
+  name: &lt;name&gt;
+</code></pre>
+<h2 id="deleting-a-created-sub-namespace"><a class="header" href="#deleting-a-created-sub-namespace">Deleting a created sub-namespace</a></h2>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate sub delete &lt;name&gt;
+</code></pre>
+<p>Applying YAML manifests:</p>
+<p>Delete the created SubNamespace object.</p>
+<h2 id="changing-the-parent-of-a-sub-namespace"><a class="header" href="#changing-the-parent-of-a-sub-namespace">Changing the parent of a sub-namespace</a></h2>
+<p>Only cluster admins can do this.</p>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate sub move &lt;name&gt; &lt;new-parent&gt;
+</code></pre>
+<p>Applying YAML manifests:</p>
+<pre><code class="language-console">apiVersion: v1
+kind: Namespace
+metadata:
+  name: &lt;name&gt;
+  labels:
+    accurate.cybozu.com/parent: &lt;new-parent&gt;
+</code></pre>
+<h2 id="converting-a-normal-namespace-to-a-sub-namespace"><a class="header" href="#converting-a-normal-namespace-to-a-sub-namespace">Converting a normal Namespace to a sub-namespace</a></h2>
+<p>Only cluster admins can do this.</p>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate sub graft &lt;name&gt; &lt;parent&gt;
+</code></pre>
+<p>Applying YAML manifests:</p>
+<pre><code class="language-console">apiVersion: v1
+kind: Namespace
+metadata:
+  name: &lt;name&gt;
+  labels:
+    accurate.cybozu.com/parent: &lt;parent&gt;
+</code></pre>
+<h2 id="converting-a-sub-namespace-to-a-root-namespace"><a class="header" href="#converting-a-sub-namespace-to-a-root-namespace">Converting a sub-namespace to a root Namespace</a></h2>
+<p>Only cluster admins can do this.</p>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate sub cut &lt;name&gt;
+</code></pre>
+<p>Applying YAML manifests:</p>
+<pre><code class="language-console">apiVersion: v1
+kind: Namespace
+metadata:
+  name: &lt;name&gt;
+  labels:
+    accurate.cybozu.com/type: root
+    # and remove accurate.cybozu.com/parent label
+</code></pre>
 
                     </main>
 

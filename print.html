@@ -245,8 +245,8 @@ Labels, annotations, and resources can be propagated from a template Namespace t
 </ol>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="configurations"><a class="header" href="#configurations">Configurations</a></h1>
 <h2 id="configuration-file"><a class="header" href="#configuration-file">Configuration file</a></h2>
-<p><a href="accurate-controller.html"><code>accurate-controller</code></a> reads its configurations from a configuration file.
-The repository includes an example as follows:</p>
+<p><a href="accurate-controller.html"><code>accurate-controller</code></a> reads its configurations from a configuration file.</p>
+<p>The repository includes an example as follows:</p>
 <pre><code class="language-yaml"># Labels to be propagated to sub-namespaces.
 labelKeys:
 - team
@@ -269,12 +269,284 @@ watches:
 - version: v1
   kind: Secret
 </code></pre>
+<p>Only labels and annotations specified in the configuration file will be inherited.</p>
+<p>Likewise, Accurate watches only namespace-scope resources specified in the configuration file.</p>
+<p>Edit <code>config.yaml</code> in the top directory of the repository.
+The file will be embedded in ConfigMap laster using <code>kustomize</code>.</p>
+<h2 id="clusterrolebindings"><a class="header" href="#clusterrolebindings">ClusterRoleBindings</a></h2>
+<p><code>config/rbac/role_binding.yaml</code> contains ClusterRoleBindings for <code>accurate-controller</code>.</p>
+<p>A built-in ClusterRole <code>admin</code> is bound by default to allow <code>accurate-controller</code> to watch and propagate namespace-scope resources.  However, <code>admin</code> does not contain verbs for <a href="https://kubernetes.io/docs/concepts/policy/resource-quotas/">ResourceQuota</a> and may not contain custom resources.</p>
+<p>If you need to watch and propagate resources not included in <code>admin</code> ClusterRole, add additional ClusterRole/ClusterRoleBinding to <code>accurate-controller-manager</code> ServiceAccount in <code>accurate</code> namespace.</p>
+<p>The following example is to watch and propagate ResourceQuotas.</p>
+<pre><code class="language-yaml">apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: accurate-additional-resources
+rules:
+- apiGroups:
+  - &quot;&quot;
+  resources:
+  - resourcequotas
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: accurate-additional-resources
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: accurate-additional-resources
+subjects:
+- kind: ServiceAccount
+  name: accurate-controller-manager
+  namespace: accurate
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="deploying-accurate"><a class="header" href="#deploying-accurate">Deploying Accurate</a></h1>
+<ol>
+<li>
+<p>(Optional) Prepare cert-manager</p>
+<p>Accurate depends on <a href="https://cert-manager.io/">cert-manager</a> to issue TLS certificate for admission webhooks.
+If cert-manager is not installed on your cluster, install it as follows:</p>
+<pre><code class="language-console">$ curl -fsLO https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
+$ kubectl apply -f cert-manager.yaml
+</code></pre>
+</li>
+<li>
+<p>Download the release tar ball</p>
+<p>Visit https://github.com/cybozu-go/accurate/releases/latest and download the source tar ball.</p>
+</li>
+<li>
+<p>Unpack the tar ball and edit <code>config.yaml</code> in the top directory</p>
+<p>Read <a href="config.html">Configurations</a> for details.</p>
+</li>
+<li>
+<p>Download <code>kustomize</code></p>
+<p>In the top directory of unpacked source code, run <code>make kustomize</code>.</p>
+<pre><code class="language-console">$ make kustomize
+</code></pre>
+</li>
+<li>
+<p>Apply the manifest of Accurate</p>
+<pre><code class="language-console">$ ./bin/kustomize build . | kubectl apply -f -
+</code></pre>
+</li>
+<li>
+<p>(Optional) Apply additional RBAC resources</p>
+<p>Read <a href="config.html">Configurations</a> for details.</p>
+</li>
+</ol>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="installing-kubectl-plugin"><a class="header" href="#installing-kubectl-plugin">Installing kubectl plugin</a></h1>
+<p><code>kubectl-accurate</code> is a plugin for <code>kubectl</code> to make operations of Accurate easy.</p>
+<p>It is strongly recommended to install <code>kubectl-accurate</code> though Accurate can be used without the plugin.</p>
+<ol>
+<li>
+<p>Set <code>OS</code> to the operating system name</p>
+<p>OS is one of <code>linux</code>, <code>windows</code>, or <code>darwin</code> (MacOS).</p>
+<p>If Go is available, <code>OS</code> can be set automatically as follows:</p>
+<pre><code class="language-console">$ OS=$(go env GOOS)
+</code></pre>
+</li>
+<li>
+<p>Set <code>ARCH</code> to the operating system name</p>
+<p>OS is one of <code>amd64</code> or <code>arm64</code>.</p>
+<p>If Go is available, <code>ARCH</code> can be set automatically as follows:</p>
+<pre><code class="language-console">$ OS=$(go env GOARCH)
+</code></pre>
+</li>
+<li>
+<p>Download the binary and put it in a directory of your <code>PATH</code>.</p>
+<p>The following is an example to install the plugin in <code>/usr/local/bin</code>.</p>
+<pre><code class="language-console">$ sudo curl -o /usr/local/bin/kubectl-accurate -sLf \
+  https://github.com/cybozu-go/accurate/releases/latest/download/kubectl-accurate-${OS}-${ARCH}
+$ sudo chmod a+x /usr/local/bin/kubectl-accurate
+</code></pre>
+</li>
+<li>
+<p>Check the installation</p>
+<p>Run <code>kubectl accurate -h</code> and see the output looks like:</p>
+<pre><code class="language-console">$ kubectl accurate -h
+accurate is a subcommand of kubectl to manage Accurate features.
+
+Usage:
+  accurate [command]
+
+Available Commands:
+  completion  generate the autocompletion script for the specified shell
+  help        Help about any command
+  list        List namespace trees hierarchically
+  namespace   namespace subcommand
+  sub         sub-namespace command
+  template    template subcommand
+...
+</code></pre>
+</li>
+</ol>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="usage"><a class="header" href="#usage">Usage</a></h1>
+<p>Accurate can be used imperatively using <code>kubectl</code> or declaratively with YAML manifests.</p>
+<p>The following sections will show you the usage in both ways.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="setting-up-templates"><a class="header" href="#setting-up-templates">Setting up templates</a></h1>
+<p>Template is a feature of Accurate to propagate labels, annotations, and resources between normal Namespaces.</p>
+<p>Any Namespace except for sub-namespaces can reference a template Namespace.
+So, a template Namespace can reference another template Namespace.</p>
+<p>In the following examples, <code>&lt;name&gt;</code> represents a Namespace name to be changed.
+Likewise, <code>&lt;template&gt;</code> represents a template Namespace name.</p>
+<h2 id="setting-a-namespace-as-a-template"><a class="header" href="#setting-a-namespace-as-a-template">Setting a Namespace as a template</a></h2>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate ns set-type &lt;name&gt; template
+</code></pre>
+<p>Applying YAML manifests:</p>
+<pre><code class="language-console">apiVersion: v1
+kind: Namespace
+metadata:
+  name: &lt;name&gt;
+  labels:
+    accurate.cybozu.com/type: template
+</code></pre>
+<h2 id="reverting-a-template-namespace-to-a-normal-one"><a class="header" href="#reverting-a-template-namespace-to-a-normal-one">Reverting a template Namespace to a normal one</a></h2>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate ns set-type &lt;name&gt; none
+</code></pre>
+<p>Applying YAML manifests:</p>
+<p>Remove <code>accurate.cybozu.com/type</code> label.</p>
+<h2 id="setting-a-reference-to-a-template-namespace"><a class="header" href="#setting-a-reference-to-a-template-namespace">Setting a reference to a template Namespace</a></h2>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate template set &lt;name&gt; &lt;template&gt;
+</code></pre>
+<p>Applying YAML manifests:</p>
+<pre><code class="language-console">apiVersion: v1
+kind: Namespace
+metadata:
+  name: &lt;name&gt;
+  labels:
+    accurate.cybozu.com/template: &lt;template&gt;
+</code></pre>
+<h2 id="unsetting-a-reference-to-a-template-namespace"><a class="header" href="#unsetting-a-reference-to-a-template-namespace">Unsetting a reference to a template Namespace</a></h2>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate template unset &lt;name&gt;
+</code></pre>
+<p>Applying YAML manifests:</p>
+<p>Remove <code>accurate.cybozu.com/template</code> label.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="sub-namespace-operations"><a class="header" href="#sub-namespace-operations">Sub-namespace operations</a></h1>
+<p>Sub-namespaces is a feature of Accurate to allow tenant users to create Namespaces and delete the created Namespaces.</p>
+<p>Sub-namespaces can be created in either a root Namespace or a sub-namespace.</p>
+<p>In the following examples, <code>&lt;name&gt;</code> represents a Namespace name to be changed.
+Likewise, <code>&lt;parent&gt;</code> represents a root or another sub-namespace.</p>
+<h2 id="setting-a-namespace-as-a-root-namespace"><a class="header" href="#setting-a-namespace-as-a-root-namespace">Setting a Namespace as a root Namespace</a></h2>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate ns set-type &lt;name&gt; root
+</code></pre>
+<p>Applying YAML manifests:</p>
+<pre><code class="language-console">apiVersion: v1
+kind: Namespace
+metadata:
+  name: &lt;name&gt;
+  labels:
+    accurate.cybozu.com/type: root
+</code></pre>
+<h2 id="reverting-a-root-namespace-to-a-normal-one"><a class="header" href="#reverting-a-root-namespace-to-a-normal-one">Reverting a root Namespace to a normal one</a></h2>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate ns set-type &lt;name&gt; none
+</code></pre>
+<p>Applying YAML manifests:</p>
+<p>Remove <code>accurate.cybozu.com/type</code> label.</p>
+<h2 id="creating-a-sub-namespace"><a class="header" href="#creating-a-sub-namespace">Creating a sub-namespace</a></h2>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate sub create &lt;name&gt; &lt;parent&gt;
+</code></pre>
+<p>Applying YAML manifests:</p>
+<pre><code class="language-console">apiVersion: accurate.cybozu.com/v1
+kind: SubNamespace
+metadata:
+  namespace: &lt;parent&gt;
+  name: &lt;name&gt;
+</code></pre>
+<h2 id="deleting-a-created-sub-namespace"><a class="header" href="#deleting-a-created-sub-namespace">Deleting a created sub-namespace</a></h2>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate sub delete &lt;name&gt;
+</code></pre>
+<p>Applying YAML manifests:</p>
+<p>Delete the created SubNamespace object.</p>
+<h2 id="changing-the-parent-of-a-sub-namespace"><a class="header" href="#changing-the-parent-of-a-sub-namespace">Changing the parent of a sub-namespace</a></h2>
+<p>Only cluster admins can do this.</p>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate sub move &lt;name&gt; &lt;new-parent&gt;
+</code></pre>
+<p>Applying YAML manifests:</p>
+<pre><code class="language-console">apiVersion: v1
+kind: Namespace
+metadata:
+  name: &lt;name&gt;
+  labels:
+    accurate.cybozu.com/parent: &lt;new-parent&gt;
+</code></pre>
+<h2 id="converting-a-normal-namespace-to-a-sub-namespace"><a class="header" href="#converting-a-normal-namespace-to-a-sub-namespace">Converting a normal Namespace to a sub-namespace</a></h2>
+<p>Only cluster admins can do this.</p>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate sub graft &lt;name&gt; &lt;parent&gt;
+</code></pre>
+<p>Applying YAML manifests:</p>
+<pre><code class="language-console">apiVersion: v1
+kind: Namespace
+metadata:
+  name: &lt;name&gt;
+  labels:
+    accurate.cybozu.com/parent: &lt;parent&gt;
+</code></pre>
+<h2 id="converting-a-sub-namespace-to-a-root-namespace"><a class="header" href="#converting-a-sub-namespace-to-a-root-namespace">Converting a sub-namespace to a root Namespace</a></h2>
+<p>Only cluster admins can do this.</p>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate sub cut &lt;name&gt;
+</code></pre>
+<p>Applying YAML manifests:</p>
+<pre><code class="language-console">apiVersion: v1
+kind: Namespace
+metadata:
+  name: &lt;name&gt;
+  labels:
+    accurate.cybozu.com/type: root
+    # and remove accurate.cybozu.com/parent label
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="propagating-resources"><a class="header" href="#propagating-resources">Propagating resources</a></h1>
+<p>Accurate propagates only resources annotated with <code>accurate.cybozu.com/propagate=&lt;mode&gt;</code>.</p>
+<p>The Group/Version/Kind of the resource must be listed in the <a href="config.html">configuration file</a>.</p>
+<p>In the following examples, <code>&lt;mode&gt;</code> represents either <code>create</code> or <code>update</code>.
+Read <a href="concepts.html">Concepts</a> about the propagation modes.</p>
+<h2 id="annotating-a-resource-for-propagation"><a class="header" href="#annotating-a-resource-for-propagation">Annotating a resource for propagation</a></h2>
+<p>The following is an example to propagate Secrets.</p>
+<p>Using <code>kubectl</code>:</p>
+<pre><code class="language-console">$ kubectl annotate secrets &lt;name&gt; accurate.cybozu.com/propagate=&lt;mode&gt;
+</code></pre>
+<p>Applying YAML manifests:</p>
+<pre><code class="language-console">apiVersion: v1
+kind: Secret
+metadata:
+  namespace: default
+  name: &lt;name&gt;
+  annotations:
+    accurate.cybozu.com/propagate: &lt;mode&gt;
+</code></pre>
+<h2 id="annotating-a-resource-to-propagate-resources-created-from-it"><a class="header" href="#annotating-a-resource-to-propagate-resources-created-from-it">Annotating a resource to propagate resources created from it</a></h2>
+<p>For example, a Secret created from cert-manager's Certificate can automatically be propagated.</p>
+<p>To do this, Certificate should be annotated with <code>accurate.cybozu.com/propagate-generated=&lt;mode&gt;</code> at the time of creation.</p>
+<pre><code class="language-yaml">apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  namespace: default
+  name: example-cert
+  annotations:
+    accurate.cybozu.com/propagate-generated: &lt;mode&gt;
+spec:
+  ...
+</code></pre>
+<p><code>accurate-controller</code> needs to be able to get Certificate objects.</p>
 <div style="break-before: page; page-break-before: always;"></div><h3 id="custom-resources"><a class="header" href="#custom-resources">Custom Resources</a></h3>
 <ul>
 <li><a href="crd_subnamespace.html#subnamespace">SubNamespace</a></li>
@@ -641,7 +913,7 @@ With this rule, Accurate can delete such orphaned resources when the controller 
 <p>Accurate annotates the resource with <code>accurate.cybozu.com/propagate</code>.
 The annotation value is the same as <code>accurate.cybozu.com/propagate-generated</code> annotation.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="release-procedure"><a class="header" href="#release-procedure">Release procedure</a></h1>
-<p>This document describes how to release a new version of accurate.</p>
+<p>This document describes how to release a new version of Accurate.</p>
 <h2 id="versioning"><a class="header" href="#versioning">Versioning</a></h2>
 <p>Follow <a href="https://semver.org/spec/v2.0.0.html">semantic versioning 2.0.0</a> to choose the new version number.</p>
 <h2 id="prepare-change-log-entries"><a class="header" href="#prepare-change-log-entries">Prepare change log entries</a></h2>
