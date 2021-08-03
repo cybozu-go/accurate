@@ -1,8 +1,12 @@
 # Labels to be propagated to sub-namespaces.
+# It is also possible to specify a glob pattern that can be interpreted by Go's "filepath.Match" func.
+# https://pkg.go.dev/path/filepath#Match
 labelKeys:
 - team
 
 # Annotations to be propagated to sub-namespaces.
+# It is also possible to specify a glob pattern that can be interpreted by Go's "filepath.Match" func.
+# https://pkg.go.dev/path/filepath#Match
 annotationKeys:
 # An example to propagate an annotation for MetalLB
 # https://metallb.universe.tf/usage/#requesting-specific-ips

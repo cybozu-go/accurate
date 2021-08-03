@@ -51,8 +51,8 @@ var _ = Describe("Namespace controller", func() {
 
 		nr := &NamespaceReconciler{
 			Client:         mgr.GetClient(),
-			LabelKeys:      []string{"foo.bar/baz", "team"},
-			AnnotationKeys: []string{"foo.bar/zot", "memo"},
+			LabelKeys:      []string{"foo.bar/baz", "team", "*.glob/*"},
+			AnnotationKeys: []string{"foo.bar/zot", "memo", "*.glob/*"},
 			Watched:        []*unstructured.Unstructured{roleRes, secretRes},
 		}
 		err = nr.SetupWithManager(mgr)
@@ -335,11 +335,15 @@ var _ = Describe("Namespace controller", func() {
 		root := &corev1.Namespace{}
 		root.Name = "root"
 		root.Labels = map[string]string{
-			constants.LabelType: constants.NSTypeRoot,
-			"team":              "neco",
+			constants.LabelType:        constants.NSTypeRoot,
+			"team":                     "neco",
+			"foo.glob/a":               "glob",
+			"do.not.match/glob.patten": "glob",
 		}
 		root.Annotations = map[string]string{
-			"foo": "bar",
+			"foo":                      "bar",
+			"bar.glob/b":               "glob",
+			"do.not.match/glob.patten": "glob",
 		}
 		err := k8sClient.Create(ctx, root)
 		Expect(err).NotTo(HaveOccurred())
@@ -381,8 +385,12 @@ var _ = Describe("Namespace controller", func() {
 			}
 			return sub1.Labels["team"]
 		}).Should(Equal("neco"))
+		Expect(sub1.Labels).Should(HaveKeyWithValue("foo.glob/a", "glob"))
 		Expect(sub1.Labels).NotTo(HaveKey(constants.LabelType))
+		Expect(sub1.Labels).NotTo(HaveKey("do.not.match/glob/patten"))
+		Expect(sub1.Annotations).Should(HaveKeyWithValue("bar.glob/b", "glob"))
 		Expect(sub1.Annotations).NotTo(HaveKey("foo"))
+		Expect(sub1.Annotations).NotTo(HaveKey("do.not.match/glob/patten"))
 
 		Eventually(func() error {
 			cSec2 := &corev1.Secret{}

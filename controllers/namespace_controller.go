@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"reflect"
 
 	"github.com/cybozu-go/accurate/pkg/constants"
@@ -76,16 +77,30 @@ func (r *NamespaceReconciler) reconcile(ctx context.Context, ns *corev1.Namespac
 func (r *NamespaceReconciler) propagateMeta(ctx context.Context, ns, parent *corev1.Namespace) error {
 	orig := ns.DeepCopy()
 	for _, key := range r.LabelKeys {
-		if val, ok := parent.Labels[key]; ok {
-			ns.Labels[key] = val
+		for label, val := range parent.Labels {
+			ok, err := filepath.Match(key, label)
+			if err != nil {
+				return fmt.Errorf("malformed pattern for labelKeys %s: %w", key, err)
+			}
+
+			if ok {
+				ns.Labels[label] = val
+			}
 		}
 	}
 	for _, key := range r.AnnotationKeys {
-		if val, ok := parent.Annotations[key]; ok {
-			if ns.Annotations == nil {
-				ns.Annotations = make(map[string]string)
+		for annotation, val := range parent.Annotations {
+			ok, err := filepath.Match(key, annotation)
+			if err != nil {
+				return fmt.Errorf("malformed pattern for labelKeys %s: %w", key, err)
 			}
-			ns.Annotations[key] = val
+
+			if ok {
+				if ns.Annotations == nil {
+					ns.Annotations = make(map[string]string)
+				}
+				ns.Annotations[annotation] = val
+			}
 		}
 	}
 	if !reflect.DeepEqual(ns.ObjectMeta, orig.ObjectMeta) {
