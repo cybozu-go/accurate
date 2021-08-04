@@ -17,14 +17,15 @@ $ kubectl accurate list
 
 ## Show all template Namespaces
 
-Use `kubectl get ns -l accurate.cybozu.com/type=template`:
+Use `kubectl accurate template list`:
 
 ```console
-$ kubectl get ns -l accurate.cybozu.com/type=template
-NAME    STATUS   AGE
-tmpl1   Active   3m45s
-tmpl2   Active   3m43s
-tmpl3   Active   3m43s
+$ kubectl accurate template list
+ template1
+ template2
+    ⮡reference1
+    ⮡reference2
+ template3
 ```
 
 ## Show the properties of a Namespace

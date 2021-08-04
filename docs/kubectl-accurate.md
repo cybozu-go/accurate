@@ -70,6 +70,12 @@ Valid types are `root` or `template`.
 
 To unset the type, specify `none` as the type.
 
+### `template list [TEMPLATE]`
+
+List template namespace trees hierarchically.
+If TEMPLATE is not given, all root namespaces and their children will be shown.
+If TEMPLATE is given, only the tree under the TEMPLATE namespace will be shown.
+
 ### `template set NS TEMPLATE`
 
 Set `TEMPLATE` namespace as the template of `NS` namespace.
