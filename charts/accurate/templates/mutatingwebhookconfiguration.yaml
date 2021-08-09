@@ -1,0 +1,30 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: {{ template "accurate.fullname" . }}-mutating-webhook-configuration
+  annotations:
+    cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ template "accurate.fullname" . }}-serving-cert
+  labels:
+    {{- include "accurate.labels" . | nindent 4 }}
+webhooks:
+  - admissionReviewVersions:
+      - v1
+      - v1beta1
+    clientConfig:
+      service:
+        name: {{ template "accurate.fullname" . }}-webhook-service
+        namespace: {{ .Release.Namespace }}
+        path: /mutate-accurate-cybozu-com-v1-subnamespace
+    failurePolicy: Fail
+    name: msubnamespace.kb.io
+    rules:
+      - apiGroups:
+          - accurate.cybozu.com
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - subnamespaces
+    sideEffects: None
