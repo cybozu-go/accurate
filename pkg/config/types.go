@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"path/filepath"
+	"path"
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -21,14 +21,14 @@ type Config struct {
 func (c *Config) Validate(mapper meta.RESTMapper) error {
 	for _, key := range c.LabelKeys {
 		// Verify that pattern is a valid format.
-		if _, err := filepath.Match(key, ""); err != nil {
+		if _, err := path.Match(key, ""); err != nil {
 			return fmt.Errorf("malformed pattern for labelKeys %s: %w", key, err)
 		}
 	}
 
 	for _, key := range c.AnnotationKeys {
 		// Verify that pattern is a valid format.
-		if _, err := filepath.Match(key, ""); err != nil {
+		if _, err := path.Match(key, ""); err != nil {
 			return fmt.Errorf("malformed pattern for annotationKeys %s: %w", key, err)
 		}
 	}

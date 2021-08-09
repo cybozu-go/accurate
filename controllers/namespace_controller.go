@@ -3,7 +3,7 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"path/filepath"
+	"path"
 	"reflect"
 
 	"github.com/cybozu-go/accurate/pkg/constants"
@@ -100,7 +100,7 @@ func (r *NamespaceReconciler) propagateMeta(ctx context.Context, ns, parent *cor
 func (r *NamespaceReconciler) matchLabelKey(key string) bool {
 	for _, l := range r.LabelKeys {
 		// The glob pattern has been verified to be in the valid format when reading the config file.
-		if ok, _ := filepath.Match(l, key); ok {
+		if ok, _ := path.Match(l, key); ok {
 			return true
 		}
 	}
@@ -111,7 +111,7 @@ func (r *NamespaceReconciler) matchLabelKey(key string) bool {
 func (r *NamespaceReconciler) matchAnnotationKey(key string) bool {
 	for _, a := range r.AnnotationKeys {
 		// The glob pattern has been verified to be in the valid format when reading the config file.
-		if ok, _ := filepath.Match(a, key); ok {
+		if ok, _ := path.Match(a, key); ok {
 			return true
 		}
 	}
