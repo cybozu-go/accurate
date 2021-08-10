@@ -115,4 +115,8 @@ The child sub-namespaces under `NS` will be moved along with it.
 
 Propagated resources with mode `update` in `NS` will be deleted.
 
+### `sub list [ROOT]`
+
+Alias for `kubectl-accurate list` command.
+
 [SubNamespace]: ./crd_subnamespace.md
