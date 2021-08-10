@@ -25,7 +25,7 @@ func newTemplateListCmd(streams genericclioptions.IOStreams, config *genericclio
 		Aliases: []string{"ls"},
 		Short:   "List template namespace trees hierarchically",
 		Long: `List template namespace trees hierarchically.
-If TEMPLATE is not given, all root namespaces and their children will be shown.
+If TEMPLATE is not given, all template namespaces are shown hierarchically.
 If TEMPLATE is given, only the tree under the TEMPLATE namespace will be shown.`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
