@@ -248,10 +248,14 @@ Labels, annotations, and resources can be propagated from a template Namespace t
 <p><a href="accurate-controller.html"><code>accurate-controller</code></a> reads its configurations from a configuration file.</p>
 <p>The repository includes an example as follows:</p>
 <pre><code class="language-yaml"># Labels to be propagated to sub-namespaces.
+# It is also possible to specify a glob pattern that can be interpreted by Go's &quot;path.Match&quot; func.
+# https://pkg.go.dev/path#Match
 labelKeys:
 - team
 
 # Annotations to be propagated to sub-namespaces.
+# It is also possible to specify a glob pattern that can be interpreted by Go's &quot;path.Match&quot; func.
+# https://pkg.go.dev/path#Match
 annotationKeys:
 # An example to propagate an annotation for MetalLB
 # https://metallb.universe.tf/usage/#requesting-specific-ips
