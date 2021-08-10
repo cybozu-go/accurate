@@ -85,7 +85,7 @@ func (o *templateListOpts) showNS(ctx context.Context, name string, level int) e
 
 	children := &corev1.NamespaceList{}
 	if err := o.client.List(ctx, children, client.MatchingLabels{constants.LabelTemplate: name}); err != nil {
-		return fmt.Errorf("failed to list the children of %s: %w", name, err)
+		return fmt.Errorf("failed to list the instances of %s: %w", name, err)
 	}
 
 	level += indent
