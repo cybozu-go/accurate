@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"path"
 	"reflect"
 
 	"github.com/cybozu-go/accurate/pkg/constants"
@@ -75,17 +76,17 @@ func (r *NamespaceReconciler) reconcile(ctx context.Context, ns *corev1.Namespac
 
 func (r *NamespaceReconciler) propagateMeta(ctx context.Context, ns, parent *corev1.Namespace) error {
 	orig := ns.DeepCopy()
-	for _, key := range r.LabelKeys {
-		if val, ok := parent.Labels[key]; ok {
-			ns.Labels[key] = val
+	for k, v := range parent.Labels {
+		if ok := r.matchLabelKey(k); ok {
+			ns.Labels[k] = v
 		}
 	}
-	for _, key := range r.AnnotationKeys {
-		if val, ok := parent.Annotations[key]; ok {
+	for k, v := range parent.Annotations {
+		if ok := r.matchAnnotationKey(k); ok {
 			if ns.Annotations == nil {
 				ns.Annotations = make(map[string]string)
 			}
-			ns.Annotations[key] = val
+			ns.Annotations[k] = v
 		}
 	}
 	if !reflect.DeepEqual(ns.ObjectMeta, orig.ObjectMeta) {
@@ -94,6 +95,28 @@ func (r *NamespaceReconciler) propagateMeta(ctx context.Context, ns, parent *cor
 		}
 	}
 	return nil
+}
+
+func (r *NamespaceReconciler) matchLabelKey(key string) bool {
+	for _, l := range r.LabelKeys {
+		// The glob pattern has been verified to be in the valid format when reading the config file.
+		if ok, _ := path.Match(l, key); ok {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (r *NamespaceReconciler) matchAnnotationKey(key string) bool {
+	for _, a := range r.AnnotationKeys {
+		// The glob pattern has been verified to be in the valid format when reading the config file.
+		if ok, _ := path.Match(a, key); ok {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (r *NamespaceReconciler) propagateResource(ctx context.Context, res *unstructured.Unstructured, parent, ns string) error {
