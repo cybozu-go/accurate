@@ -64,6 +64,10 @@ func (o *templateListOpts) Run(ctx context.Context) error {
 	}
 
 	for _, ns := range templates.Items {
+		if _, ok := ns.Labels[constants.LabelTemplate]; ok {
+			continue
+		}
+
 		if err := o.showNS(ctx, ns.Name, 0); err != nil {
 			return err
 		}
