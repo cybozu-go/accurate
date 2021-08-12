@@ -244,6 +244,8 @@ var _ = Describe("kubectl accurate", func() {
 
 	It("should run other commands", func() {
 		kubectlSafe(nil, "accurate", "list")
+		kubectlSafe(nil, "accurate", "sub", "list")
+		kubectlSafe(nil, "accurate", "template", "list")
 		kubectlSafe(nil, "accurate", "ns", "describe", "tmpl1")
 	})
 })

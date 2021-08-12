@@ -70,6 +70,12 @@ Valid types are `root` or `template`.
 
 To unset the type, specify `none` as the type.
 
+### `template list [TEMPLATE]`
+
+List template namespace trees hierarchically.
+If TEMPLATE is not given, all template namespaces are shown hierarchically.
+If TEMPLATE is given, only the tree under the TEMPLATE namespace will be shown.
+
 ### `template set NS TEMPLATE`
 
 Set `TEMPLATE` namespace as the template of `NS` namespace.
@@ -108,5 +114,9 @@ Make a sub-namespace `NS` a new root namespace.
 The child sub-namespaces under `NS` will be moved along with it.
 
 Propagated resources with mode `update` in `NS` will be deleted.
+
+### `sub list [ROOT]`
+
+Alias for `kubectl-accurate list` command.
 
 [SubNamespace]: ./crd_subnamespace.md

@@ -16,5 +16,6 @@ func newSubCmd(streams genericclioptions.IOStreams, config *genericclioptions.Co
 	cmd.AddCommand(newSubMoveCmd(streams, config))
 	cmd.AddCommand(newSubGraftCmd(streams, config))
 	cmd.AddCommand(newSubCutCmd(streams, config))
+	cmd.AddCommand(newSubListCmd(streams, config))
 	return cmd
 }
