@@ -162,12 +162,13 @@
  subroot2
 </code></pre>
 <h2 id="show-all-template-namespaces"><a class="header" href="#show-all-template-namespaces">Show all template Namespaces</a></h2>
-<p>Use <code>kubectl get ns -l accurate.cybozu.com/type=template</code>:</p>
-<pre><code class="language-console">$ kubectl get ns -l accurate.cybozu.com/type=template
-NAME    STATUS   AGE
-tmpl1   Active   3m45s
-tmpl2   Active   3m43s
-tmpl3   Active   3m43s
+<p>Use <code>kubectl accurate template list</code>:</p>
+<pre><code class="language-console">$ kubectl accurate template list
+ template1
+ template2
+    ⮡reference1
+    ⮡reference2
+ template3
 </code></pre>
 <h2 id="show-the-properties-of-a-namespace"><a class="header" href="#show-the-properties-of-a-namespace">Show the properties of a Namespace</a></h2>
 <p>Use <code>kubectl accurate ns describe</code>:</p>

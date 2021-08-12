@@ -213,6 +213,10 @@ If <code>ROOT</code> is given, only the tree starting from <code>ROOT</code> nam
 <p>Set the type of a namespace <code>NS</code> to <code>TYPE</code>.</p>
 <p>Valid types are <code>root</code> or <code>template</code>.</p>
 <p>To unset the type, specify <code>none</code> as the type.</p>
+<h3 id="template-list-template"><a class="header" href="#template-list-template"><code>template list [TEMPLATE]</code></a></h3>
+<p>List template namespace trees hierarchically.
+If TEMPLATE is not given, all template namespaces are shown hierarchically.
+If TEMPLATE is given, only the tree under the TEMPLATE namespace will be shown.</p>
 <h3 id="template-set-ns-template"><a class="header" href="#template-set-ns-template"><code>template set NS TEMPLATE</code></a></h3>
 <p>Set <code>TEMPLATE</code> namespace as the template of <code>NS</code> namespace.</p>
 <h3 id="template-unset-ns"><a class="header" href="#template-unset-ns"><code>template unset NS</code></a></h3>
@@ -233,6 +237,8 @@ If <code>ROOT</code> is given, only the tree starting from <code>ROOT</code> nam
 <p>Make a sub-namespace <code>NS</code> a new root namespace.
 The child sub-namespaces under <code>NS</code> will be moved along with it.</p>
 <p>Propagated resources with mode <code>update</code> in <code>NS</code> will be deleted.</p>
+<h3 id="sub-list-root"><a class="header" href="#sub-list-root"><code>sub list [ROOT]</code></a></h3>
+<p>Alias for <code>kubectl-accurate list</code> command.</p>
 
                     </main>
 

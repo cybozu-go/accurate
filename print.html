@@ -409,12 +409,13 @@ Available Commands:
  subroot2
 </code></pre>
 <h2 id="show-all-template-namespaces"><a class="header" href="#show-all-template-namespaces">Show all template Namespaces</a></h2>
-<p>Use <code>kubectl get ns -l accurate.cybozu.com/type=template</code>:</p>
-<pre><code class="language-console">$ kubectl get ns -l accurate.cybozu.com/type=template
-NAME    STATUS   AGE
-tmpl1   Active   3m45s
-tmpl2   Active   3m43s
-tmpl3   Active   3m43s
+<p>Use <code>kubectl accurate template list</code>:</p>
+<pre><code class="language-console">$ kubectl accurate template list
+ template1
+ template2
+    ⮡reference1
+    ⮡reference2
+ template3
 </code></pre>
 <h2 id="show-the-properties-of-a-namespace"><a class="header" href="#show-the-properties-of-a-namespace">Show the properties of a Namespace</a></h2>
 <p>Use <code>kubectl accurate ns describe</code>:</p>
@@ -694,6 +695,10 @@ If <code>ROOT</code> is given, only the tree starting from <code>ROOT</code> nam
 <p>Set the type of a namespace <code>NS</code> to <code>TYPE</code>.</p>
 <p>Valid types are <code>root</code> or <code>template</code>.</p>
 <p>To unset the type, specify <code>none</code> as the type.</p>
+<h3 id="template-list-template"><a class="header" href="#template-list-template"><code>template list [TEMPLATE]</code></a></h3>
+<p>List template namespace trees hierarchically.
+If TEMPLATE is not given, all template namespaces are shown hierarchically.
+If TEMPLATE is given, only the tree under the TEMPLATE namespace will be shown.</p>
 <h3 id="template-set-ns-template"><a class="header" href="#template-set-ns-template"><code>template set NS TEMPLATE</code></a></h3>
 <p>Set <code>TEMPLATE</code> namespace as the template of <code>NS</code> namespace.</p>
 <h3 id="template-unset-ns"><a class="header" href="#template-unset-ns"><code>template unset NS</code></a></h3>
@@ -714,6 +719,8 @@ If <code>ROOT</code> is given, only the tree starting from <code>ROOT</code> nam
 <p>Make a sub-namespace <code>NS</code> a new root namespace.
 The child sub-namespaces under <code>NS</code> will be moved along with it.</p>
 <p>Propagated resources with mode <code>update</code> in <code>NS</code> will be deleted.</p>
+<h3 id="sub-list-root"><a class="header" href="#sub-list-root"><code>sub list [ROOT]</code></a></h3>
+<p>Alias for <code>kubectl-accurate list</code> command.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="accurate-controller"><a class="header" href="#accurate-controller">accurate-controller</a></h1>
 <p><code>accurate-controller</code> is a Kubernetes controller to manage sub-namespaces and
 to propagate resources from parents to their children namespaces.</p>
