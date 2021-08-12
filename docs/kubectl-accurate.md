@@ -73,7 +73,7 @@ To unset the type, specify `none` as the type.
 ### `template list [TEMPLATE]`
 
 List template namespace trees hierarchically.
-If TEMPLATE is not given, all root namespaces and their children will be shown.
+If TEMPLATE is not given, all template namespaces are shown hierarchically.
 If TEMPLATE is given, only the tree under the TEMPLATE namespace will be shown.
 
 ### `template set NS TEMPLATE`
