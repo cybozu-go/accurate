@@ -1,0 +1,22 @@
+image:
+  repository: accurate
+  tag: dev
+  pullPolicy: Never
+
+controller:
+  config:
+    labelKeys:
+      - team
+
+    annotationKeys:
+      - test
+
+    watches:
+      - group: rbac.authorization.k8s.io
+        version: v1
+        kind: Role
+      - group: rbac.authorization.k8s.io
+        version: v1
+        kind: RoleBinding
+      - version: v1
+        kind: Secret

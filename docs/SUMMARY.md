@@ -9,6 +9,7 @@
 - [Getting started](getting_started.md)
     - [Configurations](config.md)
     - [Deploying Accurate](setup.md)
+    - [Helm Chart](helm.md)
     - [Installing kubectl plugin](install-plugin.md)
 - [Usage](usage.md)
     - [Showing information](info.md)

@@ -5,24 +5,10 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
   config.yaml: |
-    # Labels to be propagated to sub-namespaces.
-    labelKeys:
-    - team
-
-    # Annotations to be propagated to sub-namespaces.
-    annotationKeys:
-    # An example to propagate an annotation for MetalLB
-    # https://metallb.universe.tf/usage/#requesting-specific-ips
-    - metallb.universe.tf/address-pool
-
-    # List of GVK for namespace-scoped resources that can be propagated.
-    # Any namespace-scoped resource is allowed.
-    watches:
-    - group: rbac.authorization.k8s.io
-      version: v1
-      kind: Role
-    - group: rbac.authorization.k8s.io
-      version: v1
-      kind: RoleBinding
-    - version: v1
-      kind: Secret
+    {{- with .Values.controller.config.labelKeys }}
+    labelKeys: {{ toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.controller.config.annotationKeys }}
+    annotationKeys: {{ toYaml . | nindent 6 }}
+    {{- end }}
+    watches: {{ toYaml .Values.controller.config.watches | nindent 6 }}
