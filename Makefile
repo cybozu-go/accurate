@@ -1,7 +1,8 @@
 # Tool versions
 CTRL_TOOLS_VERSION=0.6.1
 CTRL_RUNTIME_VERSION := $(shell awk '/sigs.k8s.io\/controller-runtime/ {print substr($$2, 2)}' go.mod)
-KUSTOMIZE_VERSION = 4.1.3
+HELM_VERSION = 3.6.3
+HELM_DOCS_VERSION = 1.5.0
 CRD_TO_MARKDOWN_VERSION = 0.0.3
 MDBOOK_VERSION = 0.4.10
 
@@ -92,7 +93,7 @@ build:
 	GOBIN=$(shell pwd)/bin go install ./cmd/...
 
 .PHONY: release-build
-release-build: kustomize
+release-build:
 	rm -rf build
 	mkdir -p build
 	$(MAKE) kubectl-accurate GOOS=windows GOARCH=amd64 SUFFIX=.exe
@@ -120,14 +121,22 @@ $(SETUP_ENVTEST):
 	# see https://github.com/kubernetes-sigs/controller-runtime/tree/master/tools/setup-envtest
 	GOBIN=$(shell pwd)/bin go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
 
-KUSTOMIZE := $(shell pwd)/bin/kustomize
-.PHONY: kustomize
-kustomize: $(KUSTOMIZE) ## Download kustomize locally if necessary.
+HELM := $(shell pwd)/bin/helm
+.PHONY: helm
+helm: $(HELM) ## Download helm locally if necessary.
 
-$(KUSTOMIZE):
-	mkdir -p bin
-	curl -fsL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv$(KUSTOMIZE_VERSION)/kustomize_v$(KUSTOMIZE_VERSION)_linux_amd64.tar.gz | \
-	tar -C bin -xzf -
+$(HELM):
+	mkdir -p $(BIN_DIR)
+	curl -L -sS https://get.helm.sh/helm-v$(HELM_VERSION)-linux-amd64.tar.gz \
+	  | tar xvz -C $(BIN_DIR) --strip-components 1 linux-amd64/helm
+
+HELM_DOCS := $(shell pwd)/bin/helm-docs
+.PHONY: helm-docs
+helm-docs: $(HELM_DOCS) ## Download helm-docs locally if necessary.
+
+$(HELM_DOCS):
+	mkdir -p $(BIN_DIR)
+	GOBIN=$(BIN_DIR) go install github.com/norwoodj/helm-docs/cmd/helm-docs@v$(HELM_DOCS_VERSION)
 
 CRD_TO_MARKDOWN := $(shell pwd)/bin/crd-to-markdown
 .PHONY: crd-to-markdown

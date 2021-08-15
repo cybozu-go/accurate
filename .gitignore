@@ -21,3 +21,6 @@
 
 # Generated files
 /docs/book
+
+# Ignore dependency charts
+charts/*/charts
