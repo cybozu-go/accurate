@@ -26,6 +26,9 @@ spec:
           {{- with .Values.image.pullPolicy }}
           imagePullPolicy: {{ . }}
           {{- end }}
+          {{- with .Values.controller.extraArgs }}
+          args: {{ . }}
+          {{- end }}
           ports:
             - containerPort: 9443
               name: webhook-server

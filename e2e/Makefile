@@ -29,14 +29,10 @@ start: $(KIND) $(KUBECTL) $(HELM) $(KUBESEAL) $(KUBECTL_ACCURATE)
 	$(KIND) load docker-image accurate:dev --name=accurate
 	$(KUBECTL) apply -f https://github.com/jetstack/cert-manager/releases/download/v$(CERT_MANAGER_VERSION)/cert-manager.yaml
 	$(KUBECTL) -n cert-manager wait --for=condition=available --timeout=180s --all deployments
-	$(HELM) repo add jetstack https://charts.jetstack.io
-	$(HELM) repo update
-	$(HELM) dependency build ../charts/accurate/
 	$(HELM) install --create-namespace --namespace accurate accurate ../charts/accurate -f values.yaml
 	$(KUBECTL) -n accurate wait --for=condition=available --timeout=180s --all deployments
 	$(KUBECTL) apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v$(SEALED_SECRET_VERSION)/controller.yaml
 	$(KUBECTL) -n kube-system wait --for=condition=available --timeout=180s --all deployments
-	$(KUBECTL) apply -f clusterrole_for_sealedsecrets.yaml
 	rm -f sealed.json
 	$(KUBECTL) -n root2 create secret generic mysecret --dry-run=client --from-literal=foo=bar -o json | \
 		$(KUBESEAL) | jq '. * {metadata: {annotations: {"accurate.cybozu.com/propagate-generated": "create"}}}' > sealed.json
