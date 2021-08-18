@@ -55,11 +55,11 @@ helm install --create-namespace --namespace accurate accurate accurate/accurate 
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| cert-manager.enabled | bool | `false` | Install cert-manager together. |
 | controller.additionalRBAC.rules | list | `[]` | Specify the RBAC rules to be added to the controller. ClusterRole and ClusterRoleBinding are created with the names `{{ release name }}-additional-resources`. The rules defined here will be used for the ClusterRole rules. |
 | controller.config.annotationKeys | list | `[]` | Annotations to be propagated to sub-namespaces. It is also possible to specify a glob pattern that can be interpreted by Go's "path.Match" func. |
 | controller.config.labelKeys | list | `[]` | Labels to be propagated to sub-namespaces. It is also possible to specify a glob pattern that can be interpreted by Go's "path.Match" func. |
 | controller.config.watches | list | `[{"group":"rbac.authorization.k8s.io","kind":"Role","version":"v1"},{"group":"rbac.authorization.k8s.io","kind":"RoleBinding","version":"v1"},{"kind":"Secret","version":"v1"}]` | List of GVK for namespace-scoped resources that can be propagated. Any namespace-scoped resource is allowed. |
+| controller.extraArgs | list | `[]` | Optional additional arguments. |
 | controller.replicas | int | `2` | Specify the number of replicas of the controller Pod. |
 | controller.resources | object | `{"requests":{"cpu":"100m","memory":"20Mi"}}` | Specify resources. |
 | controller.terminationGracePeriodSeconds | int | `10` | Specify terminationGracePeriodSeconds. |

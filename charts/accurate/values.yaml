@@ -22,6 +22,9 @@ controller:
   # controller.terminationGracePeriodSeconds -- Specify terminationGracePeriodSeconds.
   terminationGracePeriodSeconds: 10
 
+  # controller.extraArgs -- Optional additional arguments.
+  extraArgs: []
+
   config:
     # controller.config.labelKeys -- Labels to be propagated to sub-namespaces.
     # It is also possible to specify a glob pattern that can be interpreted by Go's "path.Match" func.
@@ -66,8 +69,3 @@ controller:
     #     - update
     #     - patch
     #     - delete
-
-cert-manager:
-  # cert-manager.enabled -- Install cert-manager together.
-  ## ref: https://cert-manager.io/docs/installation/kubernetes/#installing-with-helm
-  enabled: false

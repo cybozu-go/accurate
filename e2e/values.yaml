@@ -4,6 +4,9 @@ image:
   pullPolicy: Never
 
 controller:
+  extraArgs:
+    - --zap-log-level=5
+
   config:
     labelKeys:
       - team
@@ -20,3 +23,14 @@ controller:
         kind: RoleBinding
       - version: v1
         kind: Secret
+
+  additionalRBAC:
+    rules:
+      - apiGroups:
+          - bitnami.com
+        resources:
+          - sealedsecrets
+        verbs:
+          - get
+          - list
+          - watch
