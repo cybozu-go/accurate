@@ -76,7 +76,7 @@ spec:
         - name: cert
           secret:
             defaultMode: 420
-            secretName: {{ template "accurate.fullname" . }}-webhook-server-cert
+            secretName: webhook-server-cert
         - configMap:
             name: {{ template "accurate.fullname" . }}-config
           name: config
