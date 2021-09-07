@@ -113,6 +113,20 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev1
 
 	if ns.Labels[constants.LabelParent] == sn.Namespace {
 		sn.Status = accuratev1.SubNamespaceOK
+
+		labels := cloneMap(sn.Labels, []string{constants.LabelCreatedBy, constants.LabelParent})
+		for k, v := range labels {
+			ns.Labels[k] = v
+		}
+		if ns.Annotations == nil {
+			ns.Annotations = make(map[string]string)
+		}
+		for k, v := range sn.Annotations {
+			ns.Annotations[k] = v
+		}
+		if err := r.Update(ctx, ns); err != nil {
+			return err
+		}
 	} else {
 		logger.Info("a conflicting namespace already exists")
 		sn.Status = accuratev1.SubNamespaceConflict
@@ -148,4 +162,17 @@ func (r *SubNamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			},
 		}).
 		Complete(r)
+}
+
+func cloneMap(m map[string]string, excludeKeys []string) map[string]string {
+	result := make(map[string]string)
+	for k, v := range m {
+		for _, key := range excludeKeys {
+			if key == k {
+				continue
+			}
+		}
+		result[k] = v
+	}
+	return result
 }
