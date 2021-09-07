@@ -128,7 +128,7 @@ helm: $(HELM) ## Download helm locally if necessary.
 $(HELM):
 	mkdir -p $(BIN_DIR)
 	curl -L -sS https://get.helm.sh/helm-v$(HELM_VERSION)-linux-amd64.tar.gz \
-	  | tar xvz -C $(BIN_DIR) --strip-components 1 linux-amd64/helm
+	  | tar xz -C $(BIN_DIR) --strip-components 1 linux-amd64/helm
 
 HELM_DOCS := $(shell pwd)/bin/helm-docs
 .PHONY: helm-docs
