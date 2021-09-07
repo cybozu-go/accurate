@@ -21,7 +21,7 @@ helm repo update
 
 > NOTE:
 >
-> This installation method requires cert-manger to be installed beforehand.
+> This installation method requires cert-manager to be installed beforehand.
 
 To install the chart with the release name `accurate` using a dedicated namespace(recommended):
 
