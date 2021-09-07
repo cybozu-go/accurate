@@ -19,7 +19,8 @@ jobs:
         run: |
           HELM_DOCS_VERSION="1.5.0"
           OS=$(uname)
-          curl -L -sS https://github.com/norwoodj/helm-docs/releases/download/v"${HELM_DOCS_VERSION}"/helm-docs_"${HELM_DOCS_VERSION}"_${OS}_x86_64.tar.gz \
+          ARCH=$(uname -i)
+          curl -L -sS https://github.com/norwoodj/helm-docs/releases/download/v"${HELM_DOCS_VERSION}"/helm-docs_"${HELM_DOCS_VERSION}"_${OS}_${ARCH}.tar.gz \
             | tar zx -C /tmp
           sudo mv /tmp/helm-docs /usr/local/bin
 
