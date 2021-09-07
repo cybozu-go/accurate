@@ -50,7 +50,7 @@ jobs:
 
       - name: Apply cert-manager
         run: |
-          kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.1/cert-manager.yaml
+          kubectl apply -f https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
           kubectl -n cert-manager wait --for=condition=available --timeout=180s --all deployments
 
       - name: Run chart-testing (install)
