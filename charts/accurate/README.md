@@ -9,13 +9,13 @@ helm repo add accurate https://cybozu-go.github.io/accurate/
 helm repo update
 ```
 
-## Dependencies
-
-| Repository | Name	| Version |
-| ---------- | ---- | ------- |
-| https://charts.jetstack.io | cert-manager | 1.5.0 |
-
 ## Quick start
+
+### (Optional) installing cert-manager
+
+```console
+$ curl -fsL https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml | kubectl apply -f -
+```
 
 ### Installing the Chart
 
@@ -25,30 +25,16 @@ helm repo update
 
 To install the chart with the release name `accurate` using a dedicated namespace(recommended):
 
-```sh
-helm install --create-namespace --namespace accurate accurate accurate/accurate
+```console
+$ helm install --create-namespace --namespace accurate accurate accurate/accurate
 ```
 
 Specify parameters using `--set key=value[,key=value]` argument to `helm install`.
 
 Alternatively a YAML file that specifies the values for the parameters can be provided like this:
 
-```sh
-helm upgrade --create-namespace --namespace accurate -i accurate -f values.yaml accurate/accurate
-```
-
-### Install together with cert-manager
-
-Before installing the chart, you must first install the cert-manager CustomResourceDefinition resources.
-
-```sh
-kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.0/cert-manager.crds.yaml
-```
-
-Set the `cert-manager.enabled=true` parameter when installing Accurate chart:
-
-```sh
-helm install --create-namespace --namespace accurate accurate accurate/accurate --set cert-manager.enabled=true
+```console
+$ helm install --create-namespace --namespace accurate accurate -f values.yaml accurate/accurate
 ```
 
 ## Values
@@ -71,8 +57,8 @@ helm install --create-namespace --namespace accurate accurate accurate/accurate 
 
 You can use the `helm template` command to render manifests.
 
-```sh
-helm template --namespace accurate accurate accurate/accurate
+```console
+$ helm template --namespace accurate accurate accurate/accurate
 ```
 
 ## Upgrade CRDs
