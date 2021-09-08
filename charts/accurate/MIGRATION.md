@@ -82,6 +82,31 @@ controller:
         kind: Secret
 ```
 
+Optional: If you have customized RBAC, you can use `additionalRBAC`.
+
+```yaml
+<snip>
+controller:
+  additionalRBAC:
+    # controller.additionalRBAC.rules -- Specify the RBAC rules to be added to the controller.
+    # ClusterRole and ClusterRoleBinding are created with the names `{{ release name }}-additional-resources`.
+    # The rules defined here will be used for the ClusterRole rules.
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - resourcequotas
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+<snip>
+```
+
 The values file can be specified with the `-f` option when you install Helm chart.
 
 ```console
