@@ -136,7 +136,7 @@ helm-docs: $(HELM_DOCS) ## Download helm-docs locally if necessary.
 
 $(HELM_DOCS):
 	mkdir -p $(BIN_DIR)
-	GOBIN=$(BIN_DIR) go install github.com/norwoodj/helm-docs/cmd/helm-docs@v$(HELM_DOCS_VERSION)
+	curl -L -sS https://github.com/norwoodj/helm-docs/releases/download/v$(HELM_DOCS_VERSION)/helm-docs_$(HELM_DOCS_VERSION)_Linux_arm64.tar.gz | tar -C $(BIN_DIR) -xzf -
 
 CRD_TO_MARKDOWN := $(shell pwd)/bin/crd-to-markdown
 .PHONY: crd-to-markdown
