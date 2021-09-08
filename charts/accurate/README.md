@@ -4,7 +4,7 @@
 
 You need to add this repository to your Helm repositories:
 
-```sh
+```console
 helm repo add accurate https://cybozu-go.github.io/accurate/
 helm repo update
 ```
