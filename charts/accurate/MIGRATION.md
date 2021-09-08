@@ -48,15 +48,6 @@ REVISION: 1
 TEST SUITE: None
 ```
 
-### Release Name
-
-| Template | Release Name | Output |
-| -------- | ------------ | ------ |
-| `{{ template "accurate.fullname" . }}-controller-manager` | foo | **foo-accurate-controller-manager** |
-| `{{ template "accurate.fullname" . }}-controller-manager` | accurate | **accurate-controller-manager** |
-| `{{ template "accurate.fullname" . }}-controller-manager` | bar-accurate | **bar-accurate-controller-manager** |
-| `{{ template "accurate.fullname" . }}-controller-manager` | accurate-baz | **accurate-baz-controller-manager** |
-
 ## Configuration
 
 Helm uses the values file to configure Accurate config file.
