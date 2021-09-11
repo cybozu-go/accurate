@@ -2,7 +2,6 @@
 CTRL_TOOLS_VERSION=0.6.1
 CTRL_RUNTIME_VERSION := $(shell awk '/sigs.k8s.io\/controller-runtime/ {print substr($$2, 2)}' go.mod)
 HELM_VERSION = 3.6.3
-HELM_DOCS_VERSION = 1.5.0
 CRD_TO_MARKDOWN_VERSION = 0.0.3
 MDBOOK_VERSION = 0.4.10
 
@@ -129,14 +128,6 @@ $(HELM):
 	mkdir -p $(BIN_DIR)
 	curl -L -sS https://get.helm.sh/helm-v$(HELM_VERSION)-linux-amd64.tar.gz \
 	  | tar xz -C $(BIN_DIR) --strip-components 1 linux-amd64/helm
-
-HELM_DOCS := $(shell pwd)/bin/helm-docs
-.PHONY: helm-docs
-helm-docs: $(HELM_DOCS) ## Download helm-docs locally if necessary.
-
-$(HELM_DOCS):
-	mkdir -p $(BIN_DIR)
-	curl -L -sS https://github.com/norwoodj/helm-docs/releases/download/v$(HELM_DOCS_VERSION)/helm-docs_$(HELM_DOCS_VERSION)_Linux_arm64.tar.gz | tar -C $(BIN_DIR) -xzf -
 
 CRD_TO_MARKDOWN := $(shell pwd)/bin/crd-to-markdown
 .PHONY: crd-to-markdown
