@@ -1,6 +1,12 @@
 name: Release Charts
 
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'charts/**'
+      - '!**.md'
 
 jobs:
   release:

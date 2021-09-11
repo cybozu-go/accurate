@@ -90,8 +90,4 @@ This will prevent the Accurate version from going up just by modifying the Helm 
 You must change the version of `Chart.yaml` when making changes to the Helm Chart.
 CI fails with lint error when creating a Pull Request without changing the version of `Chart.yaml`.
 
-When you release the Helm Chart, manually run the GitHub Actions workflow for the release.
-
-https://github.com/cybozu-go/accurate/actions/workflows/helm-release.yaml
-
-When you run workflow, [helm/chart-releaser-action](https://github.com/helm/chart-releaser-action) will automatically create a GitHub Release.
+When a pull request with Chart changes is merged into the main branch, [helm/chart-releaser-action](https://github.com/helm/chart-releaser-action) will automatically create a GitHub release.
