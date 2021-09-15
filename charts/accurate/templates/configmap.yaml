@@ -3,6 +3,8 @@ kind: ConfigMap
 metadata:
   name: {{ template "accurate.fullname" . }}-config
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "accurate.labels" . | nindent 4 }}
 data:
   config.yaml: |
     {{- with .Values.controller.config.labelKeys }}

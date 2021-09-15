@@ -1,0 +1,13 @@
+resources:
+  - ../../../rbac
+  - ../../../webhook
+
+namespace: '{{ .Release.Namespace }}'
+
+namePrefix: '{{ template "accurate.fullname" . }}-'
+
+patchesStrategicMerge:
+  - webhookcainjection_patch.yaml
+
+transformers:
+  - label-transformer.yaml
