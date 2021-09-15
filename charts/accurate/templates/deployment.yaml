@@ -11,14 +11,12 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: controller
-      app.kubernetes.io/name: accurate
   template:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
       labels:
         app.kubernetes.io/component: controller
-        app.kubernetes.io/name: accurate
     spec:
       containers:
         - name: manager
