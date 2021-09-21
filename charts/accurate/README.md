@@ -11,7 +11,7 @@ helm repo update
 
 ## Quick start
 
-### (Optional) installing cert-manager
+### Installing cert-manager
 
 ```console
 $ curl -fsL https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml | kubectl apply -f -
