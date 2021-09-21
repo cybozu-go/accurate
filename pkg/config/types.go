@@ -10,11 +10,17 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+type NamingPolicy struct {
+	Root  string `json:"root,omitempty"`
+	Match string `json:"match,omitempty"`
+}
+
 // Config represents the configuration file of Accurate.
 type Config struct {
 	LabelKeys      []string                  `json:"labelKeys,omitempty"`
 	AnnotationKeys []string                  `json:"annotationKeys,omitempty"`
 	Watches        []metav1.GroupVersionKind `json:"watches,omitempty"`
+	NamingPolicies []NamingPolicy            `json:"namingPolicies,omitempty"`
 }
 
 // Validate validates the configurations.

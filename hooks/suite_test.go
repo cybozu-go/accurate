@@ -15,6 +15,7 @@ import (
 	admissionv1beta1 "k8s.io/api/admission/v1beta1"
 	//+kubebuilder:scaffold:imports
 	accuratev1 "github.com/cybozu-go/accurate/api/v1"
+	"github.com/cybozu-go/accurate/pkg/config"
 	"github.com/cybozu-go/accurate/pkg/indexing"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -91,7 +92,20 @@ var _ = BeforeSuite(func() {
 	dec, err := admission.NewDecoder(scheme)
 	Expect(err).NotTo(HaveOccurred())
 	SetupNamespaceWebhook(mgr, dec)
-	SetupSubNamespaceWebhook(mgr, dec)
+	SetupSubNamespaceWebhook(mgr, dec, []config.NamingPolicy{
+		{
+			Root:  "naming-policy-root-1",
+			Match: "naming-policy-root-1-child",
+		},
+		{
+			Root:  "naming-policy-root-2",
+			Match: "naming-policy-root-2-child",
+		},
+		{
+			Root:  ".+-match-.+",
+			Match: ".+-match-.+",
+		},
+	})
 
 	go func() {
 		err = mgr.Start(ctx)
