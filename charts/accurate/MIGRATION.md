@@ -16,6 +16,7 @@ Error: rendered manifests contain a resource that already exists. Unable to cont
 ```
 
 Before installing Helm chart, you need to manually delete the resources.
+You do not need to delete Namespace, CRD and SubNamespace custom resources at this time.
 
 ```console
 $ helm template --namespace accurate accurate accurate/accurate | kubectl delete -f -
