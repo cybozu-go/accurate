@@ -3,6 +3,8 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.6.1
+  labels:
+    app.kubernetes.io/name: accurate
   name: subnamespaces.accurate.cybozu.com
 spec:
   group: accurate.cybozu.com
