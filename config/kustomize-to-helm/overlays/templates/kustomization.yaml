@@ -6,6 +6,9 @@ namespace: '{{ .Release.Namespace }}'
 
 namePrefix: '{{ template "accurate.fullname" . }}-'
 
+commonLabels:
+  app.kubernetes.io/name: '{{ include "accurate.name" . }}'
+
 patchesStrategicMerge:
   - webhookcainjection_patch.yaml
 

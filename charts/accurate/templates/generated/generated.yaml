@@ -229,6 +229,7 @@ spec:
     targetPort: webhook-server
   selector:
     app.kubernetes.io/component: controller
+    app.kubernetes.io/name: '{{ include "accurate.name" . }}'
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
