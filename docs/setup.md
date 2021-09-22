@@ -10,30 +10,21 @@
     $ kubectl apply -f cert-manager.yaml
     ```
 
-2. Download the release tar ball
+2. Setup Accurate Helm repository
 
-    Visit https://github.com/cybozu-go/accurate/releases/latest and download the source tar ball.
+   ```console
+   $ helm repo add accurate https://cybozu-go.github.io/accurate/
+   $ helm repo update
+   ```
 
-3. Unpack the tar ball and edit `config.yaml` in the top directory
-
-    Read [Configurations](config.md) for details.
-
-4. Download `kustomize`
-
-    In the top directory of unpacked source code, run `make kustomize`.
-
-    ```console
-    $ make kustomize
-    ```
-
-5. Apply the manifest of Accurate
-
-    ```console
-    $ ./bin/kustomize build . | kubectl apply -f -
-    ```
-
-6. (Optional) Apply additional RBAC resources
+3. Configuration Helm chart values
 
     Read [Configurations](config.md) for details.
+
+4. Install the Accurate Helm chart
+
+    ```console
+    $ helm install --create-namespace --namespace accurate accurate accurate/accurate -f values.yaml
+    ```
 
 [cert-manager]: https://cert-manager.io/

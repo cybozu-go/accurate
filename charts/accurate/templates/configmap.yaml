@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "accurate.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "accurate.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+    {{- with .Values.controller.config.labelKeys }}
+    labelKeys: {{ toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.controller.config.annotationKeys }}
+    annotationKeys: {{ toYaml . | nindent 6 }}
+    {{- end }}
+    watches: {{ toYaml .Values.controller.config.watches | nindent 6 }}

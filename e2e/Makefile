@@ -5,7 +5,7 @@ SEALED_SECRET_VERSION = 0.16.0
 
 KIND := $(dir $(shell pwd))/bin/kind
 KUBECTL := $(dir $(shell pwd))/bin/kubectl
-KUSTOMIZE := $(dir $(shell pwd))/bin/kustomize
+HELM := $(dir $(shell pwd))/bin/helm
 KUBESEAL := $(dir $(shell pwd))/bin/kubeseal
 KUBECTL_ACCURATE := $(dir $(shell pwd))/bin/kubectl-accurate
 KUBECONFIG := $(shell pwd)/.kubeconfig
@@ -23,17 +23,16 @@ help:
 	@echo "stop       Stop the kind cluster"
 
 .PHONY: start
-start: $(KIND) $(KUBECTL) $(KUSTOMIZE) $(KUBESEAL) $(KUBECTL_ACCURATE)
+start: $(KIND) $(KUBECTL) $(HELM) $(KUBESEAL) $(KUBECTL_ACCURATE)
 	$(KIND) create cluster --name=accurate --config=$(KIND_CONFIG) --image=kindest/node:v$(KUBERNETES_VERSION) --wait 1m
 	cd ..; docker build --no-cache -t accurate:dev .
 	$(KIND) load docker-image accurate:dev --name=accurate
 	$(KUBECTL) apply -f https://github.com/jetstack/cert-manager/releases/download/v$(CERT_MANAGER_VERSION)/cert-manager.yaml
 	$(KUBECTL) -n cert-manager wait --for=condition=available --timeout=180s --all deployments
-	$(KUSTOMIZE) build . | $(KUBECTL) apply -f -
+	$(HELM) install --create-namespace --namespace accurate accurate ../charts/accurate -f values.yaml
 	$(KUBECTL) -n accurate wait --for=condition=available --timeout=180s --all deployments
 	$(KUBECTL) apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v$(SEALED_SECRET_VERSION)/controller.yaml
 	$(KUBECTL) -n kube-system wait --for=condition=available --timeout=180s --all deployments
-	$(KUBECTL) apply -f clusterrole_for_sealedsecrets.yaml
 	rm -f sealed.json
 	$(KUBECTL) -n root2 create secret generic mysecret --dry-run=client --from-literal=foo=bar -o json | \
 		$(KUBESEAL) | jq '. * {metadata: {annotations: {"accurate.cybozu.com/propagate-generated": "create"}}}' > sealed.json
@@ -66,8 +65,8 @@ $(KUBECTL):
 	curl -sfL -o $@ https://dl.k8s.io/release/v$(KUBERNETES_VERSION)/bin/linux/amd64/kubectl
 	chmod a+x $@
 
-$(KUSTOMIZE):
-	$(MAKE) -C .. kustomize
+$(HELM):
+	$(MAKE) -C .. helm
 
 $(KUBESEAL):
 	mkdir -p ../bin
