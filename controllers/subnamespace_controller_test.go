@@ -60,6 +60,12 @@ var _ = Describe("SubNamespace controller", func() {
 		sn.Namespace = "test1"
 		sn.Name = "test1-sub1"
 		sn.Finalizers = []string{constants.Finalizer}
+		sn.Spec.Labels = map[string]string{
+			"foo": "bar",
+		}
+		sn.Spec.Annotations = map[string]string{
+			"foo": "bar",
+		}
 		err = k8sClient.Create(ctx, sn)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -71,6 +77,9 @@ var _ = Describe("SubNamespace controller", func() {
 
 		Expect(sub1.Labels).To(HaveKeyWithValue(constants.LabelCreatedBy, "accurate"))
 		Expect(sub1.Labels).To(HaveKeyWithValue(constants.LabelParent, "test1"))
+
+		Expect(sub1.Labels).To(HaveKeyWithValue("foo", "bar"))
+		Expect(sub1.Annotations).To(HaveKeyWithValue("foo", "bar"))
 
 		Eventually(func() accuratev1.SubNamespaceStatus {
 			sn = &accuratev1.SubNamespace{}

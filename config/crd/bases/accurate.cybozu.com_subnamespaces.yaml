@@ -33,6 +33,18 @@ spec:
             type: string
           metadata:
             type: object
+          spec:
+            description: Spec is the spec of SubNamespace.
+            properties:
+              annotations:
+                additionalProperties:
+                  type: string
+                type: object
+              labels:
+                additionalProperties:
+                  type: string
+                type: object
+            type: object
           status:
             description: Status is the status of SubNamespace.
             enum:
