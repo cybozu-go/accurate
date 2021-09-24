@@ -1,0 +1,22 @@
+{{ if .Values.controller.additionalRBAC.rules }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ template "accurate.fullname" . }}-additional-resources
+rules: {{ toYaml .Values.controller.additionalRBAC.rules | nindent 2 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ template "accurate.fullname" . }}-additional-resources
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ template "accurate.fullname" . }}-additional-resources
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "accurate.fullname" . }}-controller-manager
+    namespace: {{ .Release.Namespace }}
+---
+{{ end }}

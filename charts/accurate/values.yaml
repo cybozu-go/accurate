@@ -1,0 +1,71 @@
+image:
+  # image.repository -- Accurate image repository to use.
+  repository: ghcr.io/cybozu-go/accurate
+
+  # image.tag -- Accurate image tag to use.
+  # @default -- `{{ .Chart.AppVersion }}`
+  tag:  # 0.1.0
+
+  # image.pullPolicy -- Accurate image pullPolicy.
+  pullPolicy:  # Always
+
+controller:
+  # controller.replicas -- Specify the number of replicas of the controller Pod.
+  replicas: 2
+
+  # controller.resources -- Specify resources.
+  resources:
+    requests:
+      cpu: 100m
+      memory: 20Mi
+
+  # controller.terminationGracePeriodSeconds -- Specify terminationGracePeriodSeconds.
+  terminationGracePeriodSeconds: 10
+
+  # controller.extraArgs -- Optional additional arguments.
+  extraArgs: []
+
+  config:
+    # controller.config.labelKeys -- Labels to be propagated to sub-namespaces.
+    # It is also possible to specify a glob pattern that can be interpreted by Go's "path.Match" func.
+    ## https://pkg.go.dev/path#Match
+    labelKeys: []
+    # - team
+
+    # controller.config.annotationKeys -- Annotations to be propagated to sub-namespaces.
+    # It is also possible to specify a glob pattern that can be interpreted by Go's "path.Match" func.
+    ## https://pkg.go.dev/path#Match
+    annotationKeys: []
+    # An example to propagate an annotation for MetalLB
+    # https://metallb.universe.tf/usage/#requesting-specific-ips
+    # - metallb.universe.tf/address-pool
+
+    # controller.config.watches -- List of GVK for namespace-scoped resources that can be propagated.
+    # Any namespace-scoped resource is allowed.
+    watches:
+      - group: rbac.authorization.k8s.io
+        version: v1
+        kind: Role
+      - group: rbac.authorization.k8s.io
+        version: v1
+        kind: RoleBinding
+      - version: v1
+        kind: Secret
+
+  additionalRBAC:
+    # controller.additionalRBAC.rules -- Specify the RBAC rules to be added to the controller.
+    # ClusterRole and ClusterRoleBinding are created with the names `{{ release name }}-additional-resources`.
+    # The rules defined here will be used for the ClusterRole rules.
+    rules: []
+    # - apiGroups:
+    #     - ""
+    #   resources:
+    #     - resourcequotas
+    #   verbs:
+    #     - get
+    #     - list
+    #     - watch
+    #     - create
+    #     - update
+    #     - patch
+    #     - delete
