@@ -2,6 +2,7 @@
 CTRL_TOOLS_VERSION=0.6.1
 CTRL_RUNTIME_VERSION := $(shell awk '/sigs.k8s.io\/controller-runtime/ {print substr($$2, 2)}' go.mod)
 KUSTOMIZE_VERSION = 4.1.3
+HELM_VERSION = 3.6.3
 CRD_TO_MARKDOWN_VERSION = 0.0.3
 MDBOOK_VERSION = 0.4.10
 
@@ -45,8 +46,10 @@ help: ## Display this help.
 ##@ Development
 
 .PHONY: manifests
-manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+manifests: kustomize controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+	$(KUSTOMIZE) build config/kustomize-to-helm/overlays/crds > charts/accurate/crds/accurate.cybozu.com_subnamespaces.yaml
+	$(KUSTOMIZE) build config/kustomize-to-helm/overlays/templates > charts/accurate/templates/generated/generated.yaml
 
 .PHONY: generate
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
@@ -92,7 +95,7 @@ build:
 	GOBIN=$(shell pwd)/bin go install ./cmd/...
 
 .PHONY: release-build
-release-build: kustomize
+release-build:
 	rm -rf build
 	mkdir -p build
 	$(MAKE) kubectl-accurate GOOS=windows GOARCH=amd64 SUFFIX=.exe
@@ -128,6 +131,15 @@ $(KUSTOMIZE):
 	mkdir -p bin
 	curl -fsL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv$(KUSTOMIZE_VERSION)/kustomize_v$(KUSTOMIZE_VERSION)_linux_amd64.tar.gz | \
 	tar -C bin -xzf -
+
+HELM := $(shell pwd)/bin/helm
+.PHONY: helm
+helm: $(HELM) ## Download helm locally if necessary.
+
+$(HELM):
+	mkdir -p $(BIN_DIR)
+	curl -L -sS https://get.helm.sh/helm-v$(HELM_VERSION)-linux-amd64.tar.gz \
+	  | tar xz -C $(BIN_DIR) --strip-components 1 linux-amd64/helm
 
 CRD_TO_MARKDOWN := $(shell pwd)/bin/crd-to-markdown
 .PHONY: crd-to-markdown

@@ -1,0 +1,324 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: '{{ .Release.Service }}'
+    app.kubernetes.io/name: '{{ include "accurate.name" . }}'
+    app.kubernetes.io/version: '{{ .Chart.AppVersion }}'
+    helm.sh/chart: '{{ include "accurate.chart" . }}'
+  name: '{{ template "accurate.fullname" . }}-controller-manager'
+  namespace: '{{ .Release.Namespace }}'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: '{{ .Release.Service }}'
+    app.kubernetes.io/name: '{{ include "accurate.name" . }}'
+    app.kubernetes.io/version: '{{ .Chart.AppVersion }}'
+    helm.sh/chart: '{{ include "accurate.chart" . }}'
+  name: '{{ template "accurate.fullname" . }}-leader-election-role'
+  namespace: '{{ .Release.Namespace }}'
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: '{{ .Release.Service }}'
+    app.kubernetes.io/name: '{{ include "accurate.name" . }}'
+    app.kubernetes.io/version: '{{ .Chart.AppVersion }}'
+    helm.sh/chart: '{{ include "accurate.chart" . }}'
+  name: '{{ template "accurate.fullname" . }}-manager-role'
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - accurate.cybozu.com
+  resources:
+  - subnamespaces
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - accurate.cybozu.com
+  resources:
+  - subnamespaces/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - accurate.cybozu.com
+  resources:
+  - subnamespaces/status
+  verbs:
+  - get
+  - patch
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: '{{ .Release.Service }}'
+    app.kubernetes.io/name: '{{ include "accurate.name" . }}'
+    app.kubernetes.io/version: '{{ .Chart.AppVersion }}'
+    helm.sh/chart: '{{ include "accurate.chart" . }}'
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+  name: '{{ template "accurate.fullname" . }}-subnamespace-editor-role'
+rules:
+- apiGroups:
+  - accurate.cybozu.com
+  resources:
+  - subnamespaces
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - accurate.cybozu.com
+  resources:
+  - subnamespaces/status
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: '{{ .Release.Service }}'
+    app.kubernetes.io/name: '{{ include "accurate.name" . }}'
+    app.kubernetes.io/version: '{{ .Chart.AppVersion }}'
+    helm.sh/chart: '{{ include "accurate.chart" . }}'
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
+  name: '{{ template "accurate.fullname" . }}-subnamespace-viewer-role'
+rules:
+- apiGroups:
+  - accurate.cybozu.com
+  resources:
+  - subnamespaces
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - accurate.cybozu.com
+  resources:
+  - subnamespaces/status
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: '{{ .Release.Service }}'
+    app.kubernetes.io/name: '{{ include "accurate.name" . }}'
+    app.kubernetes.io/version: '{{ .Chart.AppVersion }}'
+    helm.sh/chart: '{{ include "accurate.chart" . }}'
+  name: '{{ template "accurate.fullname" . }}-leader-election-rolebinding'
+  namespace: '{{ .Release.Namespace }}'
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: '{{ template "accurate.fullname" . }}-leader-election-role'
+subjects:
+- kind: ServiceAccount
+  name: '{{ template "accurate.fullname" . }}-controller-manager'
+  namespace: '{{ .Release.Namespace }}'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: '{{ .Release.Service }}'
+    app.kubernetes.io/name: '{{ include "accurate.name" . }}'
+    app.kubernetes.io/version: '{{ .Chart.AppVersion }}'
+    helm.sh/chart: '{{ include "accurate.chart" . }}'
+  name: '{{ template "accurate.fullname" . }}-manager-admin'
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin
+subjects:
+- kind: ServiceAccount
+  name: '{{ template "accurate.fullname" . }}-controller-manager'
+  namespace: '{{ .Release.Namespace }}'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: '{{ .Release.Service }}'
+    app.kubernetes.io/name: '{{ include "accurate.name" . }}'
+    app.kubernetes.io/version: '{{ .Chart.AppVersion }}'
+    helm.sh/chart: '{{ include "accurate.chart" . }}'
+  name: '{{ template "accurate.fullname" . }}-manager-rolebinding'
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: '{{ template "accurate.fullname" . }}-manager-role'
+subjects:
+- kind: ServiceAccount
+  name: '{{ template "accurate.fullname" . }}-controller-manager'
+  namespace: '{{ .Release.Namespace }}'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: '{{ .Release.Service }}'
+    app.kubernetes.io/name: '{{ include "accurate.name" . }}'
+    app.kubernetes.io/version: '{{ .Chart.AppVersion }}'
+    helm.sh/chart: '{{ include "accurate.chart" . }}'
+  name: '{{ template "accurate.fullname" . }}-webhook-service'
+  namespace: '{{ .Release.Namespace }}'
+spec:
+  ports:
+  - port: 443
+    targetPort: webhook-server
+  selector:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/name: '{{ include "accurate.name" . }}'
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: '{{ .Release.Namespace }}/{{ template "accurate.fullname"
+      . }}-serving-cert'
+  labels:
+    app.kubernetes.io/managed-by: '{{ .Release.Service }}'
+    app.kubernetes.io/name: '{{ include "accurate.name" . }}'
+    app.kubernetes.io/version: '{{ .Chart.AppVersion }}'
+    helm.sh/chart: '{{ include "accurate.chart" . }}'
+  name: '{{ template "accurate.fullname" . }}-mutating-webhook-configuration'
+webhooks:
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: '{{ template "accurate.fullname" . }}-webhook-service'
+      namespace: '{{ .Release.Namespace }}'
+      path: /mutate-accurate-cybozu-com-v1-subnamespace
+  failurePolicy: Fail
+  name: msubnamespace.kb.io
+  rules:
+  - apiGroups:
+    - accurate.cybozu.com
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - subnamespaces
+  sideEffects: None
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: '{{ .Release.Namespace }}/{{ template "accurate.fullname"
+      . }}-serving-cert'
+  labels:
+    app.kubernetes.io/managed-by: '{{ .Release.Service }}'
+    app.kubernetes.io/name: '{{ include "accurate.name" . }}'
+    app.kubernetes.io/version: '{{ .Chart.AppVersion }}'
+    helm.sh/chart: '{{ include "accurate.chart" . }}'
+  name: '{{ template "accurate.fullname" . }}-validating-webhook-configuration'
+webhooks:
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: '{{ template "accurate.fullname" . }}-webhook-service'
+      namespace: '{{ .Release.Namespace }}'
+      path: /validate-v1-namespace
+  failurePolicy: Fail
+  name: vnamespace.kb.io
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    - DELETE
+    resources:
+    - namespaces
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: '{{ template "accurate.fullname" . }}-webhook-service'
+      namespace: '{{ .Release.Namespace }}'
+      path: /validate-accurate-cybozu-com-v1-subnamespace
+  failurePolicy: Fail
+  name: vsubnamespace.kb.io
+  rules:
+  - apiGroups:
+    - accurate.cybozu.com
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - subnamespaces
+  sideEffects: None
