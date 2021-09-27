@@ -10,9 +10,10 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+// NamingPolicy represents the configuration of naming policies for Namespaces these are managed by Accurate.
 type NamingPolicy struct {
-	Root  string `json:"root,omitempty"`
-	Match string `json:"match,omitempty"`
+	Root  string `json:"root"`
+	Match string `json:"match"`
 }
 
 // Config represents the configuration file of Accurate.
