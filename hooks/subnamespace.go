@@ -45,12 +45,17 @@ func (m *subNamespaceMutator) Handle(ctx context.Context, req admission.Request)
 	return admission.PatchResponseFromRaw(req.Object.Raw, data)
 }
 
+type NamingPolicyRegexp struct {
+	Root  *regexp.Regexp
+	Match *regexp.Regexp
+}
+
 //+kubebuilder:webhook:path=/validate-accurate-cybozu-com-v1-subnamespace,mutating=false,failurePolicy=fail,sideEffects=None,groups=accurate.cybozu.com,resources=subnamespaces,verbs=create;update,versions=v1,name=vsubnamespace.kb.io,admissionReviewVersions={v1,v1beta1}
 
 type subNamespaceValidator struct {
 	client.Client
 	dec            *admission.Decoder
-	namingPolicies []config.NamingPolicy
+	namingPolicies []NamingPolicyRegexp
 }
 
 var _ admission.Handler = &subNamespaceValidator{}
@@ -87,27 +92,17 @@ func (v *subNamespaceValidator) Handle(ctx context.Context, req admission.Reques
 
 func (v *subNamespaceValidator) notMatchingNamingPolicy(ctx context.Context, sn *accuratev1.SubNamespace) (bool, error) {
 	for _, policy := range v.namingPolicies {
-		matched, err := regexp.MatchString(policy.Root, sn.Namespace)
-		if err != nil {
-			return false, err
-		}
-
-		if matched {
-			matched, err := regexp.MatchString(policy.Match, sn.Name)
-			if err != nil {
-				return false, err
-			}
-			if !matched {
+		if policy.Root.MatchString(sn.Namespace) {
+			if !policy.Match.MatchString(sn.Name) {
 				return false, nil
 			}
 		}
 	}
-
 	return true, nil
 }
 
 // SetupSubNamespaceWebhook registers the webhooks for SubNamespace
-func SetupSubNamespaceWebhook(mgr manager.Manager, dec *admission.Decoder, namingPolicies []config.NamingPolicy) {
+func SetupSubNamespaceWebhook(mgr manager.Manager, dec *admission.Decoder, namingPolicies []config.NamingPolicy) error {
 	serv := mgr.GetWebhookServer()
 
 	m := &subNamespaceMutator{
@@ -115,10 +110,34 @@ func SetupSubNamespaceWebhook(mgr manager.Manager, dec *admission.Decoder, namin
 	}
 	serv.Register("/mutate-accurate-cybozu-com-v1-subnamespace", &webhook.Admission{Handler: m})
 
+	namingPolicyRegexps, err := compileNamingPolicies(namingPolicies)
+	if err != nil {
+		return err
+	}
+
 	v := &subNamespaceValidator{
 		Client:         mgr.GetClient(),
 		dec:            dec,
-		namingPolicies: namingPolicies,
+		namingPolicies: namingPolicyRegexps,
 	}
 	serv.Register("/validate-accurate-cybozu-com-v1-subnamespace", &webhook.Admission{Handler: v})
+	return nil
+}
+
+func compileNamingPolicies(namingPolicies []config.NamingPolicy) ([]NamingPolicyRegexp, error) {
+	var result []NamingPolicyRegexp
+	for _, policy := range namingPolicies {
+		root, err := regexp.Compile(policy.Root)
+		if err != nil {
+			return nil, err
+		}
+
+		match, err := regexp.Compile(policy.Match)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, NamingPolicyRegexp{Root: root, Match: match})
+	}
+	return result, nil
 }

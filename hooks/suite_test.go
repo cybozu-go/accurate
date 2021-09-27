@@ -92,7 +92,7 @@ var _ = BeforeSuite(func() {
 	dec, err := admission.NewDecoder(scheme)
 	Expect(err).NotTo(HaveOccurred())
 	SetupNamespaceWebhook(mgr, dec)
-	SetupSubNamespaceWebhook(mgr, dec, []config.NamingPolicy{
+	err = SetupSubNamespaceWebhook(mgr, dec, []config.NamingPolicy{
 		{
 			Root:  "naming-policy-root-1",
 			Match: "naming-policy-root-1-child",
@@ -106,6 +106,7 @@ var _ = BeforeSuite(func() {
 			Match: ".+-match-.+",
 		},
 	})
+	Expect(err).NotTo(HaveOccurred())
 
 	go func() {
 		err = mgr.Start(ctx)
