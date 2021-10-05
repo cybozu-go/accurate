@@ -49,6 +49,15 @@ controller:
         kind: RoleBinding
       - version: v1
         kind: Secret
+
+    # controller.config.namingPolicies -- List of nameing policy for SubNamespaces.
+    # root and match are both regular expressions.
+    # When a SubNamespace is created in a tree starting from a root namespace and the root namespace's name matches root expression, the SubNamespace name is validated with match expression.
+    # namingPolicies:
+    #   - root: foo
+    #     match: foo_.*
+    #   - root: bar
+    #     match: bar_.*
 <snip>
 ```
 
