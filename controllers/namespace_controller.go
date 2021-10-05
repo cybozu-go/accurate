@@ -98,25 +98,11 @@ func (r *NamespaceReconciler) propagateMeta(ctx context.Context, ns, parent *cor
 }
 
 func (r *NamespaceReconciler) matchLabelKey(key string) bool {
-	for _, l := range r.LabelKeys {
-		// The glob pattern has been verified to be in the valid format when reading the config file.
-		if ok, _ := path.Match(l, key); ok {
-			return true
-		}
-	}
-
-	return false
+	return matchKey(key, r.LabelKeys)
 }
 
 func (r *NamespaceReconciler) matchAnnotationKey(key string) bool {
-	for _, a := range r.AnnotationKeys {
-		// The glob pattern has been verified to be in the valid format when reading the config file.
-		if ok, _ := path.Match(a, key); ok {
-			return true
-		}
-	}
-
-	return false
+	return matchKey(key, r.AnnotationKeys)
 }
 
 func (r *NamespaceReconciler) propagateResource(ctx context.Context, res *unstructured.Unstructured, parent, ns string) error {
@@ -344,4 +330,15 @@ func (r *NamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&corev1.Namespace{}).
 		Complete(r)
+}
+
+func matchKey(key string, list []string) bool {
+	for _, l := range list {
+		// The glob pattern has been verified to be in the valid format when reading the config file.
+		if ok, _ := path.Match(l, key); ok {
+			return true
+		}
+	}
+
+	return false
 }

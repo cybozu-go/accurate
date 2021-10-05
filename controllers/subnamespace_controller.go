@@ -23,6 +23,8 @@ import (
 // SubNamespaceReconciler reconciles a SubNamespace object
 type SubNamespaceReconciler struct {
 	client.Client
+	LabelKeys      []string
+	AnnotationKeys []string
 }
 
 //+kubebuilder:rbac:groups=accurate.cybozu.com,resources=subnamespaces,verbs=get;list;watch;create;update;patch;delete
@@ -113,15 +115,18 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev1
 
 	if ns.Labels[constants.LabelParent] == sn.Namespace {
 		sn.Status = accuratev1.SubNamespaceOK
-		labels := cloneMap(sn.Spec.Labels, []string{constants.LabelCreatedBy, constants.LabelParent})
-		for k, v := range labels {
-			ns.Labels[k] = v
+		for k, v := range sn.Spec.Labels {
+			if ok := r.matchLabelKey(k); ok {
+				ns.Labels[k] = v
+			}
 		}
 		if ns.Annotations == nil {
 			ns.Annotations = make(map[string]string)
 		}
 		for k, v := range sn.Spec.Annotations {
-			ns.Annotations[k] = v
+			if ok := r.matchAnnotationKey(k); ok {
+				ns.Annotations[k] = v
+			}
 		}
 		if err := r.Update(ctx, ns); err != nil {
 			return err
@@ -132,6 +137,14 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev1
 	}
 
 	return r.Update(ctx, sn)
+}
+
+func (r *SubNamespaceReconciler) matchLabelKey(key string) bool {
+	return matchKey(key, r.LabelKeys)
+}
+
+func (r *SubNamespaceReconciler) matchAnnotationKey(key string) bool {
+	return matchKey(key, r.AnnotationKeys)
 }
 
 // SetupWithManager sets up the controller with the Manager.
@@ -161,17 +174,4 @@ func (r *SubNamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			},
 		}).
 		Complete(r)
-}
-
-func cloneMap(m map[string]string, excludeKeys []string) map[string]string {
-	result := make(map[string]string)
-	for k, v := range m {
-		for _, key := range excludeKeys {
-			if key == k {
-				continue
-			}
-		}
-		result[k] = v
-	}
-	return result
 }
