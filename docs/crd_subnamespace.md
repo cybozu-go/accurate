@@ -33,11 +33,11 @@ SubNamespaceList contains a list of SubNamespace
 
 #### SubNamespaceSpec
 
-
+SubNamespaceSpec defines the desired state of SubNamespace
 
 | Field | Description | Scheme | Required |
 | ----- | ----------- | ------ | -------- |
-| labels |  | map[string]string | false |
-| annotations |  | map[string]string | false |
+| labels | Labels is the labels for be propagated to the sub-namespace. | map[string]string | false |
+| annotations | Annotations is the annotations for be propagated to the sub-namespace. | map[string]string | false |
 
 [Back to Custom Resources](#custom-resources)

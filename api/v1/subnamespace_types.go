@@ -16,8 +16,14 @@ const (
 	SubNamespaceConflict = SubNamespaceStatus("conflict")
 )
 
+// SubNamespaceSpec defines the desired state of SubNamespace
 type SubNamespaceSpec struct {
-	Labels      map[string]string `json:"labels,omitempty"`
+	// Labels is the labels for be propagated to the sub-namespace.
+	// +optional
+	Labels map[string]string `json:"labels,omitempty"`
+
+	// Annotations is the annotations for be propagated to the sub-namespace.
+	// +optional
 	Annotations map[string]string `json:"annotations,omitempty"`
 }
 
