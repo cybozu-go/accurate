@@ -54,6 +54,34 @@ controller:
 
 ## ClusterRoleBindings
 
-A built-in ClusterRole `admin` is bound by default to allow `accurate-controller` to watch and propagate namespace-scope resources.
+A built-in ClusterRole `admin` is bound by default to allow `accurate-controller` to watch and propagate namespace-scope resources. However, `admin` does not contain verbs for [ResourceQuota][] and may not contain custom resources.
 
 If you need to watch and propagate resources not included in `admin` ClusterRole, add additional ClusterRole/ClusterRoleBinding to `accurate-controller-manager` ServiceAccount.
+Set the `controller.additionalRBAC.rules` in the Helm Chart values.
+
+The following example Helm chart values is to watch and propagate ResourceQuotas.
+
+```yaml
+<snip>
+controller:
+  additionalRBAC:
+    # controller.additionalRBAC.rules -- Specify the RBAC rules to be added to the controller.
+    # ClusterRole and ClusterRoleBinding are created with the names `{{ release name }}-additional-resources`.
+    # The rules defined here will be used for the ClusterRole rules.
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - resourcequotas
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+<snip>
+```
+
+[ResourceQuota]: https://kubernetes.io/docs/concepts/policy/resource-quotas/

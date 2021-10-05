@@ -53,6 +53,8 @@ subjects:
   apiGroup: rbac.authorization.k8s.io
 ```
 
+You may want to prepare more objects such as ResourceQuotas.
+
 ## Reverting a root Namespace to a normal one
 
 Using `kubectl accurate`:
