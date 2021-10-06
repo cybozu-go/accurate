@@ -1,0 +1,67 @@
+apiVersion: krew.googlecontainertools.github.com/v1alpha2
+kind: Plugin
+metadata:
+  name: accurate
+spec:
+  version: {{ .TagName }}
+  homepage: https://github.com/cybozu-go/accurate
+  platforms:
+    - selector:
+        matchLabels:
+          os: darwin
+          arch: amd64
+      {{addURIAndSha "https://github.com/cybozu-go/accurate/releases/download/{{ .TagName }}/kubectl-accurate_{{ .TagName }}_darwin_amd64.tar.gz" .TagName | indent 6 }}
+      bin: kubectl-accurate
+      files:
+        - from: kubectl-accurate
+          to: .
+        - from: LICENSE
+          to: .
+    - selector:
+        matchLabels:
+          os: darwin
+          arch: arm64
+      {{addURIAndSha "https://github.com/cybozu-go/accurate/releases/download/{{ .TagName }}/kubectl-accurate_{{ .TagName }}_darwin_arm64.tar.gz" .TagName | indent 6 }}
+      bin: kubectl-accurate
+      files:
+        - from: kubectl-accurate
+          to: .
+        - from: LICENSE
+          to: .
+    - selector:
+        matchLabels:
+          os: linux
+          arch: amd64
+      {{addURIAndSha "https://github.com/cybozu-go/accurate/releases/download/{{ .TagName }}/kubectl-accurate_{{ .TagName }}_linux_amd64.tar.gz" .TagName | indent 6 }}
+      bin: kubectl-accurate
+      files:
+        - from: kubectl-accurate
+          to: .
+        - from: LICENSE
+          to: .
+    - selector:
+        matchLabels:
+          os: linux
+          arch: arm64
+      {{addURIAndSha "https://github.com/cybozu-go/accurate/releases/download/{{ .TagName }}/kubectl-accurate_{{ .TagName }}_linux_arm64.tar.gz" .TagName | indent 6 }}
+      bin: kubectl-accurate
+      files:
+        - from: kubectl-accurate
+          to: .
+        - from: LICENSE
+          to: .
+    - selector:
+        matchLabels:
+          os: windows
+          arch: amd64
+      {{addURIAndSha "https://github.com/cybozu-go/accurate/releases/download/{{ .TagName }}/kubectl-accurate_{{ .TagName }}_windows_amd64.tar.gz" .TagName | indent 6 }}
+      bin: kubectl-accurate.exe
+      files:
+        - from: kubectl-accurate.exe
+          to: .
+        - from: LICENSE
+          to: .
+  shortDescription: Manage Accurate features
+  description: |
+    kubectl-accurate is a subcommand of kubectl to manage Accurate features.
+    Read more documentation at: https://cybozu-go.github.io/accurate/kubectl-accurate.html
