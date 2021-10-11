@@ -51,6 +51,8 @@ controller:
         kind: RoleBinding
       - version: v1
         kind: Secret
+      - version: v1
+        kind: ResourceQuota
 
   additionalRBAC:
     # controller.additionalRBAC.rules -- Specify the RBAC rules to be added to the controller.

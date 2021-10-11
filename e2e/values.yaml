@@ -23,6 +23,8 @@ controller:
         kind: RoleBinding
       - version: v1
         kind: Secret
+      - version: v1
+        kind: ResourceQuota
 
   additionalRBAC:
     rules:
@@ -34,3 +36,15 @@ controller:
           - get
           - list
           - watch
+      - apiGroups:
+          - ""
+        resources:
+          - resourcequotas
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
