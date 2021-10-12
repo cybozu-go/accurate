@@ -126,6 +126,34 @@ var _ = Describe("SubNamespace webhook", func() {
 					err = k8sClient.Create(ctx, sn)
 					Expect(err).NotTo(HaveOccurred())
 				})
+
+				It("should allow creation of SubNamespace in a root namespace - pattern4", func() {
+					root := &corev1.Namespace{}
+					root.Name = "app-root1"
+					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
+					err := k8sClient.Create(ctx, root)
+					Expect(err).NotTo(HaveOccurred())
+
+					sn := &accuratev1.SubNamespace{}
+					sn.Namespace = "app-root1"
+					sn.Name = "app-root1-child"
+					err = k8sClient.Create(ctx, sn)
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("should allow creation of SubNamespace in a root namespace - pattern5", func() {
+					root := &corev1.Namespace{}
+					root.Name = "app-root2-group1"
+					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
+					err := k8sClient.Create(ctx, root)
+					Expect(err).NotTo(HaveOccurred())
+
+					sn := &accuratev1.SubNamespace{}
+					sn.Namespace = "app-root2-group1"
+					sn.Name = "app-root2-group1-team1"
+					err = k8sClient.Create(ctx, sn)
+					Expect(err).NotTo(HaveOccurred())
+				})
 			})
 
 			When("the SubNamespace name is not matched to the Root's Match Naming Policy", func() {
@@ -173,6 +201,20 @@ var _ = Describe("SubNamespace webhook", func() {
 					sn := &accuratev1.SubNamespace{}
 					sn.Namespace = "ns-root-2-parent"
 					sn.Name = "not-ns-root-2-parent-child"
+					err = k8sClient.Create(ctx, sn)
+					Expect(err).To(HaveOccurred())
+				})
+
+				It("should deny creation of SubNamespace in a root namespace - pattern4", func() {
+					root := &corev1.Namespace{}
+					root.Name = "app-root10"
+					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
+					err := k8sClient.Create(ctx, root)
+					Expect(err).NotTo(HaveOccurred())
+
+					sn := &accuratev1.SubNamespace{}
+					sn.Namespace = "app-root10"
+					sn.Name = "app-root20-child"
 					err = k8sClient.Create(ctx, sn)
 					Expect(err).To(HaveOccurred())
 				})

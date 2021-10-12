@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
+	"strconv"
+	"strings"
 
 	accuratev1 "github.com/cybozu-go/accurate/api/v1"
 	"github.com/cybozu-go/accurate/pkg/config"
@@ -78,9 +81,12 @@ func (v *subNamespaceValidator) Handle(ctx context.Context, req admission.Reques
 	if err != nil {
 		return admission.Denied(err.Error())
 	}
-	ok, err := v.notMatchingNamingPolicy(ctx, sn.Name, root.Name)
+	ok, msg, err := v.notMatchingNamingPolicy(ctx, sn.Name, root.Name)
+	if err != nil {
+		return admission.Errored(http.StatusInternalServerError, err)
+	}
 	if !ok {
-		return admission.Denied(fmt.Sprintf("namespace %s is not match naming policies: %s", ns.Name, err.Error()))
+		return admission.Denied(fmt.Sprintf("namespace %s is not match naming policies: %s", ns.Name, msg))
 	}
 	return admission.Allowed("")
 }
@@ -100,15 +106,28 @@ func (v *subNamespaceValidator) getRootNamespace(ctx context.Context, ns *corev1
 	return v.getRootNamespace(ctx, parent)
 }
 
-func (v *subNamespaceValidator) notMatchingNamingPolicy(ctx context.Context, ns, root string) (bool, error) {
+func (v *subNamespaceValidator) notMatchingNamingPolicy(ctx context.Context, ns, root string) (bool, string, error) {
 	for _, policy := range v.namingPolicies {
-		if policy.Root.MatchString(root) {
-			if !policy.Match.MatchString(ns) {
-				return false, fmt.Errorf("namespace name - target=%s root=%s denied policy - root: %s match: %s", ns, root, policy.Root, policy.Match)
+		matches := policy.Root.FindAllSubmatch([]byte(root), -1)
+		if len(matches) != 0 && len(matches[0]) != 0 {
+			m := policy.Match
+			if len(matches[0]) > 1 {
+				for i, match := range matches[0][1:] {
+					v := `\` + strconv.Itoa(i+1)
+					m = strings.Replace(m, v, string(match), len(v))
+				}
+			}
+			r, err := regexp.Compile(m)
+			if err != nil {
+				return false, "", fmt.Errorf("invalid naming policy: %w", err)
+			}
+
+			if !r.MatchString(ns) {
+				return false, fmt.Sprintf("namespace - target=%s root=%s denied policy - root=%s match=%s", ns, root, policy.Root, policy.Match), nil
 			}
 		}
 	}
-	return true, nil
+	return true, "", nil
 }
 
 // SetupSubNamespaceWebhook registers the webhooks for SubNamespace

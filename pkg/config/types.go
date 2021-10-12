@@ -19,7 +19,7 @@ type NamingPolicy struct {
 
 type NamingPolicyRegexp struct {
 	Root  *regexp.Regexp
-	Match *regexp.Regexp
+	Match string
 }
 
 // Config represents the configuration file of Accurate.
@@ -63,13 +63,7 @@ func (c *Config) Validate(mapper meta.RESTMapper) error {
 		if err != nil {
 			return fmt.Errorf("invalid naming policy: %w", err)
 		}
-
-		match, err := regexp.Compile(policy.Match)
-		if err != nil {
-			return fmt.Errorf("invalid naming policy: %w", err)
-		}
-
-		c.NamingPolicyRegexps = append(c.NamingPolicyRegexps, NamingPolicyRegexp{Root: root, Match: match})
+		c.NamingPolicyRegexps = append(c.NamingPolicyRegexps, NamingPolicyRegexp{Root: root, Match: policy.Match})
 	}
 	return nil
 }

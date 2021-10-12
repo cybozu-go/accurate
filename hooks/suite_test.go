@@ -111,6 +111,14 @@ var _ = BeforeSuite(func() {
 				Root:  "^ns-root.+",
 				Match: "^ns-root.+",
 			},
+			{
+				Root:  "^app-(.*)",
+				Match: `^app-\1-.*`,
+			},
+			{
+				Root:  "^app-([^-]*)-([^-]*)",
+				Match: `^app-\1-\2-.*`,
+			},
 		},
 	}
 	err = conf.Validate(mgr.GetRESTMapper())
