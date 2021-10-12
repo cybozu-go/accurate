@@ -18,11 +18,11 @@ const (
 
 // SubNamespaceSpec defines the desired state of SubNamespace
 type SubNamespaceSpec struct {
-	// Labels is the labels for be propagated to the sub-namespace.
+	// Labels are the labels to be propagated to the sub-namespace
 	// +optional
 	Labels map[string]string `json:"labels,omitempty"`
 
-	// Annotations is the annotations for be propagated to the sub-namespace.
+	// Annotations are the annotations to be propagated to the sub-namespace.
 	// +optional
 	Annotations map[string]string `json:"annotations,omitempty"`
 }

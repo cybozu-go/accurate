@@ -107,14 +107,6 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev1
 			constants.LabelCreatedBy: constants.CreatedBy,
 			constants.LabelParent:    sn.Namespace,
 		}
-		if err := r.Create(ctx, ns); err != nil {
-			return err
-		}
-		logger.Info("created a sub namespace", "name", sn.Name)
-	}
-
-	if ns.Labels[constants.LabelParent] == sn.Namespace {
-		sn.Status = accuratev1.SubNamespaceOK
 		for k, v := range sn.Spec.Labels {
 			if ok := r.matchLabelKey(k); ok {
 				ns.Labels[k] = v
@@ -128,9 +120,14 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev1
 				ns.Annotations[k] = v
 			}
 		}
-		if err := r.Update(ctx, ns); err != nil {
+		if err := r.Create(ctx, ns); err != nil {
 			return err
 		}
+		logger.Info("created a sub namespace", "name", sn.Name)
+	}
+
+	if ns.Labels[constants.LabelParent] == sn.Namespace {
+		sn.Status = accuratev1.SubNamespaceOK
 	} else {
 		logger.Info("a conflicting namespace already exists")
 		sn.Status = accuratev1.SubNamespaceConflict

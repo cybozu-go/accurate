@@ -38,13 +38,13 @@ spec:
               annotations:
                 additionalProperties:
                   type: string
-                description: Annotations is the annotations for be propagated to the
+                description: Annotations are the annotations to be propagated to the
                   sub-namespace.
                 type: object
               labels:
                 additionalProperties:
                   type: string
-                description: Labels is the labels for be propagated to the sub-namespace.
+                description: Labels are the labels to be propagated to the sub-namespace
                 type: object
             type: object
           status:

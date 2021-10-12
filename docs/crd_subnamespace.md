@@ -37,7 +37,7 @@ SubNamespaceSpec defines the desired state of SubNamespace
 
 | Field | Description | Scheme | Required |
 | ----- | ----------- | ------ | -------- |
-| labels | Labels is the labels for be propagated to the sub-namespace. | map[string]string | false |
-| annotations | Annotations is the annotations for be propagated to the sub-namespace. | map[string]string | false |
+| labels | Labels are the labels to be propagated to the sub-namespace | map[string]string | false |
+| annotations | Annotations are the annotations to be propagated to the sub-namespace. | map[string]string | false |
 
 [Back to Custom Resources](#custom-resources)
