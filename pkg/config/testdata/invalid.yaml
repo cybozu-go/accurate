@@ -13,4 +13,10 @@ watches:
 - version: v1
   kind: Secret
 
+namingPolicies:
+- root: foo
+  match: bar
+- root: a
+  match: b
+
 invalid: data

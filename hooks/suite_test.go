@@ -92,24 +92,30 @@ var _ = BeforeSuite(func() {
 	dec, err := admission.NewDecoder(scheme)
 	Expect(err).NotTo(HaveOccurred())
 	SetupNamespaceWebhook(mgr, dec)
-	err = SetupSubNamespaceWebhook(mgr, dec, []config.NamingPolicy{
-		{
-			Root:  "naming-policy-root-1",
-			Match: "naming-policy-root-1-child",
+
+	conf := config.Config{
+		NamingPolicies: []config.NamingPolicy{
+			{
+				Root:  "naming-policy-root-1",
+				Match: "naming-policy-root-1-child",
+			},
+			{
+				Root:  "naming-policy-root-2",
+				Match: "naming-policy-root-2-child",
+			},
+			{
+				Root:  ".+-match-.+",
+				Match: ".+-match-.+",
+			},
+			{
+				Root:  "^ns-root.+",
+				Match: "^ns-root.+",
+			},
 		},
-		{
-			Root:  "naming-policy-root-2",
-			Match: "naming-policy-root-2-child",
-		},
-		{
-			Root:  ".+-match-.+",
-			Match: ".+-match-.+",
-		},
-		{
-			Root:  "^ns-root.+",
-			Match: "^ns-root.+",
-		},
-	})
+	}
+	err = conf.Validate(mgr.GetRESTMapper())
+	Expect(err).NotTo(HaveOccurred())
+	err = SetupSubNamespaceWebhook(mgr, dec, conf.NamingPolicyRegexps)
 	Expect(err).NotTo(HaveOccurred())
 
 	go func() {

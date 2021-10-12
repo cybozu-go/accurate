@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"regexp"
 
 	accuratev1 "github.com/cybozu-go/accurate/api/v1"
 	"github.com/cybozu-go/accurate/pkg/config"
@@ -46,17 +45,12 @@ func (m *subNamespaceMutator) Handle(ctx context.Context, req admission.Request)
 	return admission.PatchResponseFromRaw(req.Object.Raw, data)
 }
 
-type NamingPolicyRegexp struct {
-	Root  *regexp.Regexp
-	Match *regexp.Regexp
-}
-
 //+kubebuilder:webhook:path=/validate-accurate-cybozu-com-v1-subnamespace,mutating=false,failurePolicy=fail,sideEffects=None,groups=accurate.cybozu.com,resources=subnamespaces,verbs=create;update,versions=v1,name=vsubnamespace.kb.io,admissionReviewVersions={v1,v1beta1}
 
 type subNamespaceValidator struct {
 	client.Client
 	dec            *admission.Decoder
-	namingPolicies []NamingPolicyRegexp
+	namingPolicies []config.NamingPolicyRegexp
 }
 
 var _ admission.Handler = &subNamespaceValidator{}
@@ -118,18 +112,13 @@ func (v *subNamespaceValidator) notMatchingNamingPolicy(ctx context.Context, ns,
 }
 
 // SetupSubNamespaceWebhook registers the webhooks for SubNamespace
-func SetupSubNamespaceWebhook(mgr manager.Manager, dec *admission.Decoder, namingPolicies []config.NamingPolicy) error {
+func SetupSubNamespaceWebhook(mgr manager.Manager, dec *admission.Decoder, namingPolicyRegexps []config.NamingPolicyRegexp) error {
 	serv := mgr.GetWebhookServer()
 
 	m := &subNamespaceMutator{
 		dec: dec,
 	}
 	serv.Register("/mutate-accurate-cybozu-com-v1-subnamespace", &webhook.Admission{Handler: m})
-
-	namingPolicyRegexps, err := compileNamingPolicies(namingPolicies)
-	if err != nil {
-		return err
-	}
 
 	v := &subNamespaceValidator{
 		Client:         mgr.GetClient(),
@@ -138,22 +127,4 @@ func SetupSubNamespaceWebhook(mgr manager.Manager, dec *admission.Decoder, namin
 	}
 	serv.Register("/validate-accurate-cybozu-com-v1-subnamespace", &webhook.Admission{Handler: v})
 	return nil
-}
-
-func compileNamingPolicies(namingPolicies []config.NamingPolicy) ([]NamingPolicyRegexp, error) {
-	var result []NamingPolicyRegexp
-	for _, policy := range namingPolicies {
-		root, err := regexp.Compile(policy.Root)
-		if err != nil {
-			return nil, err
-		}
-
-		match, err := regexp.Compile(policy.Match)
-		if err != nil {
-			return nil, err
-		}
-
-		result = append(result, NamingPolicyRegexp{Root: root, Match: match})
-	}
-	return result, nil
 }
