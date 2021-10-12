@@ -144,17 +144,6 @@ func TestValidate(t *testing.T) {
 			},
 			isValid: false,
 		},
-		{
-			config: &Config{
-				NamingPolicies: []NamingPolicy{
-					{
-						Root:  "abc",
-						Match: "(",
-					},
-				},
-			},
-			isValid: false,
-		},
 	}
 
 	for _, testcase := range testcases {
