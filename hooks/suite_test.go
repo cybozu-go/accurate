@@ -105,6 +105,10 @@ var _ = BeforeSuite(func() {
 			Root:  ".+-match-.+",
 			Match: ".+-match-.+",
 		},
+		{
+			Root:  "^ns-root.+",
+			Match: "^ns-root.+",
+		},
 	})
 	Expect(err).NotTo(HaveOccurred())
 

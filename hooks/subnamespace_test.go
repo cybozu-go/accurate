@@ -106,6 +106,26 @@ var _ = Describe("SubNamespace webhook", func() {
 					err = k8sClient.Create(ctx, sn)
 					Expect(err).NotTo(HaveOccurred())
 				})
+
+				It("should allow creation of SubNamespace in a root namespace - pattern3", func() {
+					root := &corev1.Namespace{}
+					root.Name = "ns-root-1"
+					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
+					err := k8sClient.Create(ctx, root)
+					Expect(err).NotTo(HaveOccurred())
+
+					parent := &corev1.Namespace{}
+					parent.Name = "ns-root-1-parent"
+					parent.Labels = map[string]string{constants.LabelParent: "ns-root-1"}
+					err = k8sClient.Create(ctx, parent)
+					Expect(err).NotTo(HaveOccurred())
+
+					sn := &accuratev1.SubNamespace{}
+					sn.Namespace = "ns-root-1-parent"
+					sn.Name = "ns-root-1-parent-child"
+					err = k8sClient.Create(ctx, sn)
+					Expect(err).NotTo(HaveOccurred())
+				})
 			})
 
 			When("the SubNamespace name is not matched to the Root's Match Naming Policy", func() {
@@ -133,6 +153,26 @@ var _ = Describe("SubNamespace webhook", func() {
 					sn := &accuratev1.SubNamespace{}
 					sn.Namespace = "root-ns-match-2"
 					sn.Name = "child-2"
+					err = k8sClient.Create(ctx, sn)
+					Expect(err).To(HaveOccurred())
+				})
+
+				It("should deny creation of SubNamespace in a root namespace - pattern3", func() {
+					root := &corev1.Namespace{}
+					root.Name = "ns-root-2"
+					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
+					err := k8sClient.Create(ctx, root)
+					Expect(err).NotTo(HaveOccurred())
+
+					parent := &corev1.Namespace{}
+					parent.Name = "ns-root-2-parent"
+					parent.Labels = map[string]string{constants.LabelParent: "ns-root-1"}
+					err = k8sClient.Create(ctx, parent)
+					Expect(err).NotTo(HaveOccurred())
+
+					sn := &accuratev1.SubNamespace{}
+					sn.Namespace = "ns-root-2-parent"
+					sn.Name = "not-ns-root-2-parent-child"
 					err = k8sClient.Create(ctx, sn)
 					Expect(err).To(HaveOccurred())
 				})

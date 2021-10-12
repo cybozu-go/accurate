@@ -12,6 +12,7 @@ import (
 	"github.com/cybozu-go/accurate/pkg/constants"
 	admissionv1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
@@ -79,22 +80,37 @@ func (v *subNamespaceValidator) Handle(ctx context.Context, req admission.Reques
 		return admission.Denied(fmt.Sprintf("namespace %s is neither a root nor a sub namespace", ns.Name))
 	}
 
-	ok, err := v.notMatchingNamingPolicy(ctx, sn)
+	root, err := v.getRootNamespace(ctx, ns)
 	if err != nil {
-		return admission.Errored(http.StatusInternalServerError, err)
+		return admission.Denied(err.Error())
 	}
+	ok, err := v.notMatchingNamingPolicy(ctx, sn.Name, root.Name)
 	if !ok {
-		return admission.Denied(fmt.Sprintf("namespace %s is not match naming policies", ns.Name))
+		return admission.Denied(fmt.Sprintf("namespace %s is not match naming policies: %s", ns.Name, err.Error()))
 	}
-
 	return admission.Allowed("")
 }
 
-func (v *subNamespaceValidator) notMatchingNamingPolicy(ctx context.Context, sn *accuratev1.SubNamespace) (bool, error) {
+func (v *subNamespaceValidator) getRootNamespace(ctx context.Context, ns *corev1.Namespace) (*corev1.Namespace, error) {
+	if ns.Labels[constants.LabelType] == constants.NSTypeRoot {
+		return ns, nil
+	}
+
+	parent := &corev1.Namespace{}
+	if err := v.Get(ctx, client.ObjectKey{Name: ns.Labels[constants.LabelParent]}, parent); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return nil, fmt.Errorf("failed to get namespace %s: %w", ns.Labels[constants.LabelParent], err)
+		}
+		return nil, fmt.Errorf("namespace %s is not found", ns.Labels[constants.LabelParent])
+	}
+	return v.getRootNamespace(ctx, parent)
+}
+
+func (v *subNamespaceValidator) notMatchingNamingPolicy(ctx context.Context, ns, root string) (bool, error) {
 	for _, policy := range v.namingPolicies {
-		if policy.Root.MatchString(sn.Namespace) {
-			if !policy.Match.MatchString(sn.Name) {
-				return false, nil
+		if policy.Root.MatchString(root) {
+			if !policy.Match.MatchString(ns) {
+				return false, fmt.Errorf("namespace name - target=%s root=%s denied policy - root: %s match: %s", ns, root, policy.Root, policy.Match)
 			}
 		}
 	}
