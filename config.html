@@ -180,6 +180,8 @@ watches:
   kind: RoleBinding
 - version: v1
   kind: Secret
+- version: v1
+  kind: ResourceQuota
 </code></pre>
 <p>Only labels and annotations specified in the configuration file will be inherited.</p>
 <p>Likewise, Accurate watches only namespace-scope resources specified in the configuration file.</p>
@@ -215,7 +217,7 @@ controller:
 &lt;snip&gt;
 </code></pre>
 <h2 id="clusterrolebindings"><a class="header" href="#clusterrolebindings">ClusterRoleBindings</a></h2>
-<p>A built-in ClusterRole <code>admin</code> is bound by default to allow <code>accurate-controller</code> to watch and propagate namespace-scope resources.  However, <code>admin</code> does not contain verbs for <a href="https://kubernetes.io/docs/concepts/policy/resource-quotas/">ResourceQuota</a> and may not contain custom resources.</p>
+<p>A built-in ClusterRole <code>admin</code> is bound by default to allow <code>accurate-controller</code> to watch and propagate namespace-scope resources. However, <code>admin</code> does not contain verbs for <a href="https://kubernetes.io/docs/concepts/policy/resource-quotas/">ResourceQuota</a> and may not contain custom resources.</p>
 <p>If you need to watch and propagate resources not included in <code>admin</code> ClusterRole, add additional ClusterRole/ClusterRoleBinding to <code>accurate-controller-manager</code> ServiceAccount.
 Set the <code>controller.additionalRBAC.rules</code> in the Helm Chart values.</p>
 <p>The following example Helm chart values is to watch and propagate ResourceQuotas.</p>
