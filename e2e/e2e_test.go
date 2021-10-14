@@ -16,6 +16,9 @@ import (
 //go:embed testdata/role.yaml
 var roleYAML []byte
 
+//go:embed testdata/resourceQuota.yaml
+var resourceQuota []byte
+
 var sealedJSON []byte
 
 func init() {
@@ -70,6 +73,7 @@ var _ = Describe("kubectl accurate", func() {
 
 		kubectlSafe(roleYAML, "apply", "-f", "-")
 		kubectlSafe(nil, "create", "-n", "tmpl3", "secret", "generic", "s1", "--from-literal=foo=bar")
+		kubectlSafe(resourceQuota, "apply", "-f", "-")
 
 		By("setting up templates")
 		kubectlSafe(nil, "accurate", "template", "set", "tmpl3", "tmpl2")
@@ -77,6 +81,7 @@ var _ = Describe("kubectl accurate", func() {
 
 		By("checking propagation from templates")
 		kubectlSafe(nil, "annotate", "-n", "tmpl3", "secret", "s1", "accurate.cybozu.com/propagate=update")
+		kubectlSafe(nil, "annotate", "-n", "tmpl3", "quota", "rq1", "accurate.cybozu.com/propagate=update")
 
 		Eventually(func() error {
 			_, err := kubectl(nil, "get", "-n", "root2", "roles", "role1")
@@ -84,6 +89,10 @@ var _ = Describe("kubectl accurate", func() {
 		}).Should(Succeed())
 		Eventually(func() error {
 			_, err := kubectl(nil, "get", "-n", "root2", "secrets", "s1")
+			return err
+		}).Should(Succeed())
+		Eventually(func() error {
+			_, err := kubectl(nil, "get", "-n", "root2", "quota", "rq1")
 			return err
 		}).Should(Succeed())
 		Eventually(func() string {
@@ -113,6 +122,20 @@ var _ = Describe("kubectl accurate", func() {
 			for _, s := range sl.Items {
 				if s.Name == "s1" {
 					return errors.New("s1 exists")
+				}
+			}
+
+			out, err = kubectl(nil, "get", "-n", "root2", "quota", "-o", "json")
+			if err != nil {
+				return err
+			}
+			rql := &corev1.ResourceQuotaList{}
+			if err := json.Unmarshal(out, rql); err != nil {
+				return err
+			}
+			for _, rq := range rql.Items {
+				if rq.Name == "rq1" {
+					return errors.New("rq1 exists")
 				}
 			}
 			return nil

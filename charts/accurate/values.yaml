@@ -51,21 +51,23 @@ controller:
         kind: RoleBinding
       - version: v1
         kind: Secret
+      - version: v1
+        kind: ResourceQuota
 
   additionalRBAC:
     # controller.additionalRBAC.rules -- Specify the RBAC rules to be added to the controller.
     # ClusterRole and ClusterRoleBinding are created with the names `{{ release name }}-additional-resources`.
     # The rules defined here will be used for the ClusterRole rules.
-    rules: []
-    # - apiGroups:
-    #     - ""
-    #   resources:
-    #     - resourcequotas
-    #   verbs:
-    #     - get
-    #     - list
-    #     - watch
-    #     - create
-    #     - update
-    #     - patch
-    #     - delete
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - resourcequotas
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
