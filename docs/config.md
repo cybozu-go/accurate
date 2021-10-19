@@ -73,7 +73,7 @@ controller:
 
 ## ClusterRoleBindings
 
-A built-in ClusterRole `admin` is bound by default to allow `accurate-controller` to watch and propagate namespace-scope resources.  However, `admin` does not contain verbs for [ResourceQuota][] and may not contain custom resources.
+A built-in ClusterRole `admin` is bound by default to allow `accurate-controller` to watch and propagate namespace-scope resources. However, `admin` does not contain verbs for [ResourceQuota][] and may not contain custom resources.
 
 If you need to watch and propagate resources not included in `admin` ClusterRole, add additional ClusterRole/ClusterRoleBinding to `accurate-controller-manager` ServiceAccount.
 Set the `controller.additionalRBAC.rules` in the Helm Chart values.

@@ -23,5 +23,7 @@ watches:
   kind: RoleBinding
 - version: v1
   kind: Secret
+- version: v1
+  kind: ResourceQuota
 
 namingPolicies: []
