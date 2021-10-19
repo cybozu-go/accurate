@@ -112,9 +112,7 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev1
 				ns.Labels[k] = v
 			}
 		}
-		if ns.Annotations == nil {
-			ns.Annotations = make(map[string]string)
-		}
+		ns.Annotations = make(map[string]string)
 		for k, v := range sn.Spec.Annotations {
 			if ok := r.matchAnnotationKey(k); ok {
 				ns.Annotations[k] = v
