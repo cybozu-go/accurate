@@ -112,12 +112,16 @@ var _ = BeforeSuite(func() {
 				Match: "^ns-root.+",
 			},
 			{
-				Root:  "^app-(.*)",
-				Match: `^app-\1-.*`,
+				Root:  "^app-(?P<team>.*)",
+				Match: "^app-${team}-.*",
 			},
 			{
-				Root:  "^app-([^-]*)-([^-]*)",
-				Match: `^app-\1-\2-.*`,
+				Root:  "^app-(?P<team>[^-]*)-(?P<app>[^-]*)",
+				Match: "^app-$team-$app-.*",
+			},
+			{
+				Root:  "^unuse-naming-group-(?P<team>.*)",
+				Match: "^unuse-naming-group-child1",
 			},
 		},
 	}

@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
-	"strconv"
-	"strings"
 
 	accuratev1 "github.com/cybozu-go/accurate/api/v1"
 	"github.com/cybozu-go/accurate/pkg/config"
@@ -108,16 +106,13 @@ func (v *subNamespaceValidator) getRootNamespace(ctx context.Context, ns *corev1
 
 func (v *subNamespaceValidator) notMatchingNamingPolicy(ctx context.Context, ns, root string) (bool, string, error) {
 	for _, policy := range v.namingPolicies {
-		matches := policy.Root.FindAllSubmatch([]byte(root), -1)
-		if len(matches) != 0 && len(matches[0]) != 0 {
-			m := policy.Match
-			if len(matches[0]) > 1 {
-				for i, match := range matches[0][1:] {
-					v := `\` + strconv.Itoa(i+1)
-					m = strings.Replace(m, v, string(match), len(v))
-				}
+		matches := policy.Root.FindAllSubmatchIndex([]byte(root), -1)
+		if len(matches) > 0 {
+			m := []byte{}
+			for _, match := range matches {
+				m = policy.Root.Expand(m, []byte(policy.Match), []byte(root), match)
 			}
-			r, err := regexp.Compile(m)
+			r, err := regexp.Compile(string(m))
 			if err != nil {
 				return false, "", fmt.Errorf("invalid naming policy: %w", err)
 			}

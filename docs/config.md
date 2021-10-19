@@ -52,12 +52,22 @@ controller:
 
     # controller.config.namingPolicies -- List of nameing policy for SubNamespaces.
     # root and match are both regular expressions.
-    # When a SubNamespace is created in a tree starting from a root namespace and the root namespace's name matches root expression, the SubNamespace name is validated with match expression.
-    # namingPolicies:
-    #   - root: foo
-    #     match: foo_.*
-    #   - root: bar
-    #     match: bar_.*
+    # When a SubNamespace is created in a tree starting from a root namespace and the root namespace's name matches the "root" regular expression, the SubNamespace name is validated with the "match" regular expression.
+    #
+    # "match" namingPolicies can use variables of regexp capture group naming of "root" namingPolicies.
+    # example:
+    #   root: ^app-(?P<team>.*)
+    #   match: ^app-${team}-.*
+    #   root namespace: app-team1
+    #   compiled match naming policy: ^app-team1-.*
+    # This feature is provided using https://pkg.go.dev/regexp#Regexp.Expand
+    namingPolicies:
+      - root:  foo
+        match: foo_.*
+      - root:  bar
+        match: bar_.*
+      - root:  ^app-(?P<team>.*)
+        match: ^app-${team}-.*
 <snip>
 ```
 

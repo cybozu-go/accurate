@@ -129,28 +129,42 @@ var _ = Describe("SubNamespace webhook", func() {
 
 				It("should allow creation of SubNamespace in a root namespace - pattern4", func() {
 					root := &corev1.Namespace{}
-					root.Name = "app-root1"
+					root.Name = "app-team1"
 					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 					err := k8sClient.Create(ctx, root)
 					Expect(err).NotTo(HaveOccurred())
 
 					sn := &accuratev1.SubNamespace{}
-					sn.Namespace = "app-root1"
-					sn.Name = "app-root1-child"
+					sn.Namespace = "app-team1"
+					sn.Name = "app-team1-child"
 					err = k8sClient.Create(ctx, sn)
 					Expect(err).NotTo(HaveOccurred())
 				})
 
 				It("should allow creation of SubNamespace in a root namespace - pattern5", func() {
 					root := &corev1.Namespace{}
-					root.Name = "app-root2-group1"
+					root.Name = "app-team2-app1"
 					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 					err := k8sClient.Create(ctx, root)
 					Expect(err).NotTo(HaveOccurred())
 
 					sn := &accuratev1.SubNamespace{}
-					sn.Namespace = "app-root2-group1"
-					sn.Name = "app-root2-group1-team1"
+					sn.Namespace = "app-team2-app1"
+					sn.Name = "app-team2-app1-subapp1"
+					err = k8sClient.Create(ctx, sn)
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("should allow creation of SubNamespace in a root namespace - pattern6", func() {
+					root := &corev1.Namespace{}
+					root.Name = "unuse-naming-group-team1"
+					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
+					err := k8sClient.Create(ctx, root)
+					Expect(err).NotTo(HaveOccurred())
+
+					sn := &accuratev1.SubNamespace{}
+					sn.Namespace = "unuse-naming-group-team1"
+					sn.Name = "unuse-naming-group-child1"
 					err = k8sClient.Create(ctx, sn)
 					Expect(err).NotTo(HaveOccurred())
 				})
@@ -207,14 +221,28 @@ var _ = Describe("SubNamespace webhook", func() {
 
 				It("should deny creation of SubNamespace in a root namespace - pattern4", func() {
 					root := &corev1.Namespace{}
-					root.Name = "app-root10"
+					root.Name = "app-team10"
 					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 					err := k8sClient.Create(ctx, root)
 					Expect(err).NotTo(HaveOccurred())
 
 					sn := &accuratev1.SubNamespace{}
-					sn.Namespace = "app-root10"
-					sn.Name = "app-root20-child"
+					sn.Namespace = "app-team10"
+					sn.Name = "app-team20-child"
+					err = k8sClient.Create(ctx, sn)
+					Expect(err).To(HaveOccurred())
+				})
+
+				It("should deny creation of SubNamespace in a root namespace - pattern5", func() {
+					root := &corev1.Namespace{}
+					root.Name = "unuse-naming-group-team2"
+					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
+					err := k8sClient.Create(ctx, root)
+					Expect(err).NotTo(HaveOccurred())
+
+					sn := &accuratev1.SubNamespace{}
+					sn.Namespace = "unuse-naming-group-team2"
+					sn.Name = "unuse-naming-group-team2-foo"
 					err = k8sClient.Create(ctx, sn)
 					Expect(err).To(HaveOccurred())
 				})
