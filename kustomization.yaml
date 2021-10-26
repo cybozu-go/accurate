@@ -10,4 +10,4 @@ configMapGenerator:
 
 images:
 - name: ghcr.io/cybozu-go/accurate
-  newTag: 0.1.0
+  newTag: 0.2.0
