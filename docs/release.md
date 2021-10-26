@@ -59,5 +59,7 @@ It should look like:
 GitHub actions will build and push artifacts such as container images and
 create a new GitHub release.
 
+8. [Release Chart](https://github.com/cybozu-go/accurate/tree/main/charts/accurate#release-chart)
+
 [semver]: https://semver.org/spec/v2.0.0.html
 [example]: https://github.com/cybozu-go/etcdpasswd/commit/77d95384ac6c97e7f48281eaf23cb94f68867f79
