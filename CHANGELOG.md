@@ -9,18 +9,18 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- Add kubectl-accurate template list sub command [#9](https://github.com/cybozu-go/accurate/pull/9)
+- Add `kubectl-accurate template list` sub command [#9](https://github.com/cybozu-go/accurate/pull/9)
 - Add Helm chart [#11](https://github.com/cybozu-go/accurate/pull/11)
 
 ### Changed
 
 - Change LICENSE from MIT to Apache 2 [#5](https://github.com/cybozu-go/accurate/pull/5)
 - Allow shell glob patterns for label/annotation keys [#8](https://github.com/cybozu-go/accurate/pull/8)
-- Add role to view all resources for propagate resource [#21](https://github.com/cybozu-go/accurate/pull/21)
 - Add ResourceQuota propagation to the default setting [#15](https://github.com/cybozu-go/accurate/pull/15)
 
 ### Fixed
 
+- Add role to view all resources for propagate resource [#21](https://github.com/cybozu-go/accurate/pull/21)
 - Import auth plugin in kubectl-accurate [#27](https://github.com/cybozu-go/accurate/pull/27)
 - Fix infinite reconciliation on non-existent namespaces [#28](https://github.com/cybozu-go/accurate/pull/28)
 - Do not delete non-propagated resources in template/root namespaces [#29](https://github.com/cybozu-go/accurate/pull/29)
