@@ -106,11 +106,11 @@ func (v *subNamespaceValidator) getRootNamespace(ctx context.Context, ns *corev1
 
 func (v *subNamespaceValidator) notMatchingNamingPolicy(ctx context.Context, ns, root string) (bool, string, error) {
 	for _, policy := range v.namingPolicies {
-		matches := policy.Root.FindAllSubmatchIndex([]byte(root), -1)
+		matches := policy.Root.FindAllStringSubmatchIndex(root, -1)
 		if len(matches) > 0 {
 			m := []byte{}
 			for _, match := range matches {
-				m = policy.Root.Expand(m, []byte(policy.Match), []byte(root), match)
+				m = policy.Root.ExpandString(m, policy.Match, root, match)
 			}
 			r, err := regexp.Compile(string(m))
 			if err != nil {
