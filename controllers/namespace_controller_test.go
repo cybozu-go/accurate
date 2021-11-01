@@ -331,6 +331,35 @@ var _ = Describe("Namespace controller", func() {
 		Expect(tmpl2.Labels["team"]).Should(Equal("neco"))
 	})
 
+	It("should not delete resources in an independent namespace", func() {
+		secret := &corev1.Secret{}
+		secret.Namespace = "default"
+		secret.Name = "independent"
+		secret.Annotations = map[string]string{constants.AnnPropagate: constants.PropagateUpdate}
+		secret.Data = map[string][]byte{"foo": []byte("bar")}
+
+		err := k8sClient.Create(ctx, secret)
+		Expect(err).NotTo(HaveOccurred())
+
+		time.Sleep(100 * time.Millisecond)
+
+		ns := &corev1.Namespace{}
+		err = k8sClient.Get(ctx, client.ObjectKey{Name: "default"}, ns)
+		Expect(err).NotTo(HaveOccurred())
+
+		if ns.Labels == nil {
+			ns.Labels = make(map[string]string)
+		}
+		ns.Labels["accurate-test"] = "test"
+		err = k8sClient.Update(ctx, ns)
+		Expect(err).NotTo(HaveOccurred())
+
+		Consistently(func() error {
+			s := &corev1.Secret{}
+			return k8sClient.Get(ctx, client.ObjectKey{Namespace: "default", Name: "independent"}, s)
+		}, 1, 0.1).Should(Succeed())
+	})
+
 	It("should implement a sub namespace correctly", func() {
 		root := &corev1.Namespace{}
 		root.Name = "root"

@@ -21,7 +21,7 @@ These namespaces reference a template namespace and propagate the labels, annota
     - the value of `accurate.cybozu.com/from` annotation is not the template namespace name, or
     - there is not a resource of the same kind and the same name in the template namespace.
 
-### Namespaces w/o `accurate.cybozu.com/from` and `accurate.cybozu.com/template` labels
+### Namespaces w/o `accurate.cybozu.com/type` and `accurate.cybozu.com/template` labels
 
 If these labels are removed from the Namespace, Accurate should delete propagated resources with mode == `update`.
 

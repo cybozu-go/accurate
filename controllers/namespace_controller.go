@@ -59,6 +59,9 @@ func (r *NamespaceReconciler) reconcile(ctx context.Context, ns *corev1.Namespac
 		}
 		// a template instance may also be a root or a template namespace, so don't return here.
 	} else {
+		// Here, ns is neither a sub-namespace nor a template instance.
+		// Since there is no parent|template namespace for this namespace,
+		// propagated resources in this namespace, if any, should be deleted.
 		if err := r.deletePropagatedResources(ctx, ns); err != nil {
 			return err
 		}
@@ -230,6 +233,13 @@ func (r *NamespaceReconciler) deleteResource(ctx context.Context, res *unstructu
 	}
 	for i := range l.Items {
 		obj := &l.Items[i]
+
+		from := obj.GetAnnotations()[constants.AnnFrom]
+		if from == "" {
+			// don't delete origins
+			continue
+		}
+
 		if err := r.Delete(ctx, obj); err != nil {
 			return fmt.Errorf("failed to delete %s/%s of %s: %w", ns, obj.GetName(), gvkStr, err)
 		}
