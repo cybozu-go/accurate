@@ -162,6 +162,9 @@ func (r *PropagateController) handleDelete(ctx context.Context, req ctrl.Request
 
 	ns := &corev1.Namespace{}
 	if err := r.Get(ctx, client.ObjectKey{Name: req.Namespace}, ns); err != nil {
+		if apierrors.IsNotFound(err) {
+			return nil
+		}
 		return fmt.Errorf("failed to get namespace %s: %w", req.Namespace, err)
 	}
 
