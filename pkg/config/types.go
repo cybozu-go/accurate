@@ -12,9 +12,11 @@ import (
 
 // Config represents the configuration file of Accurate.
 type Config struct {
-	LabelKeys      []string                  `json:"labelKeys,omitempty"`
-	AnnotationKeys []string                  `json:"annotationKeys,omitempty"`
-	Watches        []metav1.GroupVersionKind `json:"watches,omitempty"`
+	LabelKeys                  []string                  `json:"labelKeys,omitempty"`
+	AnnotationKeys             []string                  `json:"annotationKeys,omitempty"`
+	SubNamespaceLabelKeys      []string                  `json:"subNamespaceLabelKeys,omitempty"`
+	SubNamespaceAnnotationKeys []string                  `json:"subNamespaceAnnotationKeys,omitempty"`
+	Watches                    []metav1.GroupVersionKind `json:"watches,omitempty"`
 }
 
 // Validate validates the configurations.
@@ -30,6 +32,20 @@ func (c *Config) Validate(mapper meta.RESTMapper) error {
 		// Verify that pattern is a valid format.
 		if _, err := path.Match(key, ""); err != nil {
 			return fmt.Errorf("malformed pattern for annotationKeys %s: %w", key, err)
+		}
+	}
+
+	for _, key := range c.SubNamespaceLabelKeys {
+		// Verify that pattern is a valid format.
+		if _, err := path.Match(key, ""); err != nil {
+			return fmt.Errorf("malformed pattern for subNamespaceLabelKeys %s: %w", key, err)
+		}
+	}
+
+	for _, key := range c.SubNamespaceAnnotationKeys {
+		// Verify that pattern is a valid format.
+		if _, err := path.Match(key, ""); err != nil {
+			return fmt.Errorf("malformed pattern for subNamespaceAnnotationKeys %s: %w", key, err)
 		}
 	}
 

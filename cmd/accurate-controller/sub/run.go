@@ -99,8 +99,8 @@ func subMain(ns, addr string, port int) error {
 	// SubNamespace reconciler & webhook
 	if err = (&controllers.SubNamespaceReconciler{
 		Client:         mgr.GetClient(),
-		LabelKeys:      cfg.LabelKeys,
-		AnnotationKeys: cfg.AnnotationKeys,
+		LabelKeys:      cfg.SubNamespaceLabelKeys,
+		AnnotationKeys: cfg.SubNamespaceAnnotationKeys,
 	}).SetupWithManager(mgr); err != nil {
 		return fmt.Errorf("unable to create SubNamespace controller: %w", err)
 	}

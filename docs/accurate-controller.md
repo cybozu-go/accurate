@@ -11,11 +11,13 @@ The location can be changed with `--config-file` flag.
 
 The configuration file should be a JSON or YAML file having the following keys:
 
-| Key              | Type       | Description                                                    |
-| ---------------- | ---------- | -------------------------------------------------------------- |
-| `labelKeys`      | `[]string` | Keys of namespace labels to be propagated.                     |
-| `annotationKeys` | `[]string` | Keys of namespace annotations to be propagated.                |
-| `watches`        | `[]object` | GroupVersionKind of namespace-scoped objects to be propagated. |
+| Key                          | Type       | Description                                                       |
+| ---------------------------- | ---------- | ----------------------------------------------------------------- |
+| `labelKeys`                  | `[]string` | Keys of namespace labels to be propagated.                        |
+| `annotationKeys`             | `[]string` | Keys of namespace annotations to be propagated.                   |
+| `subNamespaceLabelKeys`      | `[]string` | Keys of SubNamespace labels to be propagated.                     |
+| `subNamespaceAnnotationKeys` | `[]string` | Keys of SubNamespace annotations to be propagated.                |
+| `watches`                    | `[]object` | GroupVersionKind of namespace-scoped objects to be propagated.    |
 
 Example:
 
@@ -24,6 +26,12 @@ labelKeys:
 - team
 
 annotationKeys:
+- foo.bar/baz
+
+subNamespaceLabelKeys:
+- app
+
+subNamespaceAnnotationKeys:
 - foo.bar/baz
 
 watches:

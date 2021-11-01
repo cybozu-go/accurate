@@ -38,6 +38,18 @@ controller:
     # https://metallb.universe.tf/usage/#requesting-specific-ips
     # - metallb.universe.tf/address-pool
 
+    # Labels to be propagated to sub-namespaces from SubNamespace resource.
+    # It is also possible to specify a glob pattern that can be interpreted by Go's "path.Match" func.
+    # https://pkg.go.dev/path#Match
+    subNamespaceLabelKeys:
+    - app
+
+    # Annotations to be propagated to sub-namespaces from SubNamespace resource.
+    # It is also possible to specify a glob pattern that can be interpreted by Go's "path.Match" func.
+    # https://pkg.go.dev/path#Match
+    subNamespaceAnnotationKeys:
+    - foo.bar/baz
+
     # controller.config.watches -- List of GVK for namespace-scoped resources that can be propagated.
     # Any namespace-scoped resource is allowed.
     watches:
