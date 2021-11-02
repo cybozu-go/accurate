@@ -46,7 +46,7 @@ controller:
     subNamespaceLabelKeys: []
     # - app
 
-    # controller.config.subNamespaceAnnotationKeys -- Labels to be propagated to sub-namespaces from SubNamespace resource.
+    # controller.config.subNamespaceAnnotationKeys -- Annotations to be propagated to sub-namespaces from SubNamespace resource.
     # It is also possible to specify a glob pattern that can be interpreted by Go's "path.Match" func.
     # https://pkg.go.dev/path#Match
     subNamespaceAnnotationKeys: []
