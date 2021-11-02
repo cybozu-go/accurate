@@ -11,7 +11,7 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-// NamingPolicy represents the configuration of naming policies for Namespaces these are managed by Accurate.
+// NamingPolicy represents naming policies for Namespaces created from SubNamespaces.
 type NamingPolicy struct {
 	Root  string `json:"root"`
 	Match string `json:"match"`
