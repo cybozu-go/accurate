@@ -61,7 +61,9 @@ spec:
           to: .
         - from: LICENSE
           to: .
-  shortDescription: Manage Accurate features
+  shortDescription: Accurate is a Kubernetes controller for multi-tenancy.
   description: |
     kubectl-accurate is a subcommand of kubectl to manage Accurate features.
-    Read more documentation at: https://cybozu-go.github.io/accurate/kubectl-accurate.html
+    Accurate is a Kubernetes controller for multi-tenancy.
+    It propagates resources between namespaces accurately and allows tenant users to create/delete sub-namespaces.
+    Read more documentation at: https://cybozu-go.github.io/accurate/index.html
