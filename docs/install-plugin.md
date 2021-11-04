@@ -39,7 +39,7 @@ $ kubectl krew install accurate
 
 3. Set `VERSION` to the accurate version
 
-   See the accurate release page: https://github.com/cybozu-go/accurate/releases
+   See the Accurate release page: https://github.com/cybozu-go/accurate/releases
 
    ```console
    $ VERSION=< The version you want to install >
