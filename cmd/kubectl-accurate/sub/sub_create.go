@@ -10,13 +10,17 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/spf13/pflag"
 )
 
 type subCreateOpts struct {
-	streams genericclioptions.IOStreams
-	client  client.Client
-	name    string
-	parent  string
+	streams     genericclioptions.IOStreams
+	client      client.Client
+	name        string
+	parent      string
+	labels      map[string]string
+	annotations map[string]string
 }
 
 func newSubCreateCmd(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
@@ -36,7 +40,13 @@ This effectively creates a namespace named NAME as a sub-namespace of NS.`,
 		},
 	}
 
+	cmd.Flags().StringToStringVar(&opts.labels, "labels", opts.labels, "the labels to be propagated to the sub-namespace")
+	cmd.Flags().StringToStringVar(&opts.annotations, "annotations", opts.annotations, "the annotations to be propagated to the sub-namespace")
 	return cmd
+}
+
+func (o *subCreateOpts) addFlags(f *pflag.FlagSet) {
+
 }
 
 func (o *subCreateOpts) Fill(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
@@ -64,6 +74,8 @@ func (o *subCreateOpts) Run(ctx context.Context) error {
 	sn := &accuratev1.SubNamespace{}
 	sn.Namespace = o.parent
 	sn.Name = o.name
+	sn.Spec.Labels = o.labels
+	sn.Spec.Annotations = o.annotations
 
 	if err := o.client.Create(ctx, sn); err != nil {
 		return fmt.Errorf("failed to create a SubNamespace: %w", err)
