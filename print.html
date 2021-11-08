@@ -416,6 +416,13 @@ If the chart version in the tag does not match the version listed in <code>Chart
 <div style="break-before: page; page-break-before: always;"></div><h1 id="installing-kubectl-plugin"><a class="header" href="#installing-kubectl-plugin">Installing kubectl plugin</a></h1>
 <p><code>kubectl-accurate</code> is a plugin for <code>kubectl</code> to make operations of Accurate easy.</p>
 <p>It is strongly recommended to install <code>kubectl-accurate</code> though Accurate can be used without the plugin.</p>
+<h2 id="installing-using-krew"><a class="header" href="#installing-using-krew">Installing using Krew</a></h2>
+<p><a href="https://krew.sigs.k8s.io/">Krew</a> is the plugin manager for kubectl command-line tool.</p>
+<p>See the <a href="https://krew.sigs.k8s.io/docs/user-guide/setup/install/">documentation</a> for how to install Krew.</p>
+<pre><code class="language-console">$ kubectl krew update
+$ kubectl krew install accurate
+</code></pre>
+<h2 id="installing-manually"><a class="header" href="#installing-manually">Installing manually</a></h2>
 <ol>
 <li>
 <p>Set <code>OS</code> to the operating system name</p>
@@ -432,11 +439,16 @@ If the chart version in the tag does not match the version listed in <code>Chart
 </code></pre>
 </li>
 <li>
+<p>Set <code>VERSION</code> to the accurate version</p>
+<p>See the Accurate release page: https://github.com/cybozu-go/accurate/releases</p>
+<pre><code class="language-console">$ VERSION=&lt; The version you want to install &gt;
+</code></pre>
+</li>
+<li>
 <p>Download the binary and put it in a directory of your <code>PATH</code>.</p>
 <p>The following is an example to install the plugin in <code>/usr/local/bin</code>.</p>
-<pre><code class="language-console">$ sudo curl -o /usr/local/bin/kubectl-accurate -sLf \
-  https://github.com/cybozu-go/accurate/releases/latest/download/kubectl-accurate-${OS}-${ARCH}
-$ sudo chmod a+x /usr/local/bin/kubectl-accurate
+<pre><code class="language-console">$ curl -L -sS https://github.com/cybozu-go/accurate/releases/download/$(VERSION)/kubectl-accurate_$(VERSION)_$(OS)_$(ARCH).tar.gz \
+  | tar xz -C /usr/local/bin kubectl-accurate
 </code></pre>
 </li>
 <li>
