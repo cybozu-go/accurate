@@ -18,6 +18,7 @@
 # Binaries
 /bin
 /build
+/dist
 
 # Generated files
 /docs/book
