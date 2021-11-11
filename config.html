@@ -182,6 +182,19 @@ watches:
   kind: Secret
 - version: v1
   kind: ResourceQuota
+
+# List of nameing policy for SubNamespaces.
+# root and match are both regular expressions.
+# When a SubNamespace is created in a tree starting from a root namespace and the root namespace's name matches the &quot;root&quot; regular expression, the SubNamespace name is validated with the &quot;match&quot; regular expression.
+#
+# &quot;match&quot; namingPolicies can use variables of regexp capture group naming of &quot;root&quot; namingPolicies.
+# example:
+#   root: ^app-(?P&lt;team&gt;.*)
+#   match: ^app-${team}-.*
+#   root namespace: app-team1
+#   compiled match naming policy: ^app-team1-.*
+# This feature is provided using https://pkg.go.dev/regexp#Regexp.Expand
+namingPolicies: []
 </code></pre>
 <p>Only labels and annotations specified in the configuration file will be inherited.</p>
 <p>Likewise, Accurate watches only namespace-scope resources specified in the configuration file.</p>
@@ -214,6 +227,25 @@ controller:
         kind: RoleBinding
       - version: v1
         kind: Secret
+
+    # controller.config.namingPolicies -- List of nameing policy for SubNamespaces.
+    # root and match are both regular expressions.
+    # When a SubNamespace is created in a tree starting from a root namespace and the root namespace's name matches the &quot;root&quot; regular expression, the SubNamespace name is validated with the &quot;match&quot; regular expression.
+    #
+    # &quot;match&quot; namingPolicies can use variables of regexp capture group naming of &quot;root&quot; namingPolicies.
+    # example:
+    #   root: ^app-(?P&lt;team&gt;.*)
+    #   match: ^app-${team}-.*
+    #   root namespace: app-team1
+    #   compiled match naming policy: ^app-team1-.*
+    # This feature is provided using https://pkg.go.dev/regexp#Regexp.Expand
+    namingPolicies:
+      - root:  foo
+        match: foo_.*
+      - root:  bar
+        match: bar_.*
+      - root:  ^app-(?P&lt;team&gt;.*)
+        match: ^app-${team}-.*
 &lt;snip&gt;
 </code></pre>
 <h2 id="clusterrolebindings"><a class="header" href="#clusterrolebindings">ClusterRoleBindings</a></h2>
