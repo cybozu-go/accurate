@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"path"
+	"regexp"
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -10,11 +11,24 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+// NamingPolicy represents naming policies for Namespaces created from SubNamespaces.
+type NamingPolicy struct {
+	Root  string `json:"root"`
+	Match string `json:"match"`
+}
+
+type NamingPolicyRegexp struct {
+	Root  *regexp.Regexp
+	Match string
+}
+
 // Config represents the configuration file of Accurate.
 type Config struct {
-	LabelKeys      []string                  `json:"labelKeys,omitempty"`
-	AnnotationKeys []string                  `json:"annotationKeys,omitempty"`
-	Watches        []metav1.GroupVersionKind `json:"watches,omitempty"`
+	LabelKeys           []string                  `json:"labelKeys,omitempty"`
+	AnnotationKeys      []string                  `json:"annotationKeys,omitempty"`
+	Watches             []metav1.GroupVersionKind `json:"watches,omitempty"`
+	NamingPolicies      []NamingPolicy            `json:"namingPolicies,omitempty"`
+	NamingPolicyRegexps []NamingPolicyRegexp
 }
 
 // Validate validates the configurations.
@@ -42,6 +56,14 @@ func (c *Config) Validate(mapper meta.RESTMapper) error {
 		if mapping.Scope.Name() != meta.RESTScopeNameNamespace {
 			return fmt.Errorf("%s is not namespace-scoped", gvk.String())
 		}
+	}
+
+	for _, policy := range c.NamingPolicies {
+		root, err := regexp.Compile(policy.Root)
+		if err != nil {
+			return fmt.Errorf("invalid naming policy: %w", err)
+		}
+		c.NamingPolicyRegexps = append(c.NamingPolicyRegexps, NamingPolicyRegexp{Root: root, Match: policy.Match})
 	}
 	return nil
 }
