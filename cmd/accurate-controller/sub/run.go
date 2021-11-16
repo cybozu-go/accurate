@@ -104,7 +104,9 @@ func subMain(ns, addr string, port int) error {
 	}).SetupWithManager(mgr); err != nil {
 		return fmt.Errorf("unable to create SubNamespace controller: %w", err)
 	}
-	hooks.SetupSubNamespaceWebhook(mgr, dec)
+	if err = hooks.SetupSubNamespaceWebhook(mgr, dec, cfg.NamingPolicyRegexps); err != nil {
+		return fmt.Errorf("unable to create SubNamespace webhook: %w", err)
+	}
 
 	// Resource propagation controller
 	for _, res := range watched {

@@ -5,6 +5,7 @@ KUSTOMIZE_VERSION = 4.1.3
 HELM_VERSION = 3.6.3
 CRD_TO_MARKDOWN_VERSION = 0.0.3
 MDBOOK_VERSION = 0.4.10
+GORELEASER_VERSION = 0.180.3
 
 # Test tools
 BIN_DIR := $(shell pwd)/bin
@@ -95,20 +96,8 @@ build:
 	GOBIN=$(shell pwd)/bin go install ./cmd/...
 
 .PHONY: release-build
-release-build:
-	rm -rf build
-	mkdir -p build
-	$(MAKE) kubectl-accurate GOOS=windows GOARCH=amd64 SUFFIX=.exe
-	$(MAKE) kubectl-accurate GOOS=darwin GOARCH=amd64
-	$(MAKE) kubectl-accurate GOOS=darwin GOARCH=arm64
-	$(MAKE) kubectl-accurate GOOS=linux GOARCH=amd64
-	$(MAKE) kubectl-accurate GOOS=linux GOARCH=arm64
-
-.PHONY: kubectl-accurate
-kubectl-accurate: build/kubectl-accurate-$(GOOS)-$(GOARCH)$(SUFFIX)
-
-build/kubectl-accurate-$(GOOS)-$(GOARCH)$(SUFFIX):
-	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o $@ ./cmd/kubectl-accurate
+release-build: goreleaser
+	$(GORELEASER) build --snapshot --rm-dist
 
 ##@ Tools
 
@@ -152,6 +141,15 @@ mdbook: $(MDBOOK) ## Donwload mdbook locally if necessary
 $(MDBOOK):
 	mkdir -p bin
 	curl -fsL https://github.com/rust-lang/mdBook/releases/download/v$(MDBOOK_VERSION)/mdbook-v$(MDBOOK_VERSION)-x86_64-unknown-linux-gnu.tar.gz | tar -C bin -xzf -
+
+GORELEASER := $(shell pwd)/bin/goreleaser
+.PHONY: goreleaser
+goreleaser: $(GORELEASER) ## Download goreleaser locally if necessary.
+
+$(GORELEASER):
+	mkdir -p $(BIN_DIR)
+	curl -L -sS https://github.com/goreleaser/goreleaser/releases/download/v$(GORELEASER_VERSION)/goreleaser_Linux_x86_64.tar.gz \
+	  | tar xz -C $(BIN_DIR) goreleaser
 
 # go-get-tool will 'go get' any package $2 and install it to $1.
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))

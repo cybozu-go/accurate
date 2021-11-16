@@ -11,7 +11,46 @@ Read [Helm Chart](helm.md) for details.
 The repository includes an example as follows:
 
 ```yaml
-{{#include ../config.yaml}}
+# Labels to be propagated to sub-namespaces.
+# It is also possible to specify a glob pattern that can be interpreted by Go's "path.Match" func.
+# https://pkg.go.dev/path#Match
+labelKeys:
+- team
+
+# Annotations to be propagated to sub-namespaces.
+# It is also possible to specify a glob pattern that can be interpreted by Go's "path.Match" func.
+# https://pkg.go.dev/path#Match
+annotationKeys:
+# An example to propagate an annotation for MetalLB
+# https://metallb.universe.tf/usage/#requesting-specific-ips
+- metallb.universe.tf/address-pool
+
+# List of GVK for namespace-scoped resources that can be propagated.
+# Any namespace-scoped resource is allowed.
+watches:
+- group: rbac.authorization.k8s.io
+  version: v1
+  kind: Role
+- group: rbac.authorization.k8s.io
+  version: v1
+  kind: RoleBinding
+- version: v1
+  kind: Secret
+- version: v1
+  kind: ResourceQuota
+
+# List of nameing policy for SubNamespaces.
+# root and match are both regular expressions.
+# When a SubNamespace is created in a tree starting from a root namespace and the root namespace's name matches the "root" regular expression, the SubNamespace name is validated with the "match" regular expression.
+#
+# "match" namingPolicies can use variables of regexp capture group naming of "root" namingPolicies.
+# example:
+#   root: ^app-(?P<team>.*)
+#   match: ^app-${team}-.*
+#   root namespace: app-team1
+#   compiled match naming policy: ^app-team1-.*
+# This feature is provided using https://pkg.go.dev/regexp#Regexp.Expand
+namingPolicies: []
 ```
 
 Only labels and annotations specified in the configuration file will be inherited.
@@ -61,6 +100,25 @@ controller:
         kind: RoleBinding
       - version: v1
         kind: Secret
+
+    # controller.config.namingPolicies -- List of nameing policy for SubNamespaces.
+    # root and match are both regular expressions.
+    # When a SubNamespace is created in a tree starting from a root namespace and the root namespace's name matches the "root" regular expression, the SubNamespace name is validated with the "match" regular expression.
+    #
+    # "match" namingPolicies can use variables of regexp capture group naming of "root" namingPolicies.
+    # example:
+    #   root: ^app-(?P<team>.*)
+    #   match: ^app-${team}-.*
+    #   root namespace: app-team1
+    #   compiled match naming policy: ^app-team1-.*
+    # This feature is provided using https://pkg.go.dev/regexp#Regexp.Expand
+    namingPolicies:
+      - root:  foo
+        match: foo_.*
+      - root:  bar
+        match: bar_.*
+      - root:  ^app-(?P<team>.*)
+        match: ^app-${team}-.*
 <snip>
 ```
 
