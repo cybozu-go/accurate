@@ -573,5 +573,40 @@ var _ = Describe("Namespace controller", func() {
 			}
 			return nil
 		}).Should(Succeed())
+
+		By("updating labels and annotations of SubNamespace for sub1 namespace")
+		sn.Spec.Labels["team"] = "tama"
+		sn.Spec.Annotations["memo"] = "tama"
+		err = k8sClient.Update(ctx, sn)
+		Expect(err).NotTo(HaveOccurred())
+		Eventually(func() error {
+			sub1 := &corev1.Namespace{}
+			err := k8sClient.Get(ctx, client.ObjectKey{Name: "sub1"}, sub1)
+			if err != nil {
+				return err
+			}
+			if sub1.Labels["team"] != "tama" {
+				return errors.New("team label is not tama")
+			}
+			if sub1.Annotations["memo"] != "tama" {
+				return errors.New("memo annotation is not tama")
+			}
+			return nil
+		}).Should(Succeed())
+
+		Eventually(func() error {
+			sub2 := &corev1.Namespace{}
+			err := k8sClient.Get(ctx, client.ObjectKey{Name: "sub2"}, sub2)
+			if err != nil {
+				return err
+			}
+			if sub2.Labels["team"] != "tama" {
+				return errors.New("team label is not tama")
+			}
+			if sub2.Annotations["memo"] != "tama" {
+				return errors.New("memo annotation is not tama")
+			}
+			return nil
+		}).Should(Succeed())
 	})
 })
