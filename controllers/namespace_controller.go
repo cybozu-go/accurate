@@ -102,10 +102,9 @@ func (r *NamespaceReconciler) propagateMeta(ctx context.Context, ns, parent *cor
 	}
 
 	subNS := &accuratev1.SubNamespace{}
-	if err := r.Get(ctx, types.NamespacedName{Name: ns.Name, Namespace: parent.Name}, subNS); err != nil {
-		if !apierrors.IsNotFound(err) {
-			return fmt.Errorf("failed to get sub namespace %s/%s: %w", ns.Name, parent.Name, err)
-		}
+	err := r.Get(ctx, types.NamespacedName{Name: ns.Name, Namespace: parent.Name}, subNS)
+	if err != nil && !apierrors.IsNotFound(err) {
+		return fmt.Errorf("failed to get sub namespace %s/%s: %w", ns.Name, parent.Name, err)
 	} else {
 		for k, v := range subNS.Spec.Labels {
 			if ok := r.matchSubNamespaceLabelKey(k); ok {
