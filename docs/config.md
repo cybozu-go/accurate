@@ -25,6 +25,18 @@ annotationKeys:
 # https://metallb.universe.tf/usage/#requesting-specific-ips
 - metallb.universe.tf/address-pool
 
+# Labels to be propagated to sub-namespaces from SubNamespace resource.
+# It is also possible to specify a glob pattern that can be interpreted by Go's "path.Match" func.
+# https://pkg.go.dev/path#Match
+subNamespaceLabelKeys:
+- app
+
+# Annotations to be propagated to sub-namespaces from SubNamespace resource.
+# It is also possible to specify a glob pattern that can be interpreted by Go's "path.Match" func.
+# https://pkg.go.dev/path#Match
+subNamespaceAnnotationKeys:
+- foo.bar/baz
+
 # List of GVK for namespace-scoped resources that can be propagated.
 # Any namespace-scoped resource is allowed.
 watches:
@@ -53,7 +65,8 @@ watches:
 namingPolicies: []
 ```
 
-Only labels and annotations specified in the configuration file will be inherited.
+Only labels and annotations specified in the configuration file will be inherited.  
+If you are using something that controls permissions by labels or annotations, such as PodSecurity Admission, an administrator should allow appropriate labels and annotations.
 
 Likewise, Accurate watches only namespace-scope resources specified in the configuration file.
 
