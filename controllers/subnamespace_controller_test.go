@@ -29,9 +29,7 @@ var _ = Describe("SubNamespace controller", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		snr := &SubNamespaceReconciler{
-			Client:         mgr.GetClient(),
-			LabelKeys:      []string{"exists"},
-			AnnotationKeys: []string{"exists"},
+			Client: mgr.GetClient(),
 		}
 		err = snr.SetupWithManager(mgr)
 		Expect(err).ToNot(HaveOccurred())
@@ -62,14 +60,6 @@ var _ = Describe("SubNamespace controller", func() {
 		sn.Namespace = "test1"
 		sn.Name = "test1-sub1"
 		sn.Finalizers = []string{constants.Finalizer}
-		sn.Spec.Labels = map[string]string{
-			"exists":     "true",
-			"not-exists": "true",
-		}
-		sn.Spec.Annotations = map[string]string{
-			"exists":     "true",
-			"not-exists": "true",
-		}
 		err = k8sClient.Create(ctx, sn)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -81,12 +71,6 @@ var _ = Describe("SubNamespace controller", func() {
 
 		Expect(sub1.Labels).To(HaveKeyWithValue(constants.LabelCreatedBy, "accurate"))
 		Expect(sub1.Labels).To(HaveKeyWithValue(constants.LabelParent, "test1"))
-
-		Expect(sub1.Labels).To(HaveKeyWithValue("exists", "true"))
-		Expect(sub1.Annotations).To(HaveKeyWithValue("exists", "true"))
-		Expect(sub1.Labels).NotTo(HaveKeyWithValue("not-exists", "true"))
-		Expect(sub1.Annotations).NotTo(HaveKeyWithValue("not-exists", "true"))
-
 		Eventually(func() accuratev1.SubNamespaceStatus {
 			sn = &accuratev1.SubNamespace{}
 			err = k8sClient.Get(ctx, client.ObjectKey{Namespace: "test1", Name: "test1-sub1"}, sn)

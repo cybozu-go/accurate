@@ -23,8 +23,6 @@ import (
 // SubNamespaceReconciler reconciles a SubNamespace object
 type SubNamespaceReconciler struct {
 	client.Client
-	LabelKeys      []string
-	AnnotationKeys []string
 }
 
 //+kubebuilder:rbac:groups=accurate.cybozu.com,resources=subnamespaces,verbs=get;list;watch;create;update;patch;delete
@@ -107,17 +105,6 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev1
 			constants.LabelCreatedBy: constants.CreatedBy,
 			constants.LabelParent:    sn.Namespace,
 		}
-		for k, v := range sn.Spec.Labels {
-			if ok := r.matchLabelKey(k); ok {
-				ns.Labels[k] = v
-			}
-		}
-		ns.Annotations = make(map[string]string)
-		for k, v := range sn.Spec.Annotations {
-			if ok := r.matchAnnotationKey(k); ok {
-				ns.Annotations[k] = v
-			}
-		}
 		if err := r.Create(ctx, ns); err != nil {
 			return err
 		}
@@ -132,14 +119,6 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev1
 	}
 
 	return r.Update(ctx, sn)
-}
-
-func (r *SubNamespaceReconciler) matchLabelKey(key string) bool {
-	return matchKey(key, r.LabelKeys)
-}
-
-func (r *SubNamespaceReconciler) matchAnnotationKey(key string) bool {
-	return matchKey(key, r.AnnotationKeys)
 }
 
 // SetupWithManager sets up the controller with the Manager.
