@@ -85,6 +85,37 @@ metadata:
   name: <name>
 ```
 
+### Creating a sub-namespace with addition labels/annotations
+
+Using `kubectl accurate`:
+
+```console
+$ kubectl accurate sub create <name> <parent> --labels=foo=bar --annotations=baz=zot
+```
+
+Applying YAML manifests:
+
+```console
+apiVersion: accurate.cybozu.com/v1
+kind: SubNamespace
+metadata:
+  namespace: <parent>
+  name: <name>
+spec:
+  labels:
+    foo: bar
+  annotations:
+    baz: zot
+```
+
+You can edit these `spec.labels/spec.annotations` with `kubectl edit`:
+
+```console
+$ kubectl edit SubNamespace -n=<parent> <name>
+```
+
+The `spec.labels/spec.annotations` that can be propagated to sub-namespaces can be set with the `subNamespaceLabelKeys/subNamespaceAnnotationKeys` parameters in config.yaml.
+
 ## Deleting a created sub-namespace
 
 Using `kubectl accurate`:
