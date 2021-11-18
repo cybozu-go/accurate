@@ -392,9 +392,6 @@ func (r *NamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				}
 				subNSHandler(ev.ObjectOld, q)
 			},
-			DeleteFunc: func(ev event.DeleteEvent, q workqueue.RateLimitingInterface) {
-				subNSHandler(ev.Object, q)
-			},
 		}).
 		Complete(r)
 }
