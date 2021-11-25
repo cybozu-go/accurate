@@ -46,6 +46,11 @@ func cloneResource(res *unstructured.Unstructured, ns string) *unstructured.Unst
 	annotations[constants.AnnFrom] = res.GetNamespace()
 	c.SetAnnotations(annotations)
 
+	// special treatment for ServiceAccount
+	if c.GetAPIVersion() == "v1" && c.GetKind() == "ServiceAccount" {
+		delete(c.Object, "secrets")
+	}
+
 	return c
 }
 
