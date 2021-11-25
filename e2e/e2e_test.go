@@ -19,6 +19,9 @@ var roleYAML []byte
 //go:embed testdata/resourceQuota.yaml
 var resourceQuota []byte
 
+//go:embed testdata/serviceaccount.yaml
+var serviceAccountYAML []byte
+
 var sealedJSON []byte
 
 func init() {
@@ -263,6 +266,45 @@ var _ = Describe("kubectl accurate", func() {
 
 		_, err = kubectl(nil, "get", "-n", "subroot2", "subnamespaces", "sn2")
 		Expect(err).To(HaveOccurred())
+	})
+
+	It("should propagate ServiceAccount w/o secrets field", func() {
+		kubectlSafe(serviceAccountYAML, "apply", "-f", "-")
+		var tokenName string
+		Eventually(func() error {
+			out, err := kubectl(nil, "-n", "subroot1", "get", "serviceaccounts", "test", "-o", "json")
+			if err != nil {
+				return err
+			}
+			sa := &corev1.ServiceAccount{}
+			if err := json.Unmarshal(out, sa); err != nil {
+				return err
+			}
+			if len(sa.Secrets) == 0 {
+				return errors.New("no token")
+			}
+			tokenName = sa.Secrets[0].Name
+			return nil
+		}).Should(Succeed())
+
+		var tokenName2 string
+		Eventually(func() error {
+			out, err := kubectl(nil, "-n", "sn1", "get", "serviceaccounts", "test", "-o", "json")
+			if err != nil {
+				return err
+			}
+			sa := &corev1.ServiceAccount{}
+			if err := json.Unmarshal(out, sa); err != nil {
+				return err
+			}
+			if len(sa.Secrets) == 0 {
+				return errors.New("no token")
+			}
+			tokenName2 = sa.Secrets[0].Name
+			return nil
+		}).Should(Succeed())
+
+		Expect(tokenName2).NotTo(Equal(tokenName))
 	})
 
 	It("should run other commands", func() {

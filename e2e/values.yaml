@@ -25,6 +25,8 @@ controller:
         kind: Secret
       - version: v1
         kind: ResourceQuota
+      - version: v1
+        kind: ServiceAccount
 
   additionalRBAC:
     rules:
