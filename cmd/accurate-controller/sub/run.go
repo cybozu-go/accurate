@@ -45,7 +45,14 @@ func subMain(ns, addr string, port int) error {
 		return fmt.Errorf("unable to load the configuration file: %w", err)
 	}
 
-	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
+	restCfg, err := ctrl.GetConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get REST config: %w", err)
+	}
+	restCfg.QPS = float32(options.qps)
+	restCfg.Burst = int(restCfg.QPS * 1.5)
+
+	mgr, err := ctrl.NewManager(restCfg, ctrl.Options{
 		Scheme:                  scheme,
 		NewClient:               cluster.NewCachingClient,
 		MetricsBindAddress:      options.metricsAddr,

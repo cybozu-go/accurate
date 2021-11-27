@@ -49,6 +49,7 @@ watches:
 Flags:
       --add_dir_header                   If true, adds the file directory to the header
       --alsologtostderr                  log to standard error as well as files
+      --apiserver-qps-throttle int       The maximum QPS to the API server. (default 50)
       --cert-dir string                  webhook certificate directory
       --config-file string               Configuration file path (default "/etc/accurate/config.yaml")
       --health-probe-addr string         Listen address for health probes (default ":8081")
