@@ -14,7 +14,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
-const defaultConfigPath = "/etc/accurate/config.yaml"
+const (
+	defaultConfigPath = "/etc/accurate/config.yaml"
+	defaultQPS        = 50
+)
 
 var options struct {
 	configFile       string
@@ -23,6 +26,7 @@ var options struct {
 	leaderElectionID string
 	webhookAddr      string
 	certDir          string
+	qps              int
 	zapOpts          zap.Options
 }
 
@@ -67,6 +71,7 @@ func init() {
 	fs.StringVar(&options.leaderElectionID, "leader-election-id", "accurate", "ID for leader election by controller-runtime")
 	fs.StringVar(&options.webhookAddr, "webhook-addr", ":9443", "Listen address for the webhook endpoint")
 	fs.StringVar(&options.certDir, "cert-dir", "", "webhook certificate directory")
+	fs.IntVar(&options.qps, "apiserver-qps-throttle", defaultQPS, "The maximum QPS to the API server.")
 
 	goflags := flag.NewFlagSet("klog", flag.ExitOnError)
 	klog.InitFlags(goflags)
