@@ -38,6 +38,8 @@ var _ = Describe("SubNamespace webhook", func() {
 		sn := &accuratev1.SubNamespace{}
 		sn.Namespace = "ns2"
 		sn.Name = "foo"
+		sn.Spec.Labels = map[string]string{"foo": "bar"}
+		sn.Spec.Annotations = map[string]string{"foo": "bar"}
 		err = k8sClient.Create(ctx, sn)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -243,6 +245,52 @@ var _ = Describe("SubNamespace webhook", func() {
 					sn := &accuratev1.SubNamespace{}
 					sn.Namespace = "unuse-naming-group-team2"
 					sn.Name = "unuse-naming-group-team2-foo"
+					err = k8sClient.Create(ctx, sn)
+					Expect(err).To(HaveOccurred())
+				})
+
+				It("should deny creation of SubNamespace in a root namespace - pattern6", func() {
+					root := &corev1.Namespace{}
+					root.Name = "labels-invalid-1"
+					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
+					err := k8sClient.Create(ctx, root)
+					Expect(err).NotTo(HaveOccurred())
+
+					sn := &accuratev1.SubNamespace{}
+					sn.Namespace = "labels-invalid-1"
+					sn.Name = "labels-invalid-1-sub"
+					sn.Spec.Labels = map[string]string{"foo": "~"}
+					err = k8sClient.Create(ctx, sn)
+					Expect(err).To(HaveOccurred())
+				})
+
+				It("should deny creation of SubNamespace in a root namespace - pattern7", func() {
+					root := &corev1.Namespace{}
+					root.Name = "annotations-invalid-1"
+					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
+					err := k8sClient.Create(ctx, root)
+					Expect(err).NotTo(HaveOccurred())
+
+					sn := &accuratev1.SubNamespace{}
+					sn.Namespace = "annotations-invalid-1"
+					sn.Name = "annotations-invalid-1-sub"
+					sn.Spec.Annotations = map[string]string{"foo-": ""}
+					err = k8sClient.Create(ctx, sn)
+					Expect(err).To(HaveOccurred())
+				})
+
+				It("should deny creation of SubNamespace in a root namespace - pattern8", func() {
+					root := &corev1.Namespace{}
+					root.Name = "both-invalid-1"
+					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
+					err := k8sClient.Create(ctx, root)
+					Expect(err).NotTo(HaveOccurred())
+
+					sn := &accuratev1.SubNamespace{}
+					sn.Namespace = "both-invalid-1"
+					sn.Name = "both-invalid-1-sub"
+					sn.Spec.Labels = map[string]string{"foo": "~"}
+					sn.Spec.Annotations = map[string]string{"foo-": ""}
 					err = k8sClient.Create(ctx, sn)
 					Expect(err).To(HaveOccurred())
 				})
