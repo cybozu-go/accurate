@@ -38,8 +38,8 @@ This effectively creates a namespace named NAME as a sub-namespace of NS.`,
 		},
 	}
 
-	cmd.Flags().StringToStringVar(&opts.labels, "labels", opts.labels, "the labels to be propagated to the sub-namespace")
-	cmd.Flags().StringToStringVar(&opts.annotations, "annotations", opts.annotations, "the annotations to be propagated to the sub-namespace")
+	cmd.Flags().StringToStringVar(&opts.labels, "labels", opts.labels, "the labels to be propagated to the sub-namespace. Example: a=b,c=d")
+	cmd.Flags().StringToStringVar(&opts.annotations, "annotations", opts.annotations, "the annotations to be propagated to the sub-namespace. Example: a=b,c=d")
 	return cmd
 }
 
