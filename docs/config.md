@@ -66,7 +66,8 @@ namingPolicies: []
 ```
 
 Only labels and annotations specified in the configuration file will be inherited.  
-If you are using something that controls permissions by labels or annotations, such as PodSecurity Admission, an administrator should allow appropriate labels and annotations.
+Be careful that some labels or annotations affect security configurations or the system.
+For example, [`pod-security.kubernetes.io/*`](https://kubernetes.io/docs/concepts/security/pod-security-admission/#pod-security-admission-labels-for-namespaces) labels control the security capabilities of Pods in a Namespace.
 
 Likewise, Accurate watches only namespace-scope resources specified in the configuration file.
 
