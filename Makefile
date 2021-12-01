@@ -65,6 +65,10 @@ book: mdbook
 	rm -rf docs/book
 	cd docs; $(MDBOOK) build
 
+.PHONY: book-serve
+book-serve:
+	cd docs; $(MDBOOK) serve --hostname=0.0.0.0
+
 .PHONY: check-generate
 check-generate:
 	$(MAKE) manifests generate apidoc
