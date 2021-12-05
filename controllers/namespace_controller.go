@@ -104,21 +104,23 @@ func (r *NamespaceReconciler) propagateMeta(ctx context.Context, ns, parent *cor
 	if _, ok := ns.Labels[constants.LabelParent]; ok {
 		subNS := &accuratev1.SubNamespace{}
 		err := r.Get(ctx, types.NamespacedName{Name: ns.Name, Namespace: parent.Name}, subNS)
-		if err != nil && !apierrors.IsNotFound(err) {
-			return fmt.Errorf("failed to get sub namespace %s/%s: %w", ns.Name, parent.Name, err)
-		}
-
-		for k, v := range subNS.Spec.Labels {
-			if ok := r.matchSubNamespaceLabelKey(k); ok {
-				ns.Labels[k] = v
+		if err != nil {
+			if !apierrors.IsNotFound(err) {
+				return fmt.Errorf("failed to get sub namespace %s/%s: %w", ns.Name, parent.Name, err)
 			}
-		}
-		for k, v := range subNS.Spec.Annotations {
-			if ok := r.matchSubNamespaceAnnotationKey(k); ok {
-				if ns.Annotations == nil {
-					ns.Annotations = make(map[string]string)
+		} else {
+			for k, v := range subNS.Spec.Labels {
+				if ok := r.matchSubNamespaceLabelKey(k); ok {
+					ns.Labels[k] = v
 				}
-				ns.Annotations[k] = v
+			}
+			for k, v := range subNS.Spec.Annotations {
+				if ok := r.matchSubNamespaceAnnotationKey(k); ok {
+					if ns.Annotations == nil {
+						ns.Annotations = make(map[string]string)
+					}
+					ns.Annotations[k] = v
+				}
 			}
 		}
 	}
