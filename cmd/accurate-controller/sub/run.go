@@ -94,10 +94,12 @@ func subMain(ns, addr string, port int) error {
 		return fmt.Errorf("failed to setup indexer for namespaces: %w", err)
 	}
 	if err := (&controllers.NamespaceReconciler{
-		Client:         mgr.GetClient(),
-		LabelKeys:      cfg.LabelKeys,
-		AnnotationKeys: cfg.AnnotationKeys,
-		Watched:        watched,
+		Client:                     mgr.GetClient(),
+		LabelKeys:                  cfg.LabelKeys,
+		AnnotationKeys:             cfg.AnnotationKeys,
+		SubNamespaceLabelKeys:      cfg.SubNamespaceLabelKeys,
+		SubNamespaceAnnotationKeys: cfg.SubNamespaceAnnotationKeys,
+		Watched:                    watched,
 	}).SetupWithManager(mgr); err != nil {
 		return fmt.Errorf("unable to create Namespace controller: %w", err)
 	}

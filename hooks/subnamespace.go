@@ -13,6 +13,9 @@ import (
 	admissionv1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	v1annotationvalidation "k8s.io/apimachinery/pkg/api/validation"
+	v1labelvalidation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
@@ -73,6 +76,13 @@ func (v *subNamespaceValidator) Handle(ctx context.Context, req admission.Reques
 
 	if ns.Labels[constants.LabelType] != constants.NSTypeRoot && ns.Labels[constants.LabelParent] == "" {
 		return admission.Denied(fmt.Sprintf("namespace %s is neither a root nor a sub namespace", ns.Name))
+	}
+
+	var allErrs field.ErrorList
+	allErrs = append(allErrs, v1labelvalidation.ValidateLabels(sn.Spec.Labels, field.NewPath("spec", "labels"))...)
+	allErrs = append(allErrs, v1annotationvalidation.ValidateAnnotations(sn.Spec.Annotations, field.NewPath("spec", "annotations"))...)
+	if len(allErrs) != 0 {
+		return admission.Denied(allErrs.ToAggregate().Error())
 	}
 
 	root, err := v.getRootNamespace(ctx, ns)

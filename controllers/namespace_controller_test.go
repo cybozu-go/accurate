@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"context"
+	"errors"
 	"time"
 
+	accuratev1 "github.com/cybozu-go/accurate/api/v1"
 	"github.com/cybozu-go/accurate/pkg/cluster"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	"github.com/cybozu-go/accurate/pkg/indexing"
@@ -50,10 +52,12 @@ var _ = Describe("Namespace controller", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		nr := &NamespaceReconciler{
-			Client:         mgr.GetClient(),
-			LabelKeys:      []string{"foo.bar/baz", "team", "*.glob/*"},
-			AnnotationKeys: []string{"foo.bar/zot", "memo", "*.glob/*"},
-			Watched:        []*unstructured.Unstructured{roleRes, secretRes},
+			Client:                     mgr.GetClient(),
+			LabelKeys:                  []string{"foo.bar/baz", "team", "*.glob/*"},
+			AnnotationKeys:             []string{"foo.bar/zot", "memo", "*.glob/*"},
+			SubNamespaceLabelKeys:      []string{"foo.bar/baz", "team", "*.glob/*"},
+			SubNamespaceAnnotationKeys: []string{"foo.bar/zot", "memo", "*.glob/*"},
+			Watched:                    []*unstructured.Unstructured{roleRes, secretRes},
 		}
 		err = nr.SetupWithManager(mgr)
 		Expect(err).ToNot(HaveOccurred())
@@ -504,5 +508,105 @@ var _ = Describe("Namespace controller", func() {
 		cSec2 := &corev1.Secret{}
 		err = k8sClient.Get(ctx, client.ObjectKey{Namespace: "sub2", Name: "sec2"}, cSec2)
 		Expect(err).NotTo(HaveOccurred())
+
+		By("creating a SubNamespace for sub1 namespace")
+		sn := &accuratev1.SubNamespace{}
+		sn.Namespace = "root"
+		sn.Name = "sub1"
+		sn.Spec.Labels = map[string]string{
+			"team":  "neco",
+			"empty": "true",
+		}
+		sn.Spec.Annotations = map[string]string{
+			"memo":  "neco",
+			"empty": "true",
+		}
+		sn.Finalizers = []string{constants.Finalizer}
+		err = k8sClient.Create(ctx, sn)
+		Expect(err).NotTo(HaveOccurred())
+		Eventually(func() error {
+			sub1 := &corev1.Namespace{}
+			err := k8sClient.Get(ctx, client.ObjectKey{Name: "sub1"}, sub1)
+			if err != nil {
+				return err
+			}
+
+			if sub1.Labels["team"] != "neco" {
+				return errors.New("team label is not neco")
+			}
+			if _, ok := sub1.Labels["empty"]; ok {
+				return errors.New("empty label is propagated")
+			}
+
+			if sub1.Annotations["memo"] != "neco" {
+				return errors.New("memo annotation is not neco")
+			}
+			if _, ok := sub1.Annotations["empty"]; ok {
+				return errors.New("empty annotation is propagated")
+			}
+			return nil
+		}).Should(Succeed())
+
+		By("returning the parent of sub2")
+		sub2.Labels[constants.LabelParent] = "sub1"
+		err = k8sClient.Update(ctx, sub2)
+		Expect(err).NotTo(HaveOccurred())
+		Eventually(func() error {
+			sub2 := &corev1.Namespace{}
+			err := k8sClient.Get(ctx, client.ObjectKey{Name: "sub2"}, sub2)
+			if err != nil {
+				return err
+			}
+
+			if sub2.Labels["team"] != "neco" {
+				return errors.New("team label is not neco")
+			}
+			if _, ok := sub2.Labels["empty"]; ok {
+				return errors.New("empty label is propagated")
+			}
+
+			if sub2.Annotations["memo"] != "neco" {
+				return errors.New("memo annotation is not neco")
+			}
+			if _, ok := sub2.Annotations["empty"]; ok {
+				return errors.New("empty annotation is propagated")
+			}
+			return nil
+		}).Should(Succeed())
+
+		By("updating labels and annotations of SubNamespace for sub1 namespace")
+		sn.Spec.Labels["team"] = "tama"
+		sn.Spec.Annotations["memo"] = "tama"
+		err = k8sClient.Update(ctx, sn)
+		Expect(err).NotTo(HaveOccurred())
+		Eventually(func() error {
+			sub1 := &corev1.Namespace{}
+			err := k8sClient.Get(ctx, client.ObjectKey{Name: "sub1"}, sub1)
+			if err != nil {
+				return err
+			}
+			if sub1.Labels["team"] != "tama" {
+				return errors.New("team label is not tama")
+			}
+			if sub1.Annotations["memo"] != "tama" {
+				return errors.New("memo annotation is not tama")
+			}
+			return nil
+		}).Should(Succeed())
+
+		Eventually(func() error {
+			sub2 := &corev1.Namespace{}
+			err := k8sClient.Get(ctx, client.ObjectKey{Name: "sub2"}, sub2)
+			if err != nil {
+				return err
+			}
+			if sub2.Labels["team"] != "tama" {
+				return errors.New("team label is not tama")
+			}
+			if sub2.Annotations["memo"] != "tama" {
+				return errors.New("memo annotation is not tama")
+			}
+			return nil
+		}).Should(Succeed())
 	})
 })

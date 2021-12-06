@@ -16,12 +16,27 @@ const (
 	SubNamespaceConflict = SubNamespaceStatus("conflict")
 )
 
+// SubNamespaceSpec defines the desired state of SubNamespace
+type SubNamespaceSpec struct {
+	// Labels are the labels to be propagated to the sub-namespace
+	// +optional
+	Labels map[string]string `json:"labels,omitempty"`
+
+	// Annotations are the annotations to be propagated to the sub-namespace.
+	// +optional
+	Annotations map[string]string `json:"annotations,omitempty"`
+}
+
 //+kubebuilder:object:root=true
 
 // SubNamespace is the Schema for the subnamespaces API
 type SubNamespace struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	// Spec is the spec of SubNamespace.
+	// +optional
+	Spec SubNamespaceSpec `json:"spec,omitempty"`
 
 	// Status is the status of SubNamespace.
 	// +optional

@@ -13,4 +13,10 @@ data:
     {{- with .Values.controller.config.annotationKeys }}
     annotationKeys: {{ toYaml . | nindent 6 }}
     {{- end }}
+    {{- with .Values.controller.config.subNamespaceLabelKeys }}
+    subNamespaceLabelKeys: {{ toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.controller.config.subNamespaceAnnotationKeys }}
+    subNamespaceAnnotationKeys: {{ toYaml . | nindent 6 }}
+    {{- end }}
     watches: {{ toYaml .Values.controller.config.watches | nindent 6 }}

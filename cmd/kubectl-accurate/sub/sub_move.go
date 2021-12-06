@@ -84,6 +84,11 @@ func (o *subMoveOpts) Run(ctx context.Context) error {
 
 	fmt.Fprintf(o.streams.Out, "the parent has changed to %s\n", o.parent)
 
+	oldSN := &accuratev1.SubNamespace{}
+	if err := o.client.Get(ctx, client.ObjectKey{Name: o.name, Namespace: orig}, oldSN); err != nil {
+		return fmt.Errorf("failed to get original SubNamespace %s/%s: %w", orig, o.name, err)
+	}
+
 	if !o.orphan {
 		oldSN := &accuratev1.SubNamespace{}
 		oldSN.Namespace = orig
@@ -101,6 +106,8 @@ func (o *subMoveOpts) Run(ctx context.Context) error {
 	sn := &accuratev1.SubNamespace{}
 	sn.Namespace = o.parent
 	sn.Name = o.name
+	sn.Spec.Labels = oldSN.Spec.Labels
+	sn.Spec.Annotations = oldSN.Spec.Annotations
 	if err := o.client.Create(ctx, sn); err != nil {
 		return fmt.Errorf("failed to create SubNamespace in %s: %w", o.parent, err)
 	}

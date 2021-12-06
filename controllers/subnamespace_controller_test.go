@@ -71,7 +71,6 @@ var _ = Describe("SubNamespace controller", func() {
 
 		Expect(sub1.Labels).To(HaveKeyWithValue(constants.LabelCreatedBy, "accurate"))
 		Expect(sub1.Labels).To(HaveKeyWithValue(constants.LabelParent, "test1"))
-
 		Eventually(func() accuratev1.SubNamespaceStatus {
 			sn = &accuratev1.SubNamespace{}
 			err = k8sClient.Get(ctx, client.ObjectKey{Namespace: "test1", Name: "test1-sub1"}, sn)

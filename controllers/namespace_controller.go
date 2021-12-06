@@ -6,23 +6,31 @@ import (
 	"path"
 	"reflect"
 
+	accuratev1 "github.com/cybozu-go/accurate/api/v1"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/util/workqueue"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 // NamespaceReconciler reconciles a Namespace object
 type NamespaceReconciler struct {
 	client.Client
-	LabelKeys      []string
-	AnnotationKeys []string
-	Watched        []*unstructured.Unstructured
+	LabelKeys                  []string
+	AnnotationKeys             []string
+	SubNamespaceLabelKeys      []string
+	SubNamespaceAnnotationKeys []string
+	Watched                    []*unstructured.Unstructured
 }
 
 var _ reconcile.Reconciler = &NamespaceReconciler{}
@@ -92,6 +100,31 @@ func (r *NamespaceReconciler) propagateMeta(ctx context.Context, ns, parent *cor
 			ns.Annotations[k] = v
 		}
 	}
+
+	if _, ok := ns.Labels[constants.LabelParent]; ok {
+		subNS := &accuratev1.SubNamespace{}
+		err := r.Get(ctx, types.NamespacedName{Name: ns.Name, Namespace: parent.Name}, subNS)
+		if err != nil {
+			if !apierrors.IsNotFound(err) {
+				return fmt.Errorf("failed to get sub namespace %s/%s: %w", ns.Name, parent.Name, err)
+			}
+		} else {
+			for k, v := range subNS.Spec.Labels {
+				if ok := r.matchSubNamespaceLabelKey(k); ok {
+					ns.Labels[k] = v
+				}
+			}
+			for k, v := range subNS.Spec.Annotations {
+				if ok := r.matchSubNamespaceAnnotationKey(k); ok {
+					if ns.Annotations == nil {
+						ns.Annotations = make(map[string]string)
+					}
+					ns.Annotations[k] = v
+				}
+			}
+		}
+	}
+
 	if !reflect.DeepEqual(ns.ObjectMeta, orig.ObjectMeta) {
 		if err := r.Update(ctx, ns); err != nil {
 			return fmt.Errorf("failed to propagate labels/annotations for namespace %s: %w", ns.Name, err)
@@ -101,25 +134,19 @@ func (r *NamespaceReconciler) propagateMeta(ctx context.Context, ns, parent *cor
 }
 
 func (r *NamespaceReconciler) matchLabelKey(key string) bool {
-	for _, l := range r.LabelKeys {
-		// The glob pattern has been verified to be in the valid format when reading the config file.
-		if ok, _ := path.Match(l, key); ok {
-			return true
-		}
-	}
-
-	return false
+	return matchKey(key, r.LabelKeys)
 }
 
 func (r *NamespaceReconciler) matchAnnotationKey(key string) bool {
-	for _, a := range r.AnnotationKeys {
-		// The glob pattern has been verified to be in the valid format when reading the config file.
-		if ok, _ := path.Match(a, key); ok {
-			return true
-		}
-	}
+	return matchKey(key, r.AnnotationKeys)
+}
 
-	return false
+func (r *NamespaceReconciler) matchSubNamespaceLabelKey(key string) bool {
+	return matchKey(key, r.SubNamespaceLabelKeys)
+}
+
+func (r *NamespaceReconciler) matchSubNamespaceAnnotationKey(key string) bool {
+	return matchKey(key, r.SubNamespaceAnnotationKeys)
 }
 
 func (r *NamespaceReconciler) propagateResource(ctx context.Context, res *unstructured.Unstructured, parent, ns string) error {
@@ -351,7 +378,35 @@ func (r *NamespaceReconciler) reconcileTemplateNamespace(ctx context.Context, ns
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *NamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	subNSHandler := func(o client.Object, q workqueue.RateLimitingInterface) {
+		q.Add(reconcile.Request{NamespacedName: types.NamespacedName{
+			Name: o.GetName(),
+		}})
+	}
+
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&corev1.Namespace{}).
+		Watches(&source.Kind{Type: &accuratev1.SubNamespace{}}, handler.Funcs{
+			CreateFunc: func(ev event.CreateEvent, q workqueue.RateLimitingInterface) {
+				subNSHandler(ev.Object, q)
+			},
+			UpdateFunc: func(ev event.UpdateEvent, q workqueue.RateLimitingInterface) {
+				if ev.ObjectNew.GetDeletionTimestamp() != nil {
+					return
+				}
+				subNSHandler(ev.ObjectOld, q)
+			},
+		}).
 		Complete(r)
+}
+
+func matchKey(key string, list []string) bool {
+	for _, l := range list {
+		// The glob pattern has been verified to be in the valid format when reading the config file.
+		if ok, _ := path.Match(l, key); ok {
+			return true
+		}
+	}
+
+	return false
 }

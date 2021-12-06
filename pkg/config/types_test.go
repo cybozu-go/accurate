@@ -29,6 +29,14 @@ var _ = Describe("Validate", func() {
 		Expect(c.Validate(mapper)).To(Succeed())
 	})
 
+	It("should pass any SubNamespace labels/annotations in config", func() {
+		c := &Config{
+			SubNamespaceLabelKeys:      []string{"1", "2"},
+			SubNamespaceAnnotationKeys: []string{"a", "b"},
+		}
+		Expect(c.Validate(mapper)).To(Succeed())
+	})
+
 	It("should pass watches for namespace-scoped resources", func() {
 		c := &Config{
 			Watches: []metav1.GroupVersionKind{{
@@ -70,6 +78,13 @@ func TestLoad(t *testing.T) {
 	}
 	if !cmp.Equal(c.AnnotationKeys, []string{"foo", "bar"}) {
 		t.Error("wrong annotation keys:", cmp.Diff(c.AnnotationKeys, []string{"foo", "bar"}))
+	}
+
+	if !cmp.Equal(c.SubNamespaceLabelKeys, []string{"a", "b"}) {
+		t.Error("wrong SubNamespace label keys:", cmp.Diff(c.SubNamespaceLabelKeys, []string{"a", "b"}))
+	}
+	if !cmp.Equal(c.SubNamespaceAnnotationKeys, []string{"foo", "bar"}) {
+		t.Error("wrong SubNamespace annotation keys:", cmp.Diff(c.SubNamespaceAnnotationKeys, []string{"foo", "bar"}))
 	}
 
 	if len(c.Watches) != 2 {
