@@ -31,9 +31,10 @@ start: $(KIND) $(KUBECTL) $(HELM) $(KUBESEAL) $(KUBECTL_ACCURATE)
 	$(KUBECTL) -n cert-manager wait --for=condition=available --timeout=180s --all deployments
 	$(HELM) install --create-namespace --namespace accurate accurate ../charts/accurate -f values.yaml
 	$(KUBECTL) -n accurate wait --for=condition=available --timeout=180s --all deployments
-	$(KUBECTL) apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v$(SEALED_SECRETS_VERSION)/controller.yaml
+	$(HELM) repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
+	$(HELM) repo update
+	$(HELM) install sealed-secrets-controller --namespace kube-system sealed-secrets/sealed-secrets
 	$(KUBECTL) -n kube-system wait --for=condition=available --timeout=180s --all deployments
-	rm -f sealed.json
 	$(KUBECTL) -n root2 create secret generic mysecret --dry-run=client --from-literal=foo=bar -o json | \
 		$(KUBESEAL) | jq '. * {metadata: {annotations: {"accurate.cybozu.com/propagate-generated": "create"}}}' > sealed.json
 
