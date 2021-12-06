@@ -1,7 +1,7 @@
 KIND_VERSION = 0.11.1
-KUBERNETES_VERSION = 1.21.2
-CERT_MANAGER_VERSION = 1.4.0
-SEALED_SECRET_VERSION = 0.16.0
+KUBERNETES_VERSION = 1.22.4
+CERT_MANAGER_VERSION = 1.6.1
+SEALED_SECRETS_VERSION = 0.16.0
 
 KIND := $(dir $(shell pwd))/bin/kind
 KUBECTL := $(dir $(shell pwd))/bin/kubectl
@@ -31,7 +31,7 @@ start: $(KIND) $(KUBECTL) $(HELM) $(KUBESEAL) $(KUBECTL_ACCURATE)
 	$(KUBECTL) -n cert-manager wait --for=condition=available --timeout=180s --all deployments
 	$(HELM) install --create-namespace --namespace accurate accurate ../charts/accurate -f values.yaml
 	$(KUBECTL) -n accurate wait --for=condition=available --timeout=180s --all deployments
-	$(KUBECTL) apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v$(SEALED_SECRET_VERSION)/controller.yaml
+	$(KUBECTL) apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v$(SEALED_SECRETS_VERSION)/controller.yaml
 	$(KUBECTL) -n kube-system wait --for=condition=available --timeout=180s --all deployments
 	rm -f sealed.json
 	$(KUBECTL) -n root2 create secret generic mysecret --dry-run=client --from-literal=foo=bar -o json | \
@@ -70,7 +70,7 @@ $(HELM):
 
 $(KUBESEAL):
 	mkdir -p ../bin
-	curl -sfL -o $@ https://github.com/bitnami-labs/sealed-secrets/releases/download/v$(SEALED_SECRET_VERSION)/kubeseal-linux-amd64
+	curl -sfL -o $@ https://github.com/bitnami-labs/sealed-secrets/releases/download/v$(SEALED_SECRETS_VERSION)/kubeseal-linux-amd64
 	chmod a+x $@
 
 $(KUBECTL_ACCURATE): $(wildcard ../cmd/kubectl-accurate/*/*.go)
