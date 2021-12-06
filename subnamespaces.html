@@ -206,6 +206,26 @@ metadata:
   namespace: &lt;parent&gt;
   name: &lt;name&gt;
 </code></pre>
+<h3 id="creating-a-sub-namespace-with-addition-labelsannotations"><a class="header" href="#creating-a-sub-namespace-with-addition-labelsannotations">Creating a sub-namespace with addition labels/annotations</a></h3>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate sub create &lt;name&gt; &lt;parent&gt; --labels=foo=bar --annotations=baz=zot
+</code></pre>
+<p>Applying YAML manifests:</p>
+<pre><code class="language-console">apiVersion: accurate.cybozu.com/v1
+kind: SubNamespace
+metadata:
+  namespace: &lt;parent&gt;
+  name: &lt;name&gt;
+spec:
+  labels:
+    foo: bar
+  annotations:
+    baz: zot
+</code></pre>
+<p>You can edit these <code>spec.labels/spec.annotations</code> with <code>kubectl edit</code>:</p>
+<pre><code class="language-console">$ kubectl edit SubNamespace -n=&lt;parent&gt; &lt;name&gt;
+</code></pre>
+<p>The <code>spec.labels/spec.annotations</code> that can be propagated to sub-namespaces can be set with the <code>subNamespaceLabelKeys/subNamespaceAnnotationKeys</code> parameters in config.yaml.</p>
 <h2 id="deleting-a-created-sub-namespace"><a class="header" href="#deleting-a-created-sub-namespace">Deleting a created sub-namespace</a></h2>
 <p>Using <code>kubectl accurate</code>:</p>
 <pre><code class="language-console">$ kubectl accurate sub delete &lt;name&gt;

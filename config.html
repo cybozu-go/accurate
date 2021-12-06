@@ -169,6 +169,18 @@ annotationKeys:
 # https://metallb.universe.tf/usage/#requesting-specific-ips
 - metallb.universe.tf/address-pool
 
+# Labels to be propagated to sub-namespaces from SubNamespace resource.
+# It is also possible to specify a glob pattern that can be interpreted by Go's &quot;path.Match&quot; func.
+# https://pkg.go.dev/path#Match
+subNamespaceLabelKeys:
+- app
+
+# Annotations to be propagated to sub-namespaces from SubNamespace resource.
+# It is also possible to specify a glob pattern that can be interpreted by Go's &quot;path.Match&quot; func.
+# https://pkg.go.dev/path#Match
+subNamespaceAnnotationKeys:
+- foo.bar/baz
+
 # List of GVK for namespace-scoped resources that can be propagated.
 # Any namespace-scoped resource is allowed.
 watches:
@@ -196,7 +208,9 @@ watches:
 # This feature is provided using https://pkg.go.dev/regexp#Regexp.Expand
 namingPolicies: []
 </code></pre>
-<p>Only labels and annotations specified in the configuration file will be inherited.</p>
+<p>Only labels and annotations specified in the configuration file will be inherited.<br />
+Be careful that some labels or annotations affect security configurations or the system.
+For example, <a href="https://kubernetes.io/docs/concepts/security/pod-security-admission/#pod-security-admission-labels-for-namespaces"><code>pod-security.kubernetes.io/*</code></a> labels control the security capabilities of Pods in a Namespace.</p>
 <p>Likewise, Accurate watches only namespace-scope resources specified in the configuration file.</p>
 <p>You can edit the Helm Chart values as needed.</p>
 <pre><code class="language-yaml">&lt;snip&gt;
@@ -215,6 +229,18 @@ controller:
     # An example to propagate an annotation for MetalLB
     # https://metallb.universe.tf/usage/#requesting-specific-ips
     # - metallb.universe.tf/address-pool
+
+    # Labels to be propagated to sub-namespaces from SubNamespace resource.
+    # It is also possible to specify a glob pattern that can be interpreted by Go's &quot;path.Match&quot; func.
+    # https://pkg.go.dev/path#Match
+    subNamespaceLabelKeys:
+    - app
+
+    # Annotations to be propagated to sub-namespaces from SubNamespace resource.
+    # It is also possible to specify a glob pattern that can be interpreted by Go's &quot;path.Match&quot; func.
+    # https://pkg.go.dev/path#Match
+    subNamespaceAnnotationKeys:
+    - foo.bar/baz
 
     # controller.config.watches -- List of GVK for namespace-scoped resources that can be propagated.
     # Any namespace-scoped resource is allowed.

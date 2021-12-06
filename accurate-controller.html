@@ -160,6 +160,8 @@ The location can be changed with <code>--config-file</code> flag.</p>
 <table><thead><tr><th>Key</th><th>Type</th><th>Description</th></tr></thead><tbody>
 <tr><td><code>labelKeys</code></td><td><code>[]string</code></td><td>Keys of namespace labels to be propagated.</td></tr>
 <tr><td><code>annotationKeys</code></td><td><code>[]string</code></td><td>Keys of namespace annotations to be propagated.</td></tr>
+<tr><td><code>subNamespaceLabelKeys</code></td><td><code>[]string</code></td><td>Keys of SubNamespace labels to be propagated.</td></tr>
+<tr><td><code>subNamespaceAnnotationKeys</code></td><td><code>[]string</code></td><td>Keys of SubNamespace annotations to be propagated.</td></tr>
 <tr><td><code>watches</code></td><td><code>[]object</code></td><td>GroupVersionKind of namespace-scoped objects to be propagated.</td></tr>
 </tbody></table>
 <p>Example:</p>
@@ -167,6 +169,12 @@ The location can be changed with <code>--config-file</code> flag.</p>
 - team
 
 annotationKeys:
+- foo.bar/baz
+
+subNamespaceLabelKeys:
+- app
+
+subNamespaceAnnotationKeys:
 - foo.bar/baz
 
 watches:

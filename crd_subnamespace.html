@@ -156,11 +156,13 @@
 <h3 id="sub-resources"><a class="header" href="#sub-resources">Sub Resources</a></h3>
 <ul>
 <li><a href="#subnamespacelist">SubNamespaceList</a></li>
+<li><a href="#subnamespacespec">SubNamespaceSpec</a></li>
 </ul>
 <h4 id="subnamespace"><a class="header" href="#subnamespace">SubNamespace</a></h4>
 <p>SubNamespace is the Schema for the subnamespaces API</p>
 <table><thead><tr><th>Field</th><th>Description</th><th>Scheme</th><th>Required</th></tr></thead><tbody>
 <tr><td>metadata</td><td></td><td>metav1.ObjectMeta</td><td>false</td></tr>
+<tr><td>spec</td><td>Spec is the spec of SubNamespace.</td><td><a href="#subnamespacespec">SubNamespaceSpec</a></td><td>false</td></tr>
 <tr><td>status</td><td>Status is the status of SubNamespace.</td><td>SubNamespaceStatus</td><td>false</td></tr>
 </tbody></table>
 <p><a href="#custom-resources">Back to Custom Resources</a></p>
@@ -169,6 +171,13 @@
 <table><thead><tr><th>Field</th><th>Description</th><th>Scheme</th><th>Required</th></tr></thead><tbody>
 <tr><td>metadata</td><td></td><td>metav1.ListMeta</td><td>false</td></tr>
 <tr><td>items</td><td></td><td>[]<a href="#subnamespace">SubNamespace</a></td><td>true</td></tr>
+</tbody></table>
+<p><a href="#custom-resources">Back to Custom Resources</a></p>
+<h4 id="subnamespacespec"><a class="header" href="#subnamespacespec">SubNamespaceSpec</a></h4>
+<p>SubNamespaceSpec defines the desired state of SubNamespace</p>
+<table><thead><tr><th>Field</th><th>Description</th><th>Scheme</th><th>Required</th></tr></thead><tbody>
+<tr><td>labels</td><td>Labels are the labels to be propagated to the sub-namespace</td><td>map[string]string</td><td>false</td></tr>
+<tr><td>annotations</td><td>Annotations are the annotations to be propagated to the sub-namespace.</td><td>map[string]string</td><td>false</td></tr>
 </tbody></table>
 <p><a href="#custom-resources">Back to Custom Resources</a></p>
 

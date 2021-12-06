@@ -263,6 +263,18 @@ annotationKeys:
 # https://metallb.universe.tf/usage/#requesting-specific-ips
 - metallb.universe.tf/address-pool
 
+# Labels to be propagated to sub-namespaces from SubNamespace resource.
+# It is also possible to specify a glob pattern that can be interpreted by Go's &quot;path.Match&quot; func.
+# https://pkg.go.dev/path#Match
+subNamespaceLabelKeys:
+- app
+
+# Annotations to be propagated to sub-namespaces from SubNamespace resource.
+# It is also possible to specify a glob pattern that can be interpreted by Go's &quot;path.Match&quot; func.
+# https://pkg.go.dev/path#Match
+subNamespaceAnnotationKeys:
+- foo.bar/baz
+
 # List of GVK for namespace-scoped resources that can be propagated.
 # Any namespace-scoped resource is allowed.
 watches:
@@ -290,7 +302,9 @@ watches:
 # This feature is provided using https://pkg.go.dev/regexp#Regexp.Expand
 namingPolicies: []
 </code></pre>
-<p>Only labels and annotations specified in the configuration file will be inherited.</p>
+<p>Only labels and annotations specified in the configuration file will be inherited.<br />
+Be careful that some labels or annotations affect security configurations or the system.
+For example, <a href="https://kubernetes.io/docs/concepts/security/pod-security-admission/#pod-security-admission-labels-for-namespaces"><code>pod-security.kubernetes.io/*</code></a> labels control the security capabilities of Pods in a Namespace.</p>
 <p>Likewise, Accurate watches only namespace-scope resources specified in the configuration file.</p>
 <p>You can edit the Helm Chart values as needed.</p>
 <pre><code class="language-yaml">&lt;snip&gt;
@@ -309,6 +323,18 @@ controller:
     # An example to propagate an annotation for MetalLB
     # https://metallb.universe.tf/usage/#requesting-specific-ips
     # - metallb.universe.tf/address-pool
+
+    # Labels to be propagated to sub-namespaces from SubNamespace resource.
+    # It is also possible to specify a glob pattern that can be interpreted by Go's &quot;path.Match&quot; func.
+    # https://pkg.go.dev/path#Match
+    subNamespaceLabelKeys:
+    - app
+
+    # Annotations to be propagated to sub-namespaces from SubNamespace resource.
+    # It is also possible to specify a glob pattern that can be interpreted by Go's &quot;path.Match&quot; func.
+    # https://pkg.go.dev/path#Match
+    subNamespaceAnnotationKeys:
+    - foo.bar/baz
 
     # controller.config.watches -- List of GVK for namespace-scoped resources that can be propagated.
     # Any namespace-scoped resource is allowed.
@@ -672,6 +698,26 @@ metadata:
   namespace: &lt;parent&gt;
   name: &lt;name&gt;
 </code></pre>
+<h3 id="creating-a-sub-namespace-with-addition-labelsannotations"><a class="header" href="#creating-a-sub-namespace-with-addition-labelsannotations">Creating a sub-namespace with addition labels/annotations</a></h3>
+<p>Using <code>kubectl accurate</code>:</p>
+<pre><code class="language-console">$ kubectl accurate sub create &lt;name&gt; &lt;parent&gt; --labels=foo=bar --annotations=baz=zot
+</code></pre>
+<p>Applying YAML manifests:</p>
+<pre><code class="language-console">apiVersion: accurate.cybozu.com/v1
+kind: SubNamespace
+metadata:
+  namespace: &lt;parent&gt;
+  name: &lt;name&gt;
+spec:
+  labels:
+    foo: bar
+  annotations:
+    baz: zot
+</code></pre>
+<p>You can edit these <code>spec.labels/spec.annotations</code> with <code>kubectl edit</code>:</p>
+<pre><code class="language-console">$ kubectl edit SubNamespace -n=&lt;parent&gt; &lt;name&gt;
+</code></pre>
+<p>The <code>spec.labels/spec.annotations</code> that can be propagated to sub-namespaces can be set with the <code>subNamespaceLabelKeys/subNamespaceAnnotationKeys</code> parameters in config.yaml.</p>
 <h2 id="deleting-a-created-sub-namespace"><a class="header" href="#deleting-a-created-sub-namespace">Deleting a created sub-namespace</a></h2>
 <p>Using <code>kubectl accurate</code>:</p>
 <pre><code class="language-console">$ kubectl accurate sub delete &lt;name&gt;
@@ -725,11 +771,13 @@ metadata:
 <h3 id="sub-resources"><a class="header" href="#sub-resources">Sub Resources</a></h3>
 <ul>
 <li><a href="crd_subnamespace.html#subnamespacelist">SubNamespaceList</a></li>
+<li><a href="crd_subnamespace.html#subnamespacespec">SubNamespaceSpec</a></li>
 </ul>
 <h4 id="subnamespace"><a class="header" href="#subnamespace">SubNamespace</a></h4>
 <p>SubNamespace is the Schema for the subnamespaces API</p>
 <table><thead><tr><th>Field</th><th>Description</th><th>Scheme</th><th>Required</th></tr></thead><tbody>
 <tr><td>metadata</td><td></td><td>metav1.ObjectMeta</td><td>false</td></tr>
+<tr><td>spec</td><td>Spec is the spec of SubNamespace.</td><td><a href="crd_subnamespace.html#subnamespacespec">SubNamespaceSpec</a></td><td>false</td></tr>
 <tr><td>status</td><td>Status is the status of SubNamespace.</td><td>SubNamespaceStatus</td><td>false</td></tr>
 </tbody></table>
 <p><a href="crd_subnamespace.html#custom-resources">Back to Custom Resources</a></p>
@@ -738,6 +786,13 @@ metadata:
 <table><thead><tr><th>Field</th><th>Description</th><th>Scheme</th><th>Required</th></tr></thead><tbody>
 <tr><td>metadata</td><td></td><td>metav1.ListMeta</td><td>false</td></tr>
 <tr><td>items</td><td></td><td>[]<a href="crd_subnamespace.html#subnamespace">SubNamespace</a></td><td>true</td></tr>
+</tbody></table>
+<p><a href="crd_subnamespace.html#custom-resources">Back to Custom Resources</a></p>
+<h4 id="subnamespacespec"><a class="header" href="#subnamespacespec">SubNamespaceSpec</a></h4>
+<p>SubNamespaceSpec defines the desired state of SubNamespace</p>
+<table><thead><tr><th>Field</th><th>Description</th><th>Scheme</th><th>Required</th></tr></thead><tbody>
+<tr><td>labels</td><td>Labels are the labels to be propagated to the sub-namespace</td><td>map[string]string</td><td>false</td></tr>
+<tr><td>annotations</td><td>Annotations are the annotations to be propagated to the sub-namespace.</td><td>map[string]string</td><td>false</td></tr>
 </tbody></table>
 <p><a href="crd_subnamespace.html#custom-resources">Back to Custom Resources</a></p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="commands"><a class="header" href="#commands">Commands</a></h1>
@@ -842,6 +897,8 @@ The location can be changed with <code>--config-file</code> flag.</p>
 <table><thead><tr><th>Key</th><th>Type</th><th>Description</th></tr></thead><tbody>
 <tr><td><code>labelKeys</code></td><td><code>[]string</code></td><td>Keys of namespace labels to be propagated.</td></tr>
 <tr><td><code>annotationKeys</code></td><td><code>[]string</code></td><td>Keys of namespace annotations to be propagated.</td></tr>
+<tr><td><code>subNamespaceLabelKeys</code></td><td><code>[]string</code></td><td>Keys of SubNamespace labels to be propagated.</td></tr>
+<tr><td><code>subNamespaceAnnotationKeys</code></td><td><code>[]string</code></td><td>Keys of SubNamespace annotations to be propagated.</td></tr>
 <tr><td><code>watches</code></td><td><code>[]object</code></td><td>GroupVersionKind of namespace-scoped objects to be propagated.</td></tr>
 </tbody></table>
 <p>Example:</p>
@@ -849,6 +906,12 @@ The location can be changed with <code>--config-file</code> flag.</p>
 - team
 
 annotationKeys:
+- foo.bar/baz
+
+subNamespaceLabelKeys:
+- app
+
+subNamespaceAnnotationKeys:
 - foo.bar/baz
 
 watches:
