@@ -37,7 +37,7 @@ It should look like:
     $ git neco dev "bump-$VERSION"
     ```
 
-3. Update version strings in `kustomization.yaml` and `version.go` in the top directory.
+3. Update version strings in `version.go` in the top directory.
 4. Edit `CHANGELOG.md` for the new version ([example][]).
 5. Commit the change and push it.
 
