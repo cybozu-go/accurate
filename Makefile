@@ -1,7 +1,9 @@
 # Tool versions
 CTRL_TOOLS_VERSION=0.7.0
 CTRL_RUNTIME_VERSION := $(shell awk '/sigs.k8s.io\/controller-runtime/ {print substr($$2, 2)}' go.mod)
-KUSTOMIZE_VERSION = 4.4.1
+# Do NOT update kustomize to 4.0.5 or higher until the following issue is resolved.
+# https://github.com/kubernetes-sigs/kustomize/issues/3969
+KUSTOMIZE_VERSION = 4.0.4
 HELM_VERSION = 3.7.1
 CRD_TO_MARKDOWN_VERSION = 0.0.3
 MDBOOK_VERSION = 0.4.14

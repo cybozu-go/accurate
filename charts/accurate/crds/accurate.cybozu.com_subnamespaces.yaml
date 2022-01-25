@@ -21,14 +21,10 @@ spec:
         description: SubNamespace is the Schema for the subnamespaces API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.'
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.'
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.'
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.'
             type: string
           metadata:
             type: object
@@ -38,8 +34,7 @@ spec:
               annotations:
                 additionalProperties:
                   type: string
-                description: Annotations are the annotations to be propagated to the
-                  sub-namespace.
+                description: Annotations are the annotations to be propagated to the sub-namespace.
                 type: object
               labels:
                 additionalProperties:
