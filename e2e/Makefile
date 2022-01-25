@@ -1,7 +1,7 @@
 KIND_VERSION = 0.11.1
 KUBERNETES_VERSION = 1.22.4
 CERT_MANAGER_VERSION = 1.6.1
-SEALED_SECRETS_VERSION = 0.16.0
+SEALED_SECRETS_VERSION = 0.17.2
 
 KIND := $(dir $(shell pwd))/bin/kind
 KUBECTL := $(dir $(shell pwd))/bin/kubectl
@@ -71,8 +71,7 @@ $(HELM):
 
 $(KUBESEAL):
 	mkdir -p ../bin
-	curl -sfL -o $@ https://github.com/bitnami-labs/sealed-secrets/releases/download/v$(SEALED_SECRETS_VERSION)/kubeseal-linux-amd64
-	chmod a+x $@
+	curl -sfL https://github.com/bitnami-labs/sealed-secrets/releases/download/v$(SEALED_SECRETS_VERSION)/kubeseal-$(SEALED_SECRETS_VERSION)-linux-amd64.tar.gz | tar -C ../bin -xzf -
 
 $(KUBECTL_ACCURATE): $(wildcard ../cmd/kubectl-accurate/*/*.go)
 	mkdir -p ../bin
