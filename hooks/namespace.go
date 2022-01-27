@@ -96,7 +96,7 @@ func (v *namespaceValidator) handleCreate(ctx context.Context, ns *corev1.Namesp
 			return admission.Denied("a sub-namespace cannot have a template")
 		}
 		if _, ok := ns.Labels[constants.LabelType]; ok {
-			return admission.Denied("a sub-resource cannot be a root or a template namespace")
+			return admission.Denied("a sub-namespace cannot be a root or a template")
 		}
 		if resp := v.checkParent(ctx, p, constants.NSTypeRoot); resp != nil {
 			return *resp
