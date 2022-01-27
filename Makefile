@@ -1,9 +1,8 @@
 # Tool versions
 CTRL_TOOLS_VERSION=0.7.0
 CTRL_RUNTIME_VERSION := $(shell awk '/sigs.k8s.io\/controller-runtime/ {print substr($$2, 2)}' go.mod)
-# Do NOT update kustomize to 4.0.5 or higher until the following issue is resolved.
-# https://github.com/kubernetes-sigs/kustomize/issues/3969
-KUSTOMIZE_VERSION = 4.0.4
+KUSTOMIZE_VERSION = 4.4.1
+YQ_VERSION = 4.17.2
 HELM_VERSION = 3.7.1
 CRD_TO_MARKDOWN_VERSION = 0.0.3
 MDBOOK_VERSION = 0.4.14
@@ -49,10 +48,10 @@ help: ## Display this help.
 ##@ Development
 
 .PHONY: manifests
-manifests: kustomize controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+manifests: kustomize controller-gen yq ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
-	$(KUSTOMIZE) build config/kustomize-to-helm/overlays/crds > charts/accurate/crds/accurate.cybozu.com_subnamespaces.yaml
-	$(KUSTOMIZE) build config/kustomize-to-helm/overlays/templates > charts/accurate/templates/generated/generated.yaml
+	$(KUSTOMIZE) build config/kustomize-to-helm/overlays/crds | $(YQ) e "." -p yaml - > charts/accurate/crds/accurate.cybozu.com_subnamespaces.yaml
+	$(KUSTOMIZE) build config/kustomize-to-helm/overlays/templates | $(YQ) e "."  -p yaml - > charts/accurate/templates/generated/generated.yaml
 
 .PHONY: generate
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
@@ -131,6 +130,14 @@ $(HELM):
 	mkdir -p $(BIN_DIR)
 	curl -L -sS https://get.helm.sh/helm-v$(HELM_VERSION)-linux-amd64.tar.gz \
 	  | tar xz -C $(BIN_DIR) --strip-components 1 linux-amd64/helm
+
+YQ := $(shell pwd)/bin/yq
+.PHONY: yq
+yq: $(YQ) ## Download yq locally if necessary
+$(YQ):
+	mkdir -p bin
+	curl -fsL -o $@ https://github.com/mikefarah/yq/releases/download/v$(YQ_VERSION)/yq_linux_amd64
+	chmod a+x $@
 
 CRD_TO_MARKDOWN := $(shell pwd)/bin/crd-to-markdown
 .PHONY: crd-to-markdown
