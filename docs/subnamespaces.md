@@ -30,6 +30,8 @@ metadata:
     team: foo
 ```
 
+Accurate only propagates labels/annotations that have been configured in that respect via the `labelKeys` and `annotationKeys` parameters in `config.yaml`. This prevents the propagation of labels/annotations that were not meant to do so.
+
 ### Preparing resources for tenant users
 
 In almost all cases, a root Namespace should have RoleBinding for a group of tenant users.
