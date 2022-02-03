@@ -37,6 +37,34 @@ var _ = Describe("Validate", func() {
 		Expect(c.Validate(mapper)).To(Succeed())
 	})
 
+	It("should deny labelKeys in accurate's own namespace", func() {
+		c := &Config{
+			LabelKeys: []string{"accurate.cybozu.com/type"},
+		}
+		Expect(c.Validate(mapper)).NotTo(Succeed())
+	})
+
+	It("should deny annotationKeys in accurate's own namespace", func() {
+		c := &Config{
+			AnnotationKeys: []string{"accurate.cybozu.com/type"},
+		}
+		Expect(c.Validate(mapper)).NotTo(Succeed())
+	})
+
+	It("should deny subNamespaceLabelKeys in accurate's own namespace", func() {
+		c := &Config{
+			SubNamespaceLabelKeys: []string{"accurate.cybozu.com/type"},
+		}
+		Expect(c.Validate(mapper)).NotTo(Succeed())
+	})
+
+	It("should deny subNamespaceAnnotationKeys in accurate's own namespace", func() {
+		c := &Config{
+			SubNamespaceAnnotationKeys: []string{"accurate.cybozu.com/type"},
+		}
+		Expect(c.Validate(mapper)).NotTo(Succeed())
+	})
+
 	It("should pass watches for namespace-scoped resources", func() {
 		c := &Config{
 			Watches: []metav1.GroupVersionKind{{

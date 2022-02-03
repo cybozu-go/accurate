@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"path"
 	"regexp"
+	"strings"
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/yaml"
+
+	"github.com/cybozu-go/accurate/pkg/constants"
 )
 
 // NamingPolicy represents naming policies for Namespaces created from SubNamespaces.
@@ -40,12 +43,18 @@ func (c *Config) Validate(mapper meta.RESTMapper) error {
 		if _, err := path.Match(key, ""); err != nil {
 			return fmt.Errorf("malformed pattern for labelKeys %s: %w", key, err)
 		}
+		if strings.HasPrefix(key, constants.MetaPrefix) {
+			return fmt.Errorf("misconfigured labelKey: %s is not allowed", key)
+		}
 	}
 
 	for _, key := range c.AnnotationKeys {
 		// Verify that pattern is a valid format.
 		if _, err := path.Match(key, ""); err != nil {
 			return fmt.Errorf("malformed pattern for annotationKeys %s: %w", key, err)
+		}
+		if strings.HasPrefix(key, constants.MetaPrefix) {
+			return fmt.Errorf("misconfigured annotationKey: %s is not allowed", key)
 		}
 	}
 
@@ -54,12 +63,18 @@ func (c *Config) Validate(mapper meta.RESTMapper) error {
 		if _, err := path.Match(key, ""); err != nil {
 			return fmt.Errorf("malformed pattern for subNamespaceLabelKeys %s: %w", key, err)
 		}
+		if strings.HasPrefix(key, constants.MetaPrefix) {
+			return fmt.Errorf("misconfigured subNamespaceLabelKey: %s is not allowed", key)
+		}
 	}
 
 	for _, key := range c.SubNamespaceAnnotationKeys {
 		// Verify that pattern is a valid format.
 		if _, err := path.Match(key, ""); err != nil {
 			return fmt.Errorf("malformed pattern for subNamespaceAnnotationKeys %s: %w", key, err)
+		}
+		if strings.HasPrefix(key, constants.MetaPrefix) {
+			return fmt.Errorf("misconfigured subNamespaceAnnotationKey: %s is not allowed", key)
 		}
 	}
 
