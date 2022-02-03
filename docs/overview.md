@@ -53,7 +53,7 @@ Without propagating Role/RoleBinding, the tenant user would be able to do nothin
     Accurate can propagate any namespace-scope resource including custom resources between Namespaces.
     Moreover, Accurate can detect generated resources owned by another resource and propagate them.
 
-- Inheriting labels and annotations from parent namespaces
+- Inheriting labels and annotations creation/update from parent namespaces
 
     Namespace labels often play important roles.
     For example, [Pod Security Admission](https://github.com/kubernetes/website/blob/dev-1.22/content/en/docs/concepts/security/pod-security-admission.md#pod-security-admission-labels-for-namespaces), a new feature planned for Kubernetes 1.22, uses Namespace labels to control security policies.
