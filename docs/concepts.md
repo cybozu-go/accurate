@@ -12,7 +12,7 @@ Any Namespace other than sub-namespaces can reference a template Namespace with 
 
 Sub-namespace can reference a root or another sub-namespace as its parent.
 
-Accurate propagates the Namespace labels, annotations, and namespace-scope resources from a referenced Namespace to referencing Namespaces.
+When configured to do so, Accurate propagates the Namespace labels, annotations, and namespace-scope resources from a referenced Namespace to referencing Namespaces.
 
 Circular references are prohibited by an admission webhook.
 
