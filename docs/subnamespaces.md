@@ -30,7 +30,7 @@ metadata:
     team: foo
 ```
 
-Accurate only propagates labels/annotations that have been configured in that respect via the `labelKeys` and `annotationKeys` parameters in `config.yaml`. This prevents the propagation of labels/annotations that were not meant to do so.
+Accurate only propagates labels/annotations that have been configured in that respect via the `labelKeys` and `annotationKeys` parameters in `config.yaml`. This prevents the propagation of labels/annotations that were not meant to do so. Accurate currently does not delete previously propagated labels when deleted from the parent namespace to prevent unintended deletions. Users are expected to manually delete labels/annotations that are no longer needed.
 
 ### Preparing resources for tenant users
 
@@ -87,7 +87,7 @@ metadata:
   name: <name>
 ```
 
-### Creating a sub-namespace with addition labels/annotations
+### Creating a sub-namespace with additional labels/annotations
 
 Using `kubectl accurate`:
 

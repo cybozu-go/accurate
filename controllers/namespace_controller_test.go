@@ -376,6 +376,7 @@ var _ = Describe("Namespace controller", func() {
 		root.Annotations = map[string]string{
 			"foo":                      "bar",
 			"bar.glob/b":               "glob",
+			"baz.glob/c":               "delete-me",
 			"do.not.match/glob.patten": "glob",
 		}
 		err := k8sClient.Create(ctx, root)
@@ -422,6 +423,7 @@ var _ = Describe("Namespace controller", func() {
 		Expect(sub1.Labels).NotTo(HaveKey(constants.LabelType))
 		Expect(sub1.Labels).NotTo(HaveKey("do.not.match/glob/patten"))
 		Expect(sub1.Annotations).Should(HaveKeyWithValue("bar.glob/b", "glob"))
+		Expect(sub1.Annotations).Should(HaveKeyWithValue("baz.glob/c", "delete-me"))
 		Expect(sub1.Annotations).NotTo(HaveKey("foo"))
 		Expect(sub1.Annotations).NotTo(HaveKey("do.not.match/glob/patten"))
 
@@ -476,6 +478,19 @@ var _ = Describe("Namespace controller", func() {
 			}
 			return sub2.Labels["team"]
 		}).Should(Equal("nuco"))
+
+		By("deleting an annotation in root namespace")
+		delete(root.Labels, "baz.glob/c")
+		Eventually(func() error {
+			sub1 = &corev1.Namespace{}
+			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "sub1"}, sub1); err != nil {
+				return err
+			}
+			if _, ok := sub1.Annotations["baz.glob/c"]; !ok {
+				return errors.New("annotation has been deleted")
+			}
+			return nil
+		}).Should(Succeed())
 
 		By("changing the parent of sub2")
 		root2 := &corev1.Namespace{}

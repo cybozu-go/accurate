@@ -42,6 +42,7 @@ Since these are fundamentally different requirements, we decided to develop our 
 - Propagate labels and annotations of parent or template namespaces
     - The label/annotation keys are given through the configuration file of Accurate.
     - Only labels/annotations specified in the configuration file of Accurate will be propagated.
+    - Label/annotation deletions from parent or template namespaces will not be propagated.
 - Opt-in root namespaces
     - Only namespaces labeled with `accurate.cybozu.com/type: root` can be the root of a namespace tree.
 - Tenant users can create and delete sub-namespaces by creating and deleting a custom resource in a root or a sub-namespace.
