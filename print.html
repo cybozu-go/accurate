@@ -184,7 +184,7 @@ Without propagating Role/RoleBinding, the tenant user would be able to do nothin
 Moreover, Accurate can detect generated resources owned by another resource and propagate them.</p>
 </li>
 <li>
-<p>Inheriting labels and annotations from parent namespaces</p>
+<p>Inheriting labels and annotations creation/update from parent namespaces</p>
 <p>Namespace labels often play important roles.
 For example, <a href="https://github.com/kubernetes/website/blob/dev-1.22/content/en/docs/concepts/security/pod-security-admission.md#pod-security-admission-labels-for-namespaces">Pod Security Admission</a>, a new feature planned for Kubernetes 1.22, uses Namespace labels to control security policies.</p>
 </li>
@@ -652,7 +652,7 @@ metadata:
     accurate.cybozu.com/type: root
     team: foo
 </code></pre>
-<p>Accurate only propagates labels/annotations that have been configured in that respect via the <code>labelKeys</code> and <code>annotationKeys</code> parameters in <code>config.yaml</code>. This prevents the propagation of labels/annotations that were not meant to do so.</p>
+<p>Accurate only propagates labels/annotations that have been configured in that respect via the <code>labelKeys</code> and <code>annotationKeys</code> parameters in <code>config.yaml</code>. This prevents the propagation of labels/annotations that were not meant to do so. Accurate currently does not delete previously propagated labels when deleted from the parent namespace to prevent unintended deletions. Users are expected to manually delete labels/annotations that are no longer needed.</p>
 <h3 id="preparing-resources-for-tenant-users"><a class="header" href="#preparing-resources-for-tenant-users">Preparing resources for tenant users</a></h3>
 <p>In almost all cases, a root Namespace should have RoleBinding for a group of tenant users.
 The RoleBinding should be annotated with <code>accurate.cybozu.com/propagate=update</code>.</p>
@@ -690,7 +690,7 @@ metadata:
   namespace: &lt;parent&gt;
   name: &lt;name&gt;
 </code></pre>
-<h3 id="creating-a-sub-namespace-with-addition-labelsannotations"><a class="header" href="#creating-a-sub-namespace-with-addition-labelsannotations">Creating a sub-namespace with addition labels/annotations</a></h3>
+<h3 id="creating-a-sub-namespace-with-additional-labelsannotations"><a class="header" href="#creating-a-sub-namespace-with-additional-labelsannotations">Creating a sub-namespace with additional labels/annotations</a></h3>
 <p>Using <code>kubectl accurate</code>:</p>
 <pre><code class="language-console">$ kubectl accurate sub create &lt;name&gt; &lt;parent&gt; --labels=foo=bar --annotations=baz=zot
 </code></pre>
@@ -1025,6 +1025,7 @@ Since we consider resource-propagation alone is highly useful, the feature is av
 <ul>
 <li>The label/annotation keys are given through the configuration file of Accurate.</li>
 <li>Only labels/annotations specified in the configuration file of Accurate will be propagated.</li>
+<li>Label/annotation deletions from parent or template namespaces will not be propagated.</li>
 </ul>
 </li>
 <li>Opt-in root namespaces
