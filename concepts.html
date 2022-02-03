@@ -150,7 +150,7 @@
 </ul>
 <p>Any Namespace other than sub-namespaces can reference a template Namespace with <code>accurate.cybozu.com/template=&lt;name&gt;</code> label.</p>
 <p>Sub-namespace can reference a root or another sub-namespace as its parent.</p>
-<p>Accurate propagates the Namespace labels, annotations, and namespace-scope resources from a referenced Namespace to referencing Namespaces.</p>
+<p>When configured to do so, Accurate propagates the Namespace labels, annotations, and namespace-scope resources from a referenced Namespace to referencing Namespaces.</p>
 <p>Circular references are prohibited by an admission webhook.</p>
 <h2 id="resource-propagation"><a class="header" href="#resource-propagation">Resource propagation</a></h2>
 <p>Accurate propagates any namespace-scope resource that are annotated with <code>accurate.cybozu.com/propagate=&lt;mode&gt;</code>.</p>

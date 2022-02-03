@@ -215,7 +215,7 @@ Labels, annotations, and resources can be propagated from a template Namespace t
 </ul>
 <p>Any Namespace other than sub-namespaces can reference a template Namespace with <code>accurate.cybozu.com/template=&lt;name&gt;</code> label.</p>
 <p>Sub-namespace can reference a root or another sub-namespace as its parent.</p>
-<p>Accurate propagates the Namespace labels, annotations, and namespace-scope resources from a referenced Namespace to referencing Namespaces.</p>
+<p>When configured to do so, Accurate propagates the Namespace labels, annotations, and namespace-scope resources from a referenced Namespace to referencing Namespaces.</p>
 <p>Circular references are prohibited by an admission webhook.</p>
 <h2 id="resource-propagation"><a class="header" href="#resource-propagation">Resource propagation</a></h2>
 <p>Accurate propagates any namespace-scope resource that are annotated with <code>accurate.cybozu.com/propagate=&lt;mode&gt;</code>.</p>
@@ -652,6 +652,7 @@ metadata:
     accurate.cybozu.com/type: root
     team: foo
 </code></pre>
+<p>Accurate only propagates labels/annotations that have been configured in that respect via the <code>labelKeys</code> and <code>annotationKeys</code> parameters in <code>config.yaml</code>. This prevents the propagation of labels/annotations that were not meant to do so.</p>
 <h3 id="preparing-resources-for-tenant-users"><a class="header" href="#preparing-resources-for-tenant-users">Preparing resources for tenant users</a></h3>
 <p>In almost all cases, a root Namespace should have RoleBinding for a group of tenant users.
 The RoleBinding should be annotated with <code>accurate.cybozu.com/propagate=update</code>.</p>
