@@ -35,6 +35,8 @@ start: $(KIND) $(KUBECTL) $(HELM) $(KUBESEAL) $(KUBECTL_ACCURATE)
 	$(HELM) repo update
 	$(HELM) install sealed-secrets-controller --namespace kube-system sealed-secrets/sealed-secrets
 	$(KUBECTL) -n kube-system wait --for=condition=available --timeout=180s --all deployments
+	# wait for a secret to be created
+	sleep 5
 	$(KUBECTL) -n root2 create secret generic mysecret --dry-run=client --from-literal=foo=bar -o json | \
 		$(KUBESEAL) | jq '. * {metadata: {annotations: {"accurate.cybozu.com/propagate-generated": "create"}}}' > sealed.json
 
