@@ -1170,7 +1170,11 @@ It should look like:</p>
 <h2 id="bump-version"><a class="header" href="#bump-version">Bump version</a></h2>
 <ol>
 <li>
-<p>Determine a new version number.  Let it write <code>$VERSION</code> as <code>VERSION=x.y.z</code>.</p>
+<p>Determine a new version number. Then set <code>VERSION</code> variable.</p>
+<pre><code class="language-console"># Set VERSION and confirm it. It should not have &quot;v&quot; prefix.
+$ VERSION=x.y.z
+$ echo $VERSION
+</code></pre>
 </li>
 <li>
 <p>Make a branch to release</p>
@@ -1194,9 +1198,17 @@ $ git neco review
 </li>
 <li>
 <p>Add a git tag to the main HEAD, then push it.</p>
-<pre><code class="language-console">$ git checkout main
+<pre><code class="language-console"># Set VERSION again.
+$ VERSION=x.y.z
+$ echo $VERSION
+
+$ git checkout main
 $ git pull
 $ git tag -a -m &quot;Release v$VERSION&quot; &quot;v$VERSION&quot;
+
+# Make sure the release tag exists.
+$ git tag -ln | grep $VERSION
+
 $ git push origin &quot;v$VERSION&quot;
 </code></pre>
 </li>
