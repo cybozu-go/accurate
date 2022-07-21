@@ -11,7 +11,6 @@ GORELEASER_VERSION = 1.10.2
 # Test tools
 BIN_DIR := $(shell pwd)/bin
 STATICCHECK := $(BIN_DIR)/staticcheck
-NILERR := $(BIN_DIR)/nilerr
 SUDO = sudo
 
 # Set the shell used to bash for better error handling.
@@ -87,7 +86,6 @@ test: test-tools
 	go vet ./...
 	test -z $$(gofmt -s -l . | tee /dev/stderr)
 	$(STATICCHECK) ./...
-	$(NILERR) ./...
 
 ##@ Build
 
@@ -171,12 +169,8 @@ GOBIN=$(PROJECT_DIR)/bin go install $(2) ;\
 endef
 
 .PHONY: test-tools
-test-tools: $(STATICCHECK) $(NILERR)
+test-tools: $(STATICCHECK)
 
 $(STATICCHECK):
 	mkdir -p $(BIN_DIR)
 	GOBIN=$(BIN_DIR) go install honnef.co/go/tools/cmd/staticcheck@latest
-
-$(NILERR):
-	mkdir -p $(BIN_DIR)
-	GOBIN=$(BIN_DIR) go install github.com/gostaticanalysis/nilerr/cmd/nilerr@latest
