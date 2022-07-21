@@ -74,9 +74,9 @@ check-generate:
 .PHONY: envtest
 envtest: setup-envtest
 	source <($(SETUP_ENVTEST) use -p env); \
-		TEST_CONFIG=1 go test -v -count 1 -race ./pkg/config -ginkgo.progress -ginkgo.v -ginkgo.failFast
+		TEST_CONFIG=1 go test -v -count 1 -race ./pkg/config -ginkgo.progress -ginkgo.v -ginkgo.fail-fast
 	source <($(SETUP_ENVTEST) use -p env); \
-		go test -v -count 1 -race ./controllers -ginkgo.progress -ginkgo.v -ginkgo.failFast
+		go test -v -count 1 -race ./controllers -ginkgo.progress -ginkgo.v -ginkgo.fail-fast
 	source <($(SETUP_ENVTEST) use -p env); \
 		go test -v -count 1 -race ./hooks -ginkgo.progress -ginkgo.v
 

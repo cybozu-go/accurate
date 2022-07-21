@@ -43,7 +43,7 @@ start: $(KIND) $(KUBECTL) $(HELM) $(KUBESEAL) $(KUBECTL_ACCURATE)
 .PHONY: test
 test:
 	env PATH=$$(pwd)/../bin:$$PATH RUN_E2E=1 \
-		go test -v -race . -ginkgo.progress -ginkgo.v -ginkgo.failFast
+		go test -v -race . -ginkgo.progress -ginkgo.v -ginkgo.fail-fast
 
 .PHONY: logs
 logs:
