@@ -345,7 +345,7 @@ var _ = Describe("kubectl accurate", func() {
 		// some ServiceAccounts that have been created before the upgrade might have the secrets field.
 		// In this case, accurate should not copy the field.
 		kubectlSafe(serviceAccountWithDummySecretsYAML, "apply", "-f", "-")
-		Consistently(func() error {
+		Eventually(func() error {
 			out, err := kubectl(nil, "-n", "sn1", "get", "serviceaccounts", "test", "-o", "json")
 			if err != nil {
 				return err
