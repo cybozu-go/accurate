@@ -148,13 +148,14 @@ to propagate resources from parents to their children namespaces.</p>
 The default location is <code>/etc/accurate/config.yaml</code>.
 The location can be changed with <code>--config-file</code> flag.</p>
 <p>The configuration file should be a JSON or YAML file having the following keys:</p>
-<table><thead><tr><th>Key</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Key</th><th>Type</th><th>Description</th></tr></thead><tbody>
 <tr><td><code>labelKeys</code></td><td><code>[]string</code></td><td>Keys of namespace labels to be propagated.</td></tr>
 <tr><td><code>annotationKeys</code></td><td><code>[]string</code></td><td>Keys of namespace annotations to be propagated.</td></tr>
 <tr><td><code>subNamespaceLabelKeys</code></td><td><code>[]string</code></td><td>Keys of SubNamespace labels to be propagated.</td></tr>
 <tr><td><code>subNamespaceAnnotationKeys</code></td><td><code>[]string</code></td><td>Keys of SubNamespace annotations to be propagated.</td></tr>
 <tr><td><code>watches</code></td><td><code>[]object</code></td><td>GroupVersionKind of namespace-scoped objects to be propagated.</td></tr>
 </tbody></table>
+</div>
 <p>Example:</p>
 <pre><code class="language-yaml">labelKeys:
 - team
@@ -179,9 +180,10 @@ watches:
   kind: Secret
 </code></pre>
 <h2 id="environment-variables"><a class="header" href="#environment-variables">Environment variables</a></h2>
-<table><thead><tr><th>Name</th><th>Required</th><th>Description</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Required</th><th>Description</th></tr></thead><tbody>
 <tr><td><code>POD_NAMESPACE</code></td><td>Yes</td><td>The namespace name where <code>accurate-controller</code> is running.</td></tr>
 </tbody></table>
+</div>
 <h2 id="command-line-flags"><a class="header" href="#command-line-flags">Command-line flags</a></h2>
 <pre><code>Flags:
       --add_dir_header                   If true, adds the file directory to the header

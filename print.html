@@ -434,7 +434,7 @@ helm repo update
 <pre><code class="language-console">$ helm install --create-namespace --namespace accurate accurate -f values.yaml accurate/accurate
 </code></pre>
 <h2 id="values"><a class="header" href="#values">Values</a></h2>
-<table><thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody>
 <tr><td>controller.additionalRBAC.rules</td><td>list</td><td><code>[]</code></td><td>Specify the RBAC rules to be added to the controller. ClusterRole and ClusterRoleBinding are created with the names <code>{{ release name }}-additional-resources</code>. The rules defined here will be used for the ClusterRole rules.</td></tr>
 <tr><td>controller.config.annotationKeys</td><td>list</td><td><code>[]</code></td><td>Annotations to be propagated to sub-namespaces. It is also possible to specify a glob pattern that can be interpreted by Go's &quot;path.Match&quot; func.</td></tr>
 <tr><td>controller.config.labelKeys</td><td>list</td><td><code>[]</code></td><td>Labels to be propagated to sub-namespaces. It is also possible to specify a glob pattern that can be interpreted by Go's &quot;path.Match&quot; func.</td></tr>
@@ -447,6 +447,7 @@ helm repo update
 <tr><td>image.repository</td><td>string</td><td><code>&quot;ghcr.io/cybozu-go/accurate&quot;</code></td><td>Accurate image repository to use.</td></tr>
 <tr><td>image.tag</td><td>string</td><td><code>{{ .Chart.AppVersion }}</code></td><td>Accurate image tag to use.</td></tr>
 </tbody></table>
+</div>
 <h2 id="generate-manifests"><a class="header" href="#generate-manifests">Generate Manifests</a></h2>
 <p>You can use the <code>helm template</code> command to render manifests.</p>
 <pre><code class="language-console">$ helm template --namespace accurate accurate accurate/accurate
@@ -767,25 +768,28 @@ metadata:
 </ul>
 <h4 id="subnamespace"><a class="header" href="#subnamespace">SubNamespace</a></h4>
 <p>SubNamespace is the Schema for the subnamespaces API</p>
-<table><thead><tr><th>Field</th><th>Description</th><th>Scheme</th><th>Required</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Description</th><th>Scheme</th><th>Required</th></tr></thead><tbody>
 <tr><td>metadata</td><td></td><td>metav1.ObjectMeta</td><td>false</td></tr>
 <tr><td>spec</td><td>Spec is the spec of SubNamespace.</td><td><a href="crd_subnamespace.html#subnamespacespec">SubNamespaceSpec</a></td><td>false</td></tr>
 <tr><td>status</td><td>Status is the status of SubNamespace.</td><td>SubNamespaceStatus</td><td>false</td></tr>
 </tbody></table>
+</div>
 <p><a href="crd_subnamespace.html#custom-resources">Back to Custom Resources</a></p>
 <h4 id="subnamespacelist"><a class="header" href="#subnamespacelist">SubNamespaceList</a></h4>
 <p>SubNamespaceList contains a list of SubNamespace</p>
-<table><thead><tr><th>Field</th><th>Description</th><th>Scheme</th><th>Required</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Description</th><th>Scheme</th><th>Required</th></tr></thead><tbody>
 <tr><td>metadata</td><td></td><td>metav1.ListMeta</td><td>false</td></tr>
 <tr><td>items</td><td></td><td>[]<a href="crd_subnamespace.html#subnamespace">SubNamespace</a></td><td>true</td></tr>
 </tbody></table>
+</div>
 <p><a href="crd_subnamespace.html#custom-resources">Back to Custom Resources</a></p>
 <h4 id="subnamespacespec"><a class="header" href="#subnamespacespec">SubNamespaceSpec</a></h4>
 <p>SubNamespaceSpec defines the desired state of SubNamespace</p>
-<table><thead><tr><th>Field</th><th>Description</th><th>Scheme</th><th>Required</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Description</th><th>Scheme</th><th>Required</th></tr></thead><tbody>
 <tr><td>labels</td><td>Labels are the labels to be propagated to the sub-namespace</td><td>map[string]string</td><td>false</td></tr>
 <tr><td>annotations</td><td>Annotations are the annotations to be propagated to the sub-namespace.</td><td>map[string]string</td><td>false</td></tr>
 </tbody></table>
+</div>
 <p><a href="crd_subnamespace.html#custom-resources">Back to Custom Resources</a></p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="commands"><a class="header" href="#commands">Commands</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="kubectl-accurate"><a class="header" href="#kubectl-accurate">kubectl-accurate</a></h1>
@@ -886,13 +890,14 @@ to propagate resources from parents to their children namespaces.</p>
 The default location is <code>/etc/accurate/config.yaml</code>.
 The location can be changed with <code>--config-file</code> flag.</p>
 <p>The configuration file should be a JSON or YAML file having the following keys:</p>
-<table><thead><tr><th>Key</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Key</th><th>Type</th><th>Description</th></tr></thead><tbody>
 <tr><td><code>labelKeys</code></td><td><code>[]string</code></td><td>Keys of namespace labels to be propagated.</td></tr>
 <tr><td><code>annotationKeys</code></td><td><code>[]string</code></td><td>Keys of namespace annotations to be propagated.</td></tr>
 <tr><td><code>subNamespaceLabelKeys</code></td><td><code>[]string</code></td><td>Keys of SubNamespace labels to be propagated.</td></tr>
 <tr><td><code>subNamespaceAnnotationKeys</code></td><td><code>[]string</code></td><td>Keys of SubNamespace annotations to be propagated.</td></tr>
 <tr><td><code>watches</code></td><td><code>[]object</code></td><td>GroupVersionKind of namespace-scoped objects to be propagated.</td></tr>
 </tbody></table>
+</div>
 <p>Example:</p>
 <pre><code class="language-yaml">labelKeys:
 - team
@@ -917,9 +922,10 @@ watches:
   kind: Secret
 </code></pre>
 <h2 id="environment-variables"><a class="header" href="#environment-variables">Environment variables</a></h2>
-<table><thead><tr><th>Name</th><th>Required</th><th>Description</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Required</th><th>Description</th></tr></thead><tbody>
 <tr><td><code>POD_NAMESPACE</code></td><td>Yes</td><td>The namespace name where <code>accurate-controller</code> is running.</td></tr>
 </tbody></table>
+</div>
 <h2 id="command-line-flags"><a class="header" href="#command-line-flags">Command-line flags</a></h2>
 <pre><code>Flags:
       --add_dir_header                   If true, adds the file directory to the header
@@ -950,21 +956,21 @@ watches:
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="labels-used-by-accurate"><a class="header" href="#labels-used-by-accurate">Labels used by Accurate</a></h1>
 <p>The table below is a list of labels used by Accurate.</p>
-<table><thead><tr><th>Key</th><th>Value</th><th>Resource</th><th>Description</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Key</th><th>Value</th><th>Resource</th><th>Description</th></tr></thead><tbody>
 <tr><td><code>accurate.cybozu.com/type</code></td><td><code>template</code> or <code>root</code></td><td>Namespace</td><td>The type of namespace.</td></tr>
 <tr><td><code>accurate.cybozu.com/template</code></td><td>Namespace name</td><td>Namespace</td><td>The template namespace name.</td></tr>
 <tr><td><code>accurate.cybozu.com/parent</code></td><td>Namespace name</td><td>Namespace</td><td>The parent namespace name.</td></tr>
 <tr><td><code>app.kubernetes.io/created-by</code></td><td><code>accurate</code></td><td>Copied or propagated resources, sub-namespaces</td><td>Informational</td></tr>
 </tbody></table>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="annotations-used-by-accurate"><a class="header" href="#annotations-used-by-accurate">Annotations used by Accurate</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="annotations-used-by-accurate"><a class="header" href="#annotations-used-by-accurate">Annotations used by Accurate</a></h1>
 <p>The table below is a list of annotations used by Accurate.</p>
-<table><thead><tr><th>Key</th><th>Value</th><th>Resource</th><th>Description</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Key</th><th>Value</th><th>Resource</th><th>Description</th></tr></thead><tbody>
 <tr><td><code>accurate.cybozu.com/from</code></td><td>Namespace name</td><td>Copied or propagated resources</td><td>The namespace name from which the source resource was copied.</td></tr>
 <tr><td><code>accurate.cybozu.com/propagate</code></td><td><code>&quot;create&quot;</code> or <code>&quot;update&quot;</code></td><td>Namespace-scoped resources</td><td>Specify propagation mode.</td></tr>
 <tr><td><code>accurate.cybozu.com/propagate-generated</code></td><td><code>&quot;create&quot;</code> or <code>&quot;update&quot;</code></td><td>Namespace-scoped resources</td><td>Specify propagation mode of generated resources.</td></tr>
 <tr><td><code>accurate.cybozu.com/generated</code></td><td><code>false</code></td><td>Namespace-scoped resources</td><td>The result of checking if this is generated from another resource.</td></tr>
 </tbody></table>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="design-notes"><a class="header" href="#design-notes">Design notes</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="design-notes"><a class="header" href="#design-notes">Design notes</a></h1>
 <ul>
 <li><a href="design.html#overview">Overview</a></li>
 <li><a href="design.html#why-do-we-need-another-namespace-controller-in-the-first-place">Why do we need another namespace controller in the first place?</a></li>

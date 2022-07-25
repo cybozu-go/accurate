@@ -163,7 +163,7 @@ helm repo update
 <pre><code class="language-console">$ helm install --create-namespace --namespace accurate accurate -f values.yaml accurate/accurate
 </code></pre>
 <h2 id="values"><a class="header" href="#values">Values</a></h2>
-<table><thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody>
 <tr><td>controller.additionalRBAC.rules</td><td>list</td><td><code>[]</code></td><td>Specify the RBAC rules to be added to the controller. ClusterRole and ClusterRoleBinding are created with the names <code>{{ release name }}-additional-resources</code>. The rules defined here will be used for the ClusterRole rules.</td></tr>
 <tr><td>controller.config.annotationKeys</td><td>list</td><td><code>[]</code></td><td>Annotations to be propagated to sub-namespaces. It is also possible to specify a glob pattern that can be interpreted by Go's &quot;path.Match&quot; func.</td></tr>
 <tr><td>controller.config.labelKeys</td><td>list</td><td><code>[]</code></td><td>Labels to be propagated to sub-namespaces. It is also possible to specify a glob pattern that can be interpreted by Go's &quot;path.Match&quot; func.</td></tr>
@@ -176,6 +176,7 @@ helm repo update
 <tr><td>image.repository</td><td>string</td><td><code>&quot;ghcr.io/cybozu-go/accurate&quot;</code></td><td>Accurate image repository to use.</td></tr>
 <tr><td>image.tag</td><td>string</td><td><code>{{ .Chart.AppVersion }}</code></td><td>Accurate image tag to use.</td></tr>
 </tbody></table>
+</div>
 <h2 id="generate-manifests"><a class="header" href="#generate-manifests">Generate Manifests</a></h2>
 <p>You can use the <code>helm template</code> command to render manifests.</p>
 <pre><code class="language-console">$ helm template --namespace accurate accurate accurate/accurate
