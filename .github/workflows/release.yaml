@@ -4,13 +4,13 @@ on:
     tags:
     - 'v*'
 env:
-  go-version: 1.17
+  go-version: 1.18
 jobs:
   image:
     name: Push Container Image
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Build images
       run: |
         docker build -t accurate:dev .
@@ -26,12 +26,13 @@ jobs:
     needs: image
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-go@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
       with:
         go-version: ${{ env.go-version }}
     - name: GoReleaser
-      uses: goreleaser/goreleaser-action@v2
+      # v3.0.0 https://github.com/goreleaser/goreleaser-action/releases/tag/v3.0.0
+      uses: goreleaser/goreleaser-action@68acf3b1adf004ac9c2f0a4259e85c5f66e99bef
       with:
         distribution: goreleaser
         version: v0.180.3
@@ -39,5 +40,5 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Update new version in krew-index
-      # v0.0.40 https://github.com/rajatjindal/krew-release-bot/releases/tag/v0.0.40
-      uses: rajatjindal/krew-release-bot@56925b62bacc2c652114d66a8256faaf0bf89fa9
+      # v0.0.43 https://github.com/rajatjindal/krew-release-bot/releases/tag/v0.0.43
+      uses: rajatjindal/krew-release-bot@92da038bbf995803124a8e50ebd438b2f37bbbb0

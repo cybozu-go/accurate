@@ -1,7 +1,7 @@
-KIND_VERSION = 0.11.1
-KUBERNETES_VERSION = 1.22.4
-CERT_MANAGER_VERSION = 1.6.1
-SEALED_SECRETS_VERSION = 0.17.2
+KIND_VERSION = 0.14.0
+KUBERNETES_VERSION = 1.24.0
+CERT_MANAGER_VERSION = 1.8.2
+SEALED_SECRETS_VERSION = 0.18.1
 
 KIND := $(dir $(shell pwd))/bin/kind
 KUBECTL := $(dir $(shell pwd))/bin/kubectl
@@ -43,7 +43,7 @@ start: $(KIND) $(KUBECTL) $(HELM) $(KUBESEAL) $(KUBECTL_ACCURATE)
 .PHONY: test
 test:
 	env PATH=$$(pwd)/../bin:$$PATH RUN_E2E=1 \
-		go test -v -race . -ginkgo.progress -ginkgo.v -ginkgo.failFast
+		go test -v -race . -ginkgo.progress -ginkgo.v -ginkgo.fail-fast
 
 .PHONY: logs
 logs:

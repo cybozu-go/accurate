@@ -1,17 +1,16 @@
 # Tool versions
-CTRL_TOOLS_VERSION=0.7.0
+CTRL_TOOLS_VERSION=0.9.2
 CTRL_RUNTIME_VERSION := $(shell awk '/sigs.k8s.io\/controller-runtime/ {print substr($$2, 2)}' go.mod)
-KUSTOMIZE_VERSION = 4.4.1
-YQ_VERSION = 4.17.2
-HELM_VERSION = 3.7.1
+KUSTOMIZE_VERSION = 4.5.5
+YQ_VERSION = 4.26.1
+HELM_VERSION = 3.9.1
 CRD_TO_MARKDOWN_VERSION = 0.0.3
-MDBOOK_VERSION = 0.4.14
-GORELEASER_VERSION = 1.1.0
+MDBOOK_VERSION = 0.4.20
+GORELEASER_VERSION = 1.10.2
 
 # Test tools
 BIN_DIR := $(shell pwd)/bin
 STATICCHECK := $(BIN_DIR)/staticcheck
-NILERR := $(BIN_DIR)/nilerr
 SUDO = sudo
 
 # Set the shell used to bash for better error handling.
@@ -74,9 +73,9 @@ check-generate:
 .PHONY: envtest
 envtest: setup-envtest
 	source <($(SETUP_ENVTEST) use -p env); \
-		TEST_CONFIG=1 go test -v -count 1 -race ./pkg/config -ginkgo.progress -ginkgo.v -ginkgo.failFast
+		TEST_CONFIG=1 go test -v -count 1 -race ./pkg/config -ginkgo.progress -ginkgo.v -ginkgo.fail-fast
 	source <($(SETUP_ENVTEST) use -p env); \
-		go test -v -count 1 -race ./controllers -ginkgo.progress -ginkgo.v -ginkgo.failFast
+		go test -v -count 1 -race ./controllers -ginkgo.progress -ginkgo.v -ginkgo.fail-fast
 	source <($(SETUP_ENVTEST) use -p env); \
 		go test -v -count 1 -race ./hooks -ginkgo.progress -ginkgo.v
 
@@ -87,7 +86,6 @@ test: test-tools
 	go vet ./...
 	test -z $$(gofmt -s -l . | tee /dev/stderr)
 	$(STATICCHECK) ./...
-	$(NILERR) ./...
 
 ##@ Build
 
@@ -171,12 +169,8 @@ GOBIN=$(PROJECT_DIR)/bin go install $(2) ;\
 endef
 
 .PHONY: test-tools
-test-tools: $(STATICCHECK) $(NILERR)
+test-tools: $(STATICCHECK)
 
 $(STATICCHECK):
 	mkdir -p $(BIN_DIR)
 	GOBIN=$(BIN_DIR) go install honnef.co/go/tools/cmd/staticcheck@latest
-
-$(NILERR):
-	mkdir -p $(BIN_DIR)
-	GOBIN=$(BIN_DIR) go install github.com/gostaticanalysis/nilerr/cmd/nilerr@latest

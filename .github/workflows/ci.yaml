@@ -5,15 +5,15 @@ on:
     branches:
     - 'main'
 env:
-  go-version: 1.17
+  go-version: 1.18
   cache-version: 1
 jobs:
   build:
     name: Build binaries
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-go@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
       with:
         go-version: ${{ env.go-version }}
     - run: make release-build
@@ -21,8 +21,8 @@ jobs:
     name: Small tests
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-go@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
       with:
         go-version: ${{ env.go-version }}
     - run: make test
@@ -32,11 +32,11 @@ jobs:
     name: End-to-End Tests
     strategy:
       matrix:
-        k8s-version: ["1.20.7", "1.21.2", "1.22.4"]
+        k8s-version: ["1.22.9", "1.23.6", "1.24.0"]
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-go@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
       with:
         go-version: ${{ env.go-version }}
     - run: make start KUBERNETES_VERSION=${{ matrix.k8s-version }}
@@ -46,7 +46,7 @@ jobs:
     - run: make logs
       working-directory: e2e
       if: always()
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       if: always()
       with:
         name: logs-${{ matrix.k8s-version }}.tar.gz

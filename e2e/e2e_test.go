@@ -8,7 +8,7 @@ import (
 
 	accuratev1 "github.com/cybozu-go/accurate/api/v1"
 	"github.com/cybozu-go/accurate/pkg/constants"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -22,7 +22,13 @@ var resourceQuota []byte
 //go:embed testdata/serviceaccount.yaml
 var serviceAccountYAML []byte
 
-var sealedJSON []byte
+//go:embed testdata/serviceaccountWithDummySecrets.yaml
+var serviceAccountWithDummySecretsYAML []byte
+
+var (
+	sealedJSON      []byte
+	k8sMinorVersion int
+)
 
 func init() {
 	data, err := os.ReadFile("sealed.json")
@@ -33,6 +39,21 @@ func init() {
 }
 
 var _ = Describe("kubectl accurate", func() {
+	It("should get Kubernetes minor version", func() {
+		out, err := kubectl(nil, "version", "-o", "json")
+		ExpectWithOffset(1, err).NotTo(HaveOccurred())
+		version := &struct {
+			Server struct {
+				Minor int `json:"minor,string"`
+			} `json:"serverVersion"`
+		}{}
+		err = json.Unmarshal(out, version)
+		Expect(err).NotTo(HaveOccurred())
+
+		k8sMinorVersion = version.Server.Minor
+		Expect(k8sMinorVersion).NotTo(Equal(0))
+	})
+
 	It("should configure namespaces", func() {
 		kubectlSafe(nil, "create", "ns", "tmpl1")
 		kubectlSafe(nil, "label", "ns", "tmpl1", "team=neco")
@@ -268,7 +289,14 @@ var _ = Describe("kubectl accurate", func() {
 		Expect(err).To(HaveOccurred())
 	})
 
-	It("should propagate ServiceAccount w/o secrets field", func() {
+	It("should propagate ServiceAccount w/o secrets field (Kubernetes 1.23 or lower)", func() {
+		if k8sMinorVersion >= 26 {
+			Fail("this test case is no longer needed")
+		}
+		if k8sMinorVersion >= 24 {
+			Skip("this test case does not work")
+		}
+
 		kubectlSafe(serviceAccountYAML, "apply", "-f", "-")
 		var tokenName string
 		Eventually(func() error {
@@ -305,6 +333,32 @@ var _ = Describe("kubectl accurate", func() {
 		}).Should(Succeed())
 
 		Expect(tokenName2).NotTo(Equal(tokenName))
+	})
+
+	It("should propagate ServiceAccount w/o secrets field (Kubernetes 1.24 or higher)", func() {
+		if k8sMinorVersion < 24 {
+			Skip("this test case does not work")
+		}
+
+		// From Kubernetes 1.24, the auto-generation of secret-based service account tokens has been disabled by default.
+		// So the secrets field in the ServiceAccount is not updated. But when upgrading Kubernetes from 1.23 or lower,
+		// some ServiceAccounts that have been created before the upgrade might have the secrets field.
+		// In this case, accurate should not copy the field.
+		kubectlSafe(serviceAccountWithDummySecretsYAML, "apply", "-f", "-")
+		Eventually(func() error {
+			out, err := kubectl(nil, "-n", "sn1", "get", "serviceaccounts", "test", "-o", "json")
+			if err != nil {
+				return err
+			}
+			sa := &corev1.ServiceAccount{}
+			if err := json.Unmarshal(out, sa); err != nil {
+				return err
+			}
+			if len(sa.Secrets) != 0 {
+				return errors.New("service account have secrets field")
+			}
+			return nil
+		}).Should(Succeed())
 	})
 
 	It("should run other commands", func() {
