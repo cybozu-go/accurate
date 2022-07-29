@@ -2,8 +2,18 @@ apiVersion: v1
 entries:
   accurate:
   - apiVersion: v2
+    appVersion: 0.4.0
+    created: "2022-07-29T05:37:52.422332327Z"
+    description: Accurate is a Kubernetes controller for soft multi-tenancy environments.
+    digest: 9ef35ecac4099332f97c0c0b14b4895fbba864fc9f502131cedce408992547ac
+    name: accurate
+    type: application
+    urls:
+    - https://cybozu-go.github.io/accurate/accurate-0.4.0.tgz
+    version: 0.4.0
+  - apiVersion: v2
     appVersion: 0.3.0
-    created: "2022-01-26T03:49:52.419709292Z"
+    created: "2022-07-29T05:37:52.421095329Z"
     description: Accurate is a Kubernetes controller for soft multi-tenancy environments.
     digest: fbd420f987fbb61501674df8941d0c623bd271d456272b93f56ec661cc955da4
     name: accurate
@@ -13,7 +23,7 @@ entries:
     version: 0.3.0
   - apiVersion: v2
     appVersion: 0.3.0
-    created: "2022-01-26T03:49:52.419090576Z"
+    created: "2022-07-29T05:37:52.420087231Z"
     description: Accurate is a Kubernetes controller for soft multi-tenancy environments.
     digest: 22435b6809d69ae09ec5a7c3f5779dfb2e27912e976e8991cae5eeb19413246c
     name: accurate
@@ -23,7 +33,7 @@ entries:
     version: 0.2.3
   - apiVersion: v2
     appVersion: 0.3.0
-    created: "2022-01-26T03:49:52.418333957Z"
+    created: "2022-07-29T05:37:52.418856733Z"
     description: Accurate is a Kubernetes controller for soft multi-tenancy environments.
     digest: 5e9ce2a40c42c01f3f17e918a6a360cb2dafb061a053406e72d285f3ee407dbd
     name: accurate
@@ -33,7 +43,7 @@ entries:
     version: 0.2.2
   - apiVersion: v2
     appVersion: 0.2.0
-    created: "2022-01-26T03:49:52.417676341Z"
+    created: "2022-07-29T05:37:52.418045034Z"
     description: Accurate is a Kubernetes controller for soft multi-tenancy environments.
     digest: d41d5201eed41a52542b55d9f3a7af633b7272c4f192ee3bf5be531bc7171f3f
     name: accurate
@@ -71,4 +81,4 @@ entries:
     urls:
     - https://github.com/cybozu-go/accurate/releases/download/accurate-chart-v0.1.0/accurate-0.1.0.tgz
     version: 0.1.0
-generated: "2022-01-26T03:49:52.416824919Z"
+generated: "2022-07-29T05:37:52.417107136Z"
