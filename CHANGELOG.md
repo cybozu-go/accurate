@@ -5,6 +5,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2022-07-25
+
+### Changed
+
+- Clarify the behavior of label/annotation propagation [#47](https://github.com/cybozu-go/accurate/pull/47), [#51](https://github.com/cybozu-go/accurate/pull/51)
+- Support Kubernetes 1.24 [#57](https://github.com/cybozu-go/accurate/pull/57)
+- Build with Go 1.18 [#57](https://github.com/cybozu-go/accurate/pull/57)
+- Update dependencies [#57](https://github.com/cybozu-go/accurate/pull/57)
+
+### Fixed
+
+- Prevent accurate's label/annotation prefix from being selected for propagation [#49](https://github.com/cybozu-go/accurate/pull/49)
+
 ## [0.3.0] - 2021-12-06
 
 ### Added
@@ -41,7 +54,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 This is the first public release.
 
-[Unreleased]: https://github.com/cybozu-go/accurate/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/cybozu-go/accurate/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/cybozu-go/accurate/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/cybozu-go/accurate/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/cybozu-go/accurate/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/cybozu-go/accurate/compare/4b825dc642cb6eb9a060e54bf8d69288fbee4904...v0.1.0
