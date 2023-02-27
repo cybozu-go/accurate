@@ -1,6 +1,6 @@
 // Package v1 contains API Schema definitions for the accurate v1 API group
-//+kubebuilder:object:generate=true
-//+groupName=accurate.cybozu.com
+// +kubebuilder:object:generate=true
+// +groupName=accurate.cybozu.com
 package v1
 
 import (

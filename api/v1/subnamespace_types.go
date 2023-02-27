@@ -8,7 +8,7 @@ import (
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // SubNamespaceStatus defines the observed state of SubNamespace
-//+kubebuilder:validation:Enum=ok;conflict
+// +kubebuilder:validation:Enum=ok;conflict
 type SubNamespaceStatus string
 
 const (

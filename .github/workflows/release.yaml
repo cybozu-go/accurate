@@ -3,12 +3,10 @@ on:
   push:
     tags:
     - 'v*'
-env:
-  go-version: 1.18
 jobs:
   image:
     name: Push Container Image
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
     - name: Build images
@@ -24,12 +22,13 @@ jobs:
   release:
     name: Release on GitHub
     needs: image
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-go@v3
       with:
-        go-version: ${{ env.go-version }}
+        go-version-file: go.mod
+        cache: true
     - name: GoReleaser
       # v3.0.0 https://github.com/goreleaser/goreleaser-action/releases/tag/v3.0.0
       uses: goreleaser/goreleaser-action@68acf3b1adf004ac9c2f0a4259e85c5f66e99bef
