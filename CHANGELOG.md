@@ -5,6 +5,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.0] - 2023-02-28
+
+### Changed
+
+- Support Kubernetes 1.25 ([#62](https://github.com/cybozu-go/accurate/pull/62))
+  - Build with go 1.20
+  - Update Ubuntu to 22.04
+  - Update dependencies
+
 ## [0.4.0] - 2022-07-25
 
 ### Changed
@@ -54,7 +63,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 This is the first public release.
 
-[Unreleased]: https://github.com/cybozu-go/accurate/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/cybozu-go/accurate/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/cybozu-go/accurate/compare/v0.4.0...v1.0.0
 [0.4.0]: https://github.com/cybozu-go/accurate/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/cybozu-go/accurate/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/cybozu-go/accurate/compare/v0.1.0...v0.2.0
