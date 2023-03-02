@@ -30,12 +30,12 @@ jobs:
         go-version-file: go.mod
         cache: true
     - name: GoReleaser
-      # v3.0.0 https://github.com/goreleaser/goreleaser-action/releases/tag/v3.0.0
-      uses: goreleaser/goreleaser-action@68acf3b1adf004ac9c2f0a4259e85c5f66e99bef
+      # v4.2.0 https://github.com/goreleaser/goreleaser-action/releases/tag/v4.2.0
+      uses: goreleaser/goreleaser-action@f82d6c1c344bcacabba2c841718984797f664a6b
       with:
         distribution: goreleaser
-        version: v0.180.3
-        args: release --rm-dist
+        version: v1.15.2
+        args: release --clean
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Update new version in krew-index
