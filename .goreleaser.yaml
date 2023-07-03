@@ -9,6 +9,8 @@ builds:
     goarch:
       - amd64
       - arm64
+    ldflags:
+      - -X github.com/cybozu-go/accurate.Version={{.Version}}
     env:
       - CGO_ENABLED=0
     ignore: # ref: https://goreleaser.com/deprecations/#builds-for-windowsarm64
@@ -28,7 +30,7 @@ checksum:
   name_template: checksums.txt
 
 changelog:
-  skip: true
+  use: github-native
 
 release:
   github:

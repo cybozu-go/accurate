@@ -67,14 +67,3 @@ There is no support at this time for upgrading or deleting CRDs using Helm.
 Users must manually upgrade the CRD if there is a change in the CRD used by Accurate.
 
 https://helm.sh/docs/chart_best_practices/custom_resource_definitions/#install-a-crd-declaration-before-using-the-resource
-
-## Release Chart
-
-Accurate Helm Chart will be released independently.
-This will prevent the Accurate version from going up just by modifying the Helm Chart.
-
-You must change the version of `Chart.yaml` when making changes to the Helm Chart.
-
-Pushing a tag like `chart-v<chart version>` will cause GitHub Actions to release chart.
-Chart versions are expected to follow [Semantic Versioning](https://semver.org/).
-If the chart version in the tag does not match the version listed in `Chart.yaml`, the release will fail.

@@ -4,7 +4,7 @@ image:
 
   # image.tag -- Accurate image tag to use.
   # @default -- `{{ .Chart.AppVersion }}`
-  tag:  # 1.0.1
+  tag: app-version-placeholder
 
   # image.pullPolicy -- Accurate image pullPolicy.
   pullPolicy:  # Always

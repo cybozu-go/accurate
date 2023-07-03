@@ -11,7 +11,7 @@ import (
 func kubectl(input []byte, args ...string) ([]byte, error) {
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
-	cmd := exec.Command(kubectlCmd, args...)
+	cmd := exec.Command("kubectl", args...)
 	cmd.Stdout = stdout
 	cmd.Stderr = stderr
 	if input != nil {
