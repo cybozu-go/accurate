@@ -149,26 +149,13 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="release-procedure"><a class="header" href="#release-procedure">Release procedure</a></h1>
-<p>This document describes how to release a new version of Accurate.</p>
+<p>This document describes how to release a new version.</p>
+<h2 id="labeling"><a class="header" href="#labeling">Labeling</a></h2>
+<p>Release notes are automatically generated based on PRs included in the release.
+Those PRs are categorized based on the label assigned to them.
+Please refer to <code>.github/release.yml</code> for the kind of labels.</p>
 <h2 id="versioning"><a class="header" href="#versioning">Versioning</a></h2>
 <p>Follow <a href="https://semver.org/spec/v2.0.0.html">semantic versioning 2.0.0</a> to choose the new version number.</p>
-<h2 id="prepare-change-log-entries"><a class="header" href="#prepare-change-log-entries">Prepare change log entries</a></h2>
-<p>Add notable changes since the last release to <a href="CHANGELOG.html">CHANGELOG.md</a>.
-It should look like:</p>
-<pre><code class="language-markdown">(snip)
-## [Unreleased]
-
-### Added
-- Implement ... (#35)
-
-### Changed
-- Fix a bug in ... (#33)
-
-### Removed
-- Deprecated `-option` is removed ... (#39)
-
-(snip)
-</code></pre>
 <h2 id="bump-version"><a class="header" href="#bump-version">Bump version</a></h2>
 <ol>
 <li>
@@ -179,46 +166,13 @@ $ echo $VERSION
 </code></pre>
 </li>
 <li>
-<p>Make a branch to release</p>
-<pre><code class="language-console">$ git neco dev &quot;bump-$VERSION&quot;
-</code></pre>
-</li>
-<li>
-<p>Update version strings in <code>version.go</code> in the top directory.</p>
-</li>
-<li>
-<p>Edit <code>CHANGELOG.md</code> for the new version (<a href="https://github.com/cybozu-go/etcdpasswd/commit/77d95384ac6c97e7f48281eaf23cb94f68867f79">example</a>).</p>
-</li>
-<li>
-<p>Commit the change and push it.</p>
-<pre><code class="language-console">$ git commit -a -m &quot;Bump version to $VERSION&quot;
-$ git neco review
-</code></pre>
-</li>
-<li>
-<p>Merge this branch.</p>
-</li>
-<li>
 <p>Add a git tag to the main HEAD, then push it.</p>
-<pre><code class="language-console"># Set VERSION again.
-$ VERSION=x.y.z
-$ echo $VERSION
-
-$ git checkout main
-$ git pull
+<pre><code class="language-console">$ git checkout main
 $ git tag -a -m &quot;Release v$VERSION&quot; &quot;v$VERSION&quot;
-
-# Make sure the release tag exists.
 $ git tag -ln | grep $VERSION
-
-$ git push origin &quot;v$VERSION&quot;
+$ git push origin v$VERSION
 </code></pre>
 </li>
-</ol>
-<p>GitHub actions will build and push artifacts such as container images and
-create a new GitHub release.</p>
-<ol start="8">
-<li><a href="https://github.com/cybozu-go/accurate/tree/main/charts/accurate#release-chart">Release Chart</a></li>
 </ol>
 
                     </main>
