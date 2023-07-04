@@ -31,3 +31,4 @@
 - [Design notes](design.md)
 - [Reconciliation rules](reconcile.md)
 - [Release procedure](release.md)
+- [Maintenance](maintenance.md)

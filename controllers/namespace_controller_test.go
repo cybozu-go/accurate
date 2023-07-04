@@ -6,7 +6,6 @@ import (
 	"time"
 
 	accuratev1 "github.com/cybozu-go/accurate/api/v1"
-	"github.com/cybozu-go/accurate/pkg/cluster"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	"github.com/cybozu-go/accurate/pkg/indexing"
 	. "github.com/onsi/ginkgo/v2"
@@ -47,7 +46,11 @@ var _ = Describe("Namespace controller", func() {
 			Scheme:             scheme,
 			LeaderElection:     false,
 			MetricsBindAddress: "0",
-			NewClient:          cluster.NewCachingClient,
+			Client: client.Options{
+				Cache: &client.CacheOptions{
+					Unstructured: true,
+				},
+			},
 		})
 		Expect(err).ToNot(HaveOccurred())
 

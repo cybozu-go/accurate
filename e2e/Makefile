@@ -1,4 +1,4 @@
-KUBERNETES_VERSION = v1.25.8
+KUBERNETES_VERSION = v1.27.3
 
 KUBECTL_ACCURATE := $(dir $(shell pwd))/bin/kubectl-accurate
 KUBECONFIG := $(shell pwd)/.kubeconfig

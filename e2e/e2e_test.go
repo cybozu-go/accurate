@@ -19,9 +19,6 @@ var roleYAML []byte
 //go:embed testdata/resourceQuota.yaml
 var resourceQuota []byte
 
-//go:embed testdata/serviceaccount.yaml
-var serviceAccountYAML []byte
-
 //go:embed testdata/serviceaccountWithDummySecrets.yaml
 var serviceAccountWithDummySecretsYAML []byte
 
@@ -289,57 +286,7 @@ var _ = Describe("kubectl accurate", func() {
 		Expect(err).To(HaveOccurred())
 	})
 
-	It("should propagate ServiceAccount w/o secrets field (Kubernetes 1.23 or lower)", func() {
-		if k8sMinorVersion >= 26 {
-			Fail("this test case is no longer needed")
-		}
-		if k8sMinorVersion >= 24 {
-			Skip("this test case does not work")
-		}
-
-		kubectlSafe(serviceAccountYAML, "apply", "-f", "-")
-		var tokenName string
-		Eventually(func() error {
-			out, err := kubectl(nil, "-n", "subroot1", "get", "serviceaccounts", "test", "-o", "json")
-			if err != nil {
-				return err
-			}
-			sa := &corev1.ServiceAccount{}
-			if err := json.Unmarshal(out, sa); err != nil {
-				return err
-			}
-			if len(sa.Secrets) == 0 {
-				return errors.New("no token")
-			}
-			tokenName = sa.Secrets[0].Name
-			return nil
-		}).Should(Succeed())
-
-		var tokenName2 string
-		Eventually(func() error {
-			out, err := kubectl(nil, "-n", "sn1", "get", "serviceaccounts", "test", "-o", "json")
-			if err != nil {
-				return err
-			}
-			sa := &corev1.ServiceAccount{}
-			if err := json.Unmarshal(out, sa); err != nil {
-				return err
-			}
-			if len(sa.Secrets) == 0 {
-				return errors.New("no token")
-			}
-			tokenName2 = sa.Secrets[0].Name
-			return nil
-		}).Should(Succeed())
-
-		Expect(tokenName2).NotTo(Equal(tokenName))
-	})
-
-	It("should propagate ServiceAccount w/o secrets field (Kubernetes 1.24 or higher)", func() {
-		if k8sMinorVersion < 24 {
-			Skip("this test case does not work")
-		}
-
+	It("should propagate ServiceAccount w/o secrets field", func() {
 		// From Kubernetes 1.24, the auto-generation of secret-based service account tokens has been disabled by default.
 		// So the secrets field in the ServiceAccount is not updated. But when upgrading Kubernetes from 1.23 or lower,
 		// some ServiceAccounts that have been created before the upgrade might have the secrets field.

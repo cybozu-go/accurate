@@ -89,8 +89,7 @@ var _ = BeforeSuite(func() {
 	err = indexing.SetupIndexForNamespace(ctx, mgr)
 	Expect(err).NotTo(HaveOccurred())
 
-	dec, err := admission.NewDecoder(scheme)
-	Expect(err).NotTo(HaveOccurred())
+	dec := admission.NewDecoder(scheme)
 	SetupNamespaceWebhook(mgr, dec)
 
 	conf := config.Config{
