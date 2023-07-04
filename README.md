@@ -10,8 +10,6 @@ Accurate is a Kubernetes controller for soft multi-tenancy environments.
 Accurate resembles [Hierarchical Namespace Controller (HNC)][HNC].
 It propagates resources between namespaces and allows tenant users to create/delete sub-namespaces.
 
-**Project Status**: Beta
-
 ## Features
 
 - Resource propagation between namespaces
@@ -49,7 +47,11 @@ Run and try Accurate on a [kind (Kubernetes-In-Docker)][kind] cluster as follows
     $ git clone https://github.com/cybozu-go/accurate
     ```
 
-3. Go to `e2e` directory, setup shell variables, and execute `make start`.
+3. Install [aqua][].
+
+    https://aquaproj.github.io/docs/tutorial-basics/quick-start
+ 
+4. Go to `e2e` directory, setup shell variables, and execute `make start`.
 
     ```console
     $ cd e2e
@@ -59,7 +61,7 @@ Run and try Accurate on a [kind (Kubernetes-In-Docker)][kind] cluster as follows
     $ make start
     ```
 
-4. Create a root namespace and a sub-namespace using `kubectl accurate`.
+5. Create a root namespace and a sub-namespace using `kubectl accurate`.
 
     ```console
     $ kubectl create ns root1
@@ -70,7 +72,7 @@ Run and try Accurate on a [kind (Kubernetes-In-Docker)][kind] cluster as follows
     $ kubectl accurate ns describe sub1
     ```
 
-5. Create a Secret in `root1` and see it will be propagated to `sub1`.
+6. Create a Secret in `root1` and see it will be propagated to `sub1`.
 
     ```console
     $ kubectl -n root1 create secret generic s1 --from-literal=foo=bar
@@ -79,7 +81,7 @@ Run and try Accurate on a [kind (Kubernetes-In-Docker)][kind] cluster as follows
     $ kubectl -n sub1 get secrets
     ```
 
-6. Stop the kind cluster.
+7. Stop the kind cluster.
 
     ```console
     $ make stop
@@ -93,3 +95,4 @@ Read the documentation at https://cybozu-go.github.io/accurate/ .
 [HNC]: https://github.com/kubernetes-sigs/hierarchical-namespaces
 [doc]: https://cybozu-go.github.io/accurate
 [kind]: https://kind.sigs.k8s.io/
+[aqua]: https://aquaproj.github.io

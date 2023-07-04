@@ -1,12 +1,5 @@
 # Tool versions
-CTRL_TOOLS_VERSION=0.11.3
 CTRL_RUNTIME_VERSION := $(shell awk '/sigs.k8s.io\/controller-runtime/ {print substr($$2, 2)}' go.mod)
-KUSTOMIZE_VERSION = 4.5.7
-YQ_VERSION = 4.31.1
-HELM_VERSION = 3.9.1
-CRD_TO_MARKDOWN_VERSION = 0.0.3
-MDBOOK_VERSION = 0.4.27
-GORELEASER_VERSION = 1.15.2
 
 # Test tools
 BIN_DIR := $(shell pwd)/bin
@@ -47,23 +40,23 @@ help: ## Display this help.
 ##@ Development
 
 .PHONY: manifests
-manifests: kustomize controller-gen yq ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
-	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
-	$(KUSTOMIZE) build config/kustomize-to-helm/overlays/crds | $(YQ) e "." -p yaml - > charts/accurate/crds/accurate.cybozu.com_subnamespaces.yaml
-	$(KUSTOMIZE) build config/kustomize-to-helm/overlays/templates | $(YQ) e "."  -p yaml - > charts/accurate/templates/generated/generated.yaml
+manifests: setup ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+	controller-gen $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+	kustomize build config/kustomize-to-helm/overlays/crds | yq e "." -p yaml - > charts/accurate/crds/accurate.cybozu.com_subnamespaces.yaml
+	kustomize build config/kustomize-to-helm/overlays/templates | yq e "."  -p yaml - > charts/accurate/templates/generated/generated.yaml
 
 .PHONY: generate
-generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
-	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
+generate: setup ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
+	controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
 .PHONY: apidoc
-apidoc: crd-to-markdown $(wildcard api/*/*_types.go)
-	$(CRD_TO_MARKDOWN) --links docs/links.csv -f api/v1/subnamespace_types.go -n SubNamespace > docs/crd_subnamespace.md
+apidoc: setup $(wildcard api/*/*_types.go)
+	crd-to-markdown --links docs/links.csv -f api/v1/subnamespace_types.go -n SubNamespace > docs/crd_subnamespace.md
 
 .PHONY: book
-book: mdbook
+book: setup
 	rm -rf docs/book
-	cd docs; $(MDBOOK) build
+	cd docs; mdbook build
 
 .PHONY: check-generate
 check-generate:
@@ -95,14 +88,13 @@ build:
 	GOBIN=$(shell pwd)/bin go install ./cmd/...
 
 .PHONY: release-build
-release-build: goreleaser
-	$(GORELEASER) build --snapshot --rm-dist
+release-build: setup
+	goreleaser build --snapshot --rm-dist
 
 ##@ Tools
 
-CONTROLLER_GEN := $(shell pwd)/bin/controller-gen
-controller-gen: ## Download controller-gen locally if necessary.
-	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v$(CTRL_TOOLS_VERSION))
+setup:
+	aqua i -l
 
 SETUP_ENVTEST := $(shell pwd)/bin/setup-envtest
 .PHONY: setup-envtest
@@ -110,53 +102,6 @@ setup-envtest: $(SETUP_ENVTEST) ## Download setup-envtest locally if necessary
 $(SETUP_ENVTEST):
 	# see https://github.com/kubernetes-sigs/controller-runtime/tree/master/tools/setup-envtest
 	GOBIN=$(shell pwd)/bin go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
-
-KUSTOMIZE := $(shell pwd)/bin/kustomize
-.PHONY: kustomize
-kustomize: $(KUSTOMIZE) ## Download kustomize locally if necessary.
-
-$(KUSTOMIZE):
-	mkdir -p bin
-	curl -fsL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv$(KUSTOMIZE_VERSION)/kustomize_v$(KUSTOMIZE_VERSION)_linux_amd64.tar.gz | \
-	tar -C bin -xzf -
-
-HELM := $(shell pwd)/bin/helm
-.PHONY: helm
-helm: $(HELM) ## Download helm locally if necessary.
-
-$(HELM):
-	mkdir -p $(BIN_DIR)
-	curl -L -sS https://get.helm.sh/helm-v$(HELM_VERSION)-linux-amd64.tar.gz \
-	  | tar xz -C $(BIN_DIR) --strip-components 1 linux-amd64/helm
-
-YQ := $(shell pwd)/bin/yq
-.PHONY: yq
-yq: $(YQ) ## Download yq locally if necessary
-$(YQ):
-	mkdir -p bin
-	curl -fsL -o $@ https://github.com/mikefarah/yq/releases/download/v$(YQ_VERSION)/yq_linux_amd64
-	chmod a+x $@
-
-CRD_TO_MARKDOWN := $(shell pwd)/bin/crd-to-markdown
-.PHONY: crd-to-markdown
-crd-to-markdown: ## Download crd-to-markdown locally if necessary.
-	$(call go-get-tool,$(CRD_TO_MARKDOWN),github.com/clamoriniere/crd-to-markdown@v$(CRD_TO_MARKDOWN_VERSION))
-
-MDBOOK := $(shell pwd)/bin/mdbook
-.PHONY: mdbook
-mdbook: $(MDBOOK) ## Donwload mdbook locally if necessary
-$(MDBOOK):
-	mkdir -p bin
-	curl -fsL https://github.com/rust-lang/mdBook/releases/download/v$(MDBOOK_VERSION)/mdbook-v$(MDBOOK_VERSION)-x86_64-unknown-linux-gnu.tar.gz | tar -C bin -xzf -
-
-GORELEASER := $(shell pwd)/bin/goreleaser
-.PHONY: goreleaser
-goreleaser: $(GORELEASER) ## Download goreleaser locally if necessary.
-
-$(GORELEASER):
-	mkdir -p $(BIN_DIR)
-	curl -L -sS https://github.com/goreleaser/goreleaser/releases/download/v$(GORELEASER_VERSION)/goreleaser_Linux_x86_64.tar.gz \
-	  | tar xz -C $(BIN_DIR) goreleaser
 
 # go-get-tool will 'go get' any package $2 and install it to $1.
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
