@@ -13,4 +13,5 @@ If Kubernetes or controller-runtime API has changed, please fix the relevant sou
 
 ## How to update dependencies
 
-TBD.
+Renovate will create PRs that update dependencies once a week.
+However, Kubernetes is only updated with patched versions.
