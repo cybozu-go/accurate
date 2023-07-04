@@ -20,7 +20,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 // NamespaceReconciler reconciles a Namespace object
@@ -386,11 +385,11 @@ func (r *NamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&corev1.Namespace{}).
-		Watches(&source.Kind{Type: &accuratev1.SubNamespace{}}, handler.Funcs{
-			CreateFunc: func(ev event.CreateEvent, q workqueue.RateLimitingInterface) {
+		Watches(&accuratev1.SubNamespace{}, handler.Funcs{
+			CreateFunc: func(ctx context.Context, ev event.CreateEvent, q workqueue.RateLimitingInterface) {
 				subNSHandler(ev.Object, q)
 			},
-			UpdateFunc: func(ev event.UpdateEvent, q workqueue.RateLimitingInterface) {
+			UpdateFunc: func(ctx context.Context, ev event.UpdateEvent, q workqueue.RateLimitingInterface) {
 				if ev.ObjectNew.GetDeletionTimestamp() != nil {
 					return
 				}

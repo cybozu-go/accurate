@@ -3,6 +3,7 @@ package sub
 import (
 	"fmt"
 	"os"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -11,7 +12,6 @@ import (
 	accuratev1 "github.com/cybozu-go/accurate/api/v1"
 	"github.com/cybozu-go/accurate/controllers"
 	"github.com/cybozu-go/accurate/hooks"
-	"github.com/cybozu-go/accurate/pkg/cluster"
 	"github.com/cybozu-go/accurate/pkg/config"
 	"github.com/cybozu-go/accurate/pkg/indexing"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -53,8 +53,12 @@ func subMain(ns, addr string, port int) error {
 	restCfg.Burst = int(restCfg.QPS * 1.5)
 
 	mgr, err := ctrl.NewManager(restCfg, ctrl.Options{
-		Scheme:                  scheme,
-		NewClient:               cluster.NewCachingClient,
+		Scheme: scheme,
+		Client: client.Options{
+			Cache: &client.CacheOptions{
+				Unstructured: true,
+			},
+		},
 		MetricsBindAddress:      options.metricsAddr,
 		HealthProbeBindAddress:  options.probeAddr,
 		LeaderElection:          true,
@@ -84,10 +88,7 @@ func subMain(ns, addr string, port int) error {
 	}
 
 	ctx := ctrl.SetupSignalHandler()
-	dec, err := admission.NewDecoder(scheme)
-	if err != nil {
-		return fmt.Errorf("unable to create admission decoder: %w", err)
-	}
+	dec := admission.NewDecoder(scheme)
 
 	// Namespace reconciler & webhook
 	if err := indexing.SetupIndexForNamespace(ctx, mgr); err != nil {

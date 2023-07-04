@@ -36,9 +36,9 @@ jobs:
     strategy:
       matrix:
         k8s-version:
-        - "v1.23.17"
-        - "v1.24.12"
-        - "v1.25.8"
+        - v1.25.11
+        - v1.26.6
+        - v1.27.3
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
