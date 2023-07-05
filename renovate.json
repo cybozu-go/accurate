@@ -1,0 +1,106 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "username": "renovate[bot]",
+  "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
+  "platform": "github",
+  "onboarding": false,
+  "repositories": [
+    "cybozu-go/accurate"
+  ],
+  "extends": [
+    "config:base",
+    "github>aquaproj/aqua-renovate-config#1.6.0",
+    ":semanticCommitTypeAll(chore)",
+    ":timezone(Asia/Tokyo)"
+  ],
+  "ignorePresets": [":prHourlyLimit2"],
+  "labels": [
+    "dependencies"
+  ],
+  "packageRules": [
+    {
+      "description": "Separate minor and patch updates for Kubernetes packages",
+      "matchDatasources": [
+        "go"
+      ],
+      "matchPackagePatterns": [
+        "^k8s\\.io\\/.*"
+      ],
+      "separateMinorPatch": true
+    },
+    {
+      "description": "Disable major updates for k8s.io/client-go",
+      "enabled": false,
+      "matchDatasources": [
+        "go"
+      ],
+      "matchPackageNames": [
+        "k8s.io/client-go"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ]
+    },
+    {
+      "description": "Separate minor and patch updates for kubectl",
+      "matchPackageNames": [
+        "kubernetes/kubectl"
+      ],
+      "separateMinorPatch": true
+    },
+    {
+      "description": "Disable major and minor update for kubectl",
+      "enabled": false,
+      "matchPackageNames": [
+        "kubernetes/kubectl"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ]
+    },
+    {
+      "description": "Separate minor and patch update for Kubernetes",
+      "matchPackageNames": [
+        "kindest/node"
+      ],
+      "separateMinorPatch": true
+    },
+    {
+      "description": "Disable major and minor update for Kubernetes",
+      "enabled": false,
+      "matchPackageNames": [
+        "kindest/node"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ]
+    }
+  ],
+  "postUpdateOptions": [
+    "gomodTidy"
+  ],
+  "regexManagers": [
+    {
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "kindest/node",
+      "fileMatch": [
+        "^\\.github\\/workflows\\/.+\\.ya?ml$"
+      ],
+      "matchStrings": [
+        "- (?<currentValue>.+?) # renovate: kindest\\/node"
+      ]
+    },
+    {
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "kindest/node",
+      "fileMatch": [
+        "^e2e\\/Makefile$"
+      ],
+      "matchStrings": [
+        "KUBERNETES_VERSION := (?<currentValue>.*?) # renovate: kindest\\/node"
+      ]
+    }
+  ]
+}
