@@ -38,5 +38,3 @@ release:
     name: accurate
   prerelease: auto
   name_template: "Release {{ .Tag }}"
-  footer: |
-    See [CHANGELOG.md](./CHANGELOG.md) for details.
