@@ -10,6 +10,7 @@ spec:
     - {{ template "accurate.fullname" . }}-webhook-service.{{ .Release.Namespace }}.svc
     - {{ template "accurate.fullname" . }}-webhook-service.{{ .Release.Namespace }}.svc.cluster.local
   issuerRef:
+    group: cert-manager.io
     kind: Issuer
     name: {{ template "accurate.fullname" . }}-selfsigned-issuer
   secretName: webhook-server-cert
