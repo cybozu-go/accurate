@@ -14,6 +14,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
 
 var _ = Describe("SubNamespace controller", func() {
@@ -22,9 +23,9 @@ var _ = Describe("SubNamespace controller", func() {
 
 	BeforeEach(func() {
 		mgr, err := ctrl.NewManager(k8sCfg, ctrl.Options{
-			Scheme:             scheme,
-			LeaderElection:     false,
-			MetricsBindAddress: "0",
+			Scheme:         scheme,
+			LeaderElection: false,
+			Metrics:        server.Options{BindAddress: "0"},
 		})
 		Expect(err).ToNot(HaveOccurred())
 
