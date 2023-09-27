@@ -102,3 +102,8 @@ controller:
           - update
           - patch
           - delete
+    # controller.additionalRBAC.clusterRoles -- Specify additional ClusterRoles to be granted
+    # to the accurate controller. "admin" is recommended to allow the controller to manage
+    # common namespace-scoped resources.
+    clusterRoles:
+    - admin

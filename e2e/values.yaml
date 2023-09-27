@@ -56,3 +56,5 @@ controller:
           - update
           - patch
           - delete
+    clusterRoles:
+    - admin

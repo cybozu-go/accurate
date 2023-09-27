@@ -1,4 +1,4 @@
-{{ if .Values.controller.additionalRBAC.rules }}
+{{- if .Values.controller.additionalRBAC.rules }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -19,4 +19,22 @@ subjects:
     name: {{ template "accurate.fullname" . }}-controller-manager
     namespace: {{ .Release.Namespace }}
 ---
-{{ end }}
+{{- end }}
+{{- if .Values.controller.additionalRBAC.clusterRoles }}
+{{- $root := . }}
+{{- range .Values.controller.additionalRBAC.clusterRoles }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ template "accurate.fullname" $root }}-manager-{{ . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ template "accurate.fullname" $root }}-controller-manager
+  namespace: {{ $root.Release.Namespace }}
+---
+{{- end }}
+{{- end }}
