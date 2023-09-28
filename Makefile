@@ -10,6 +10,9 @@ SUDO = sudo
 SHELL = /bin/bash
 .SHELLFLAGS = -e -o pipefail -c
 
+PATH := $(shell aqua root-dir)/bin:$(PATH)"
+export PATH
+
 CRD_OPTIONS = "crd:crdVersions=v1,maxDescLen=220"
 
 # for Go

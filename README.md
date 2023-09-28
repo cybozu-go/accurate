@@ -49,7 +49,11 @@ Run and try Accurate on a [kind (Kubernetes-In-Docker)][kind] cluster as follows
 
 3. Install [aqua][].
 
-    https://aquaproj.github.io/docs/tutorial-basics/quick-start
+    ```console
+    $ go install github.com/aquaproj/aqua/v2/cmd/aqua@latest
+    ```
+
+    cf. https://aquaproj.github.io/docs/install
  
 4. Go to `e2e` directory, setup shell variables, and execute `make start`.
 

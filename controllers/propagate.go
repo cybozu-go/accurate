@@ -54,8 +54,6 @@ func cloneResource(res *unstructured.Unstructured, ns string) *unstructured.Unst
 	return c
 }
 
-//+kubebuilder:rbac:groups=*,resources=*,verbs=get;list;watch
-
 // PropagateController propagates objects of a namespace-scoped resource.
 type PropagateController struct {
 	client.Client
