@@ -12,7 +12,7 @@ webhooks:
       namespace: system
       path: /mutate-accurate-cybozu-com-v1-subnamespace
   failurePolicy: Fail
-  name: msubnamespace.kb.io
+  name: subnamespace.accurate.cybozu.io
   rules:
   - apiGroups:
     - accurate.cybozu.com
@@ -38,7 +38,7 @@ webhooks:
       namespace: system
       path: /validate-v1-namespace
   failurePolicy: Fail
-  name: vnamespace.kb.io
+  name: namespace.accurate.cybozu.io
   rules:
   - apiGroups:
     - ""
