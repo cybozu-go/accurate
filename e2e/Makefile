@@ -5,6 +5,8 @@ KUBECONFIG := $(shell pwd)/.kubeconfig
 KIND_CONFIG = kind-config.yaml
 export KUBECTL KUBECONFIG
 
+PATH := $(shell aqua root-dir)/bin:$(PATH)"
+export PATH
 
 .PHONY: help
 help:
