@@ -36,9 +36,9 @@ jobs:
     strategy:
       matrix:
         k8s-version:
-        - v1.25.11 # renovate: kindest/node
         - v1.26.6 # renovate: kindest/node
         - v1.27.3 # renovate: kindest/node
+        - v1.28.0 # renovate: kindest/node
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
