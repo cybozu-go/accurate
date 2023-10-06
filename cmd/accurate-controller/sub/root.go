@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/cybozu-go/accurate"
+	"github.com/cybozu-go/accurate/pkg/config"
 	"github.com/spf13/cobra"
 	klog "k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -72,6 +73,8 @@ func init() {
 	fs.StringVar(&options.webhookAddr, "webhook-addr", ":9443", "Listen address for the webhook endpoint")
 	fs.StringVar(&options.certDir, "cert-dir", "", "webhook certificate directory")
 	fs.IntVar(&options.qps, "apiserver-qps-throttle", defaultQPS, "The maximum QPS to the API server.")
+
+	config.DefaultMutableFeatureGate.AddFlag(fs)
 
 	goflags := flag.NewFlagSet("klog", flag.ExitOnError)
 	klog.InitFlags(goflags)

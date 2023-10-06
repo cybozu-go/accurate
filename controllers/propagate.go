@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cybozu-go/accurate/pkg/config"
 	"github.com/cybozu-go/accurate/pkg/constants"
+	"github.com/cybozu-go/accurate/pkg/feature"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -132,7 +134,7 @@ func (r *PropagateController) Reconcile(ctx context.Context, req ctrl.Request) (
 			return ctrl.Result{}, err
 		}
 	case "":
-		if ann[constants.AnnGenerated] != notGenerated {
+		if !config.DefaultFeatureGate.Enabled(feature.DisablePropagateGenerated) && ann[constants.AnnGenerated] != notGenerated {
 			if err := r.checkController(ctx, obj); err != nil {
 				logger.Error(err, "failed to check the controller reference")
 				return ctrl.Result{}, err
@@ -361,7 +363,7 @@ func (r *PropagateController) SetupWithManager(mgr ctrl.Manager) error {
 		if _, ok := ann[constants.AnnPropagate]; ok {
 			return true
 		}
-		if ann[constants.AnnGenerated] == notGenerated {
+		if config.DefaultFeatureGate.Enabled(feature.DisablePropagateGenerated) || ann[constants.AnnGenerated] == notGenerated {
 			return false
 		}
 		if metav1.GetControllerOfNoCopy(obj) != nil {
