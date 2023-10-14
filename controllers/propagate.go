@@ -21,6 +21,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
+// Deprecated: Part of the deprecated propagate-generated feature subject for
+// removal soon.
 const notGenerated = "false"
 
 func cloneResource(res *unstructured.Unstructured, ns string) *unstructured.Unstructured {
@@ -134,6 +136,7 @@ func (r *PropagateController) Reconcile(ctx context.Context, req ctrl.Request) (
 			return ctrl.Result{}, err
 		}
 	case "":
+		//lint:ignore SA1019 subject for removal
 		if !config.DefaultFeatureGate.Enabled(feature.DisablePropagateGenerated) && ann[constants.AnnGenerated] != notGenerated {
 			if err := r.checkController(ctx, obj); err != nil {
 				logger.Error(err, "failed to check the controller reference")
@@ -315,6 +318,8 @@ func (r *PropagateController) propagateUpdate(ctx context.Context, obj, parent *
 	return nil
 }
 
+// Deprecated: Part of the deprecated propagate-generated feature subject for
+// removal soon.
 func (r *PropagateController) checkController(ctx context.Context, obj *unstructured.Unstructured) error {
 	cref := metav1.GetControllerOfNoCopy(obj)
 	if cref == nil {
@@ -363,6 +368,7 @@ func (r *PropagateController) SetupWithManager(mgr ctrl.Manager) error {
 		if _, ok := ann[constants.AnnPropagate]; ok {
 			return true
 		}
+		//lint:ignore SA1019 subject for removal
 		if config.DefaultFeatureGate.Enabled(feature.DisablePropagateGenerated) || ann[constants.AnnGenerated] == notGenerated {
 			return false
 		}

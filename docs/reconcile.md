@@ -73,7 +73,7 @@ These resources can be propagated to other namespaces.
 - If the resource exists and the annotation value is `update`, Accurate creates or updates a copy in all sub-namespaces if missing or different.
 - When a resource is deleted, Accurate checks sub-namespaces and delete the resource of the same kind and the same name if the resource is annotated with `accurate.cybozu.com/propagate=update`.
 
-### Resources owned by another resource that is annotated with `accurate.cybozu.com/propagate-generated`
+### Resources owned by another resource that is annotated with `accurate.cybozu.com/propagate-generated` (DEPRECATED)
 
 Accurate annotates the resource with `accurate.cybozu.com/propagate`.
 The annotation value is the same as `accurate.cybozu.com/propagate-generated` annotation.
