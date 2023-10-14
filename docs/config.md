@@ -168,4 +168,35 @@ controller:
 <snip>
 ```
 
+## Feature Gates
+
+Feature gates are a set of key=value pairs that describe operator features.
+You can turn these features on or off using the `--feature-gates` command line flag.
+Use `-h` flag to see a full set of feature gates.
+
+To set feature gates, use the `--feature-gates` flag assigned to a list of feature pairs:
+
+```shell
+--feature-gates=...,DisablePropagateGenerated=false
+```
+
+The following table is a summary of the feature gates that you can set.
+
+- The "Since" column contains the Accurate release when a feature is introduced
+  or its release stage is changed.
+- The "Until" column, if not empty, contains the last Accurate release in which
+  you can still use a feature gate.
+
+{{< table caption="Feature gates for features in Alpha or Beta states" sortable="true" >}}
+
+| Feature | Default | Stage | Since | Until |
+|---------|---------|-------|-------|-------|
+| `DisablePropagateGenerated` | `false` | Alpha | 1.2.0 | 1.3.0 |
+| `DisablePropagateGenerated` | `true` | Beta | 1.3.0 | |
+
+Each feature gate is designed for enabling/disabling a specific feature:
+
+- `DisablePropagateGenerated`: Disable [propagating generated resources](concepts.md#propagating-generated-resources),
+  which is a feature subject for removal soon.
+
 [ResourceQuota]: https://kubernetes.io/docs/concepts/policy/resource-quotas/
