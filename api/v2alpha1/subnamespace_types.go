@@ -8,13 +8,17 @@ import (
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // SubNamespaceStatus defines the observed state of SubNamespace
-// +kubebuilder:validation:Enum=ok;conflict
-type SubNamespaceStatus string
+type SubNamespaceStatus struct {
+	// The generation observed by the object controller.
+	// +optional
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
 
-const (
-	SubNamespaceOK       = SubNamespaceStatus("ok")
-	SubNamespaceConflict = SubNamespaceStatus("conflict")
-)
+	// Conditions represent the latest available observations of an object's state
+	// +listType=map
+	// +listMapKey=type
+	// +optional
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
+}
 
 // SubNamespaceSpec defines the desired state of SubNamespace
 type SubNamespaceSpec struct {
@@ -30,6 +34,7 @@ type SubNamespaceSpec struct {
 // Keeping this version un-served for now
 //+kubebuilder:unservedversion
 //+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
 
 // SubNamespace is the Schema for the subnamespaces API
 type SubNamespace struct {
