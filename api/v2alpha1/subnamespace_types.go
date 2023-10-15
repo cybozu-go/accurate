@@ -1,4 +1,4 @@
-package v1
+package v2alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,8 +27,9 @@ type SubNamespaceSpec struct {
 	Annotations map[string]string `json:"annotations,omitempty"`
 }
 
+// Keeping this version un-served for now
+//+kubebuilder:unservedversion
 //+kubebuilder:object:root=true
-//+kubebuilder:storageversion
 
 // SubNamespace is the Schema for the subnamespaces API
 type SubNamespace struct {
