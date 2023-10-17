@@ -1,0 +1,8 @@
+charts/accurate/crds/* linguist-generated=true
+charts/accurate/templates/generated/* linguist-generated=true
+config/crd/bases/* linguist-generated=true
+config/rbac/role.yaml linguist-generated=true
+config/webhook/manifests.yaml linguist-generated=true
+docs/crd_*.md linguist-generated=true
+
+**/zz_generated.*.go linguist-generated=true
