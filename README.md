@@ -14,7 +14,7 @@ It propagates resources between namespaces and allows tenant users to create/del
 
 - Resource propagation between namespaces
     - Any namespace-scoped resource can be propagated.
-    - Generated resources can be automatically checked and propagated.
+    - ⚠️ Generated resources can be automatically checked and propagated. (DEPRECATED)
 - Inheriting labels and annotations from parent namespaces
 - Template namespaces
 - SubNamespace custom resource for tenant users

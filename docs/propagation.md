@@ -29,7 +29,15 @@ metadata:
     accurate.cybozu.com/propagate: <mode>
 ```
 
-## Annotating a resource to propagate resources created from it
+## Annotating a resource to propagate resources created from it (DEPRECATED)
+
+> [!WARNING]  
+> Propagating generated resources is a deprecated feature and is subject for
+> removal soon. Commonly used tools like cert-manager and sealed-secrets now
+> provide features for adding annotations/labels to resources created from
+> user-facing custom resources. These features can be used for migration to
+> ensure the standard `accurate.cybozu.com/propagate` annotation is added to
+> generated resources.
 
 For example, a Secret created from cert-manager's Certificate can automatically be propagated.
 

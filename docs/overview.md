@@ -51,7 +51,6 @@ Without propagating Role/RoleBinding, the tenant user would be able to do nothin
 - Resource propagation between namespaces
 
     Accurate can propagate any namespace-scope resource including custom resources between Namespaces.
-    Moreover, Accurate can detect generated resources owned by another resource and propagate them.
 
 - Inheriting labels and annotations creation/update from parent namespaces
 

@@ -19,7 +19,9 @@ const (
 	AnnFrom               = MetaPrefix + "from"
 	AnnPropagate          = MetaPrefix + "propagate"
 	AnnPropagateGenerated = MetaPrefix + "propagate-generated"
-	AnnGenerated          = MetaPrefix + "generated"
+	// Deprecated: Part of the deprecated propagate-generated feature subject for
+	// removal soon.
+	AnnGenerated = MetaPrefix + "generated"
 )
 
 // Label or annotation values

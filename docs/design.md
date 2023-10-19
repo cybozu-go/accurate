@@ -36,7 +36,7 @@ Since these are fundamentally different requirements, we decided to develop our 
 - Support the following propagation modes:
     - `create`: if the resource does not exist, copy the resource from the parent namespace.
     - `update`: if the resource is missing or different from the parent namespace, create or update it.  If the parent resource is deleted, the copy will also be deleted.
-- Propagate generated resources
+- ⚠️ Propagate generated resources (DEPRECATED)
     - Resources created and controlled by another resource can be automatically propagated.
     - The generator resource should be annotated with `accurate.cybozu.com/propagate-generated: <mode>`.
 - Propagate labels and annotations of parent or template namespaces

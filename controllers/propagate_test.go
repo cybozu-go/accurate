@@ -392,6 +392,7 @@ var _ = Describe("SubNamespace controller", func() {
 			}
 			return svc1.Annotations[constants.AnnPropagate]
 		}).Should(Equal(constants.PropagateUpdate))
+		//lint:ignore SA1019 subject for removal
 		Expect(svc1.Annotations).NotTo(HaveKey(constants.AnnGenerated))
 
 		svc2 := &corev1.Service{}
@@ -408,6 +409,7 @@ var _ = Describe("SubNamespace controller", func() {
 			if err := k8sClient.Get(ctx, client.ObjectKey{Namespace: rootNS, Name: "svc2"}, svc2); err != nil {
 				return ""
 			}
+			//lint:ignore SA1019 subject for removal
 			return svc2.Annotations[constants.AnnGenerated]
 		}).Should(Equal(notGenerated))
 	})
