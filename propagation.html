@@ -191,7 +191,16 @@ metadata:
   annotations:
     accurate.cybozu.com/propagate: &lt;mode&gt;
 </code></pre>
-<h2 id="annotating-a-resource-to-propagate-resources-created-from-it"><a class="header" href="#annotating-a-resource-to-propagate-resources-created-from-it">Annotating a resource to propagate resources created from it</a></h2>
+<h2 id="annotating-a-resource-to-propagate-resources-created-from-it-deprecated"><a class="header" href="#annotating-a-resource-to-propagate-resources-created-from-it-deprecated">Annotating a resource to propagate resources created from it (DEPRECATED)</a></h2>
+<blockquote>
+<p>[!WARNING]<br />
+Propagating generated resources is a deprecated feature and is subject for
+removal soon. Commonly used tools like cert-manager and sealed-secrets now
+provide features for adding annotations/labels to resources created from
+user-facing custom resources. These features can be used for migration to
+ensure the standard <code>accurate.cybozu.com/propagate</code> annotation is added to
+generated resources.</p>
+</blockquote>
 <p>For example, a Secret created from cert-manager's Certificate can automatically be propagated.</p>
 <p>To do this, Certificate should be annotated with <code>accurate.cybozu.com/propagate-generated=&lt;mode&gt;</code> at the time of creation.</p>
 <pre><code class="language-yaml">apiVersion: cert-manager.io/v1

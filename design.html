@@ -223,7 +223,7 @@ Since we consider resource-propagation alone is highly useful, the feature is av
 <li><code>update</code>: if the resource is missing or different from the parent namespace, create or update it.  If the parent resource is deleted, the copy will also be deleted.</li>
 </ul>
 </li>
-<li>Propagate generated resources
+<li>⚠️ Propagate generated resources (DEPRECATED)
 <ul>
 <li>Resources created and controlled by another resource can be automatically propagated.</li>
 <li>The generator resource should be annotated with <code>accurate.cybozu.com/propagate-generated: &lt;mode&gt;</code>.</li>
