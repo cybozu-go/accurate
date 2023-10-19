@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   accurate:
   - apiVersion: v2
+    appVersion: 1.2.1
+    created: "2023-10-19T05:56:04.133189115Z"
+    description: Accurate is a Kubernetes controller for soft multi-tenancy environments.
+    digest: 22e191917e9c9771389fa17a91a33bb2c484908da9ca0451eee7a5432ab1feda
+    name: accurate
+    type: application
+    urls:
+    - https://github.com/cybozu-go/accurate/releases/download/accurate-chart-0.7.2/accurate-0.7.2.tgz
+    version: 0.7.2
+  - apiVersion: v2
     appVersion: 1.2.0
     created: "2023-10-10T08:08:50.697741913Z"
     description: Accurate is a Kubernetes controller for soft multi-tenancy environments.
@@ -121,4 +131,4 @@ entries:
     urls:
     - https://github.com/cybozu-go/accurate/releases/download/accurate-chart-v0.1.0/accurate-0.1.0.tgz
     version: 0.1.0
-generated: "2023-10-10T08:08:50.697790416Z"
+generated: "2023-10-19T05:56:04.133276316Z"
