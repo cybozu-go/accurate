@@ -421,6 +421,31 @@ controller:
           - delete
 &lt;snip&gt;
 </code></pre>
+<h2 id="feature-gates"><a class="header" href="#feature-gates">Feature Gates</a></h2>
+<p>Feature gates are a set of key=value pairs that describe operator features.
+You can turn these features on or off using the <code>--feature-gates</code> command line flag.
+Use <code>-h</code> flag to see a full set of feature gates.</p>
+<p>To set feature gates, use the <code>--feature-gates</code> flag assigned to a list of feature pairs:</p>
+<pre><code class="language-shell">--feature-gates=...,DisablePropagateGenerated=false
+</code></pre>
+<p>The following table is a summary of the feature gates that you can set.</p>
+<ul>
+<li>The &quot;Since&quot; column contains the Accurate release when a feature is introduced
+or its release stage is changed.</li>
+<li>The &quot;Until&quot; column, if not empty, contains the last Accurate release in which
+you can still use a feature gate.</li>
+</ul>
+<p>{{&lt; table caption=&quot;Feature gates for features in Alpha or Beta states&quot; sortable=&quot;true&quot; &gt;}}</p>
+<div class="table-wrapper"><table><thead><tr><th>Feature</th><th>Default</th><th>Stage</th><th>Since</th><th>Until</th></tr></thead><tbody>
+<tr><td><code>DisablePropagateGenerated</code></td><td><code>false</code></td><td>Alpha</td><td>1.2.0</td><td>1.3.0</td></tr>
+<tr><td><code>DisablePropagateGenerated</code></td><td><code>true</code></td><td>Beta</td><td>1.3.0</td><td></td></tr>
+</tbody></table>
+</div>
+<p>Each feature gate is designed for enabling/disabling a specific feature:</p>
+<ul>
+<li><code>DisablePropagateGenerated</code>: Disable <a href="concepts.html#propagating-generated-resources">propagating generated resources</a>,
+which is a feature subject for removal soon.</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="deploying-accurate"><a class="header" href="#deploying-accurate">Deploying Accurate</a></h1>
 <ol>
 <li>
