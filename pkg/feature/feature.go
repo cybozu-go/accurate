@@ -16,5 +16,5 @@ func init() {
 }
 
 var defaultFeatureGates = map[featuregate.Feature]featuregate.FeatureSpec{
-	DisablePropagateGenerated: {Default: false, PreRelease: featuregate.Alpha},
+	DisablePropagateGenerated: {Default: true, PreRelease: featuregate.Beta},
 }

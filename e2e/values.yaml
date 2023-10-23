@@ -6,7 +6,8 @@ image:
 controller:
   extraArgs:
     - --zap-log-level=5
-
+    # Some tests are still testing the propagate-generated feature
+    - --feature-gates=DisablePropagateGenerated=false
   config:
     labelKeys:
       - team
