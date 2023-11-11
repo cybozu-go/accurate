@@ -3,7 +3,7 @@ package v1
 import (
 	"testing"
 
-	accuratev2alpha1 "github.com/cybozu-go/accurate/api/v2alpha1"
+	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
 	utilconversion "github.com/cybozu-go/accurate/internal/util/conversion"
 	fuzz "github.com/google/gofuzz"
 	"k8s.io/apimachinery/pkg/api/apitesting/fuzzer"

@@ -35,6 +35,7 @@ type SubNamespaceSpec struct {
 //+kubebuilder:unservedversion
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+genclient
 
 // SubNamespace is the Schema for the subnamespaces API
 type SubNamespace struct {

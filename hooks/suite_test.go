@@ -14,7 +14,7 @@ import (
 
 	admissionv1beta1 "k8s.io/api/admission/v1beta1"
 	//+kubebuilder:scaffold:imports
-	accuratev1 "github.com/cybozu-go/accurate/api/v1"
+	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
 	"github.com/cybozu-go/accurate/pkg/config"
 	"github.com/cybozu-go/accurate/pkg/indexing"
 	"k8s.io/apimachinery/pkg/runtime"
