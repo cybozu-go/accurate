@@ -8,6 +8,7 @@ import (
 	"regexp"
 
 	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
+	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
 	"github.com/cybozu-go/accurate/pkg/config"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	admissionv1 "k8s.io/api/admission/v1"
@@ -15,7 +16,9 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	v1annotationvalidation "k8s.io/apimachinery/pkg/api/validation"
 	v1labelvalidation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
@@ -137,6 +140,15 @@ func (v *subNamespaceValidator) notMatchingNamingPolicy(ctx context.Context, ns,
 
 // SetupSubNamespaceWebhook registers the webhooks for SubNamespace
 func SetupSubNamespaceWebhook(mgr manager.Manager, dec *admission.Decoder, namingPolicyRegexps []config.NamingPolicyRegexp) error {
+	for _, s := range []runtime.Object{&accuratev1.SubNamespace{}, &accuratev2alpha1.SubNamespace{}} {
+		err := ctrl.NewWebhookManagedBy(mgr).
+			For(s).
+			Complete()
+		if err != nil {
+			return err
+		}
+	}
+
 	serv := mgr.GetWebhookServer()
 
 	m := &subNamespaceMutator{

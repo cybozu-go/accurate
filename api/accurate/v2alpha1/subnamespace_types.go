@@ -31,8 +31,6 @@ type SubNamespaceSpec struct {
 	Annotations map[string]string `json:"annotations,omitempty"`
 }
 
-// Keeping this version un-served for now
-//+kubebuilder:unservedversion
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 //+genclient
