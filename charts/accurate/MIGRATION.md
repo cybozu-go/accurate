@@ -4,7 +4,7 @@ This document describes the steps to migrate from kustomize to Helm.
 
 ## Install Helm chart
 
-There is no significant difference between the manifests installed by kusomize and those installed by Helm.
+There is no significant difference between the manifests installed by kustomize and those installed by Helm.
 
 If a resource with the same name already exists in the Cluster, Helm will not be able to create the resource.
 

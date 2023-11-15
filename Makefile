@@ -42,10 +42,13 @@ help: ## Display this help.
 
 ##@ Development
 
+HELM_CRDS_FILE := charts/accurate/templates/generated/crds.yaml
 .PHONY: manifests
 manifests: setup ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	controller-gen $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="{./api/..., ./controllers/...}" output:crd:artifacts:config=config/crd/bases
-	kustomize build config/kustomize-to-helm/overlays/crds | yq e "." -p yaml - > charts/accurate/crds/accurate.cybozu.com_subnamespaces.yaml
+	echo '{{- if .Values.installCRDs }}' > $(HELM_CRDS_FILE)
+	kustomize build config/kustomize-to-helm/overlays/crds | yq e "." -p yaml - >> $(HELM_CRDS_FILE)
+	echo '{{- end }}' >> $(HELM_CRDS_FILE)
 	kustomize build config/kustomize-to-helm/overlays/templates | yq e "."  -p yaml - > charts/accurate/templates/generated/generated.yaml
 
 .PHONY: generate

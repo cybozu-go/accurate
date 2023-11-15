@@ -1,4 +1,3 @@
-charts/accurate/crds/* linguist-generated=true
 charts/accurate/templates/generated/* linguist-generated=true
 config/crd/bases/* linguist-generated=true
 config/rbac/role.yaml linguist-generated=true
