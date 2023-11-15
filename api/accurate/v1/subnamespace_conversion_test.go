@@ -3,7 +3,7 @@ package v1
 import (
 	"testing"
 
-	accuratev2alpha1 "github.com/cybozu-go/accurate/api/v2alpha1"
+	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kstatus "sigs.k8s.io/cli-utils/pkg/kstatus/status"
 )

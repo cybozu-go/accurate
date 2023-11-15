@@ -45,19 +45,33 @@ help: ## Display this help.
 HELM_CRDS_FILE := charts/accurate/templates/generated/crds.yaml
 .PHONY: manifests
 manifests: setup ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
-	controller-gen $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+	controller-gen $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="{./api/..., ./controllers/...}" output:crd:artifacts:config=config/crd/bases
 	echo '{{- if .Values.installCRDs }}' > $(HELM_CRDS_FILE)
 	kustomize build config/kustomize-to-helm/overlays/crds | yq e "." -p yaml - >> $(HELM_CRDS_FILE)
 	echo '{{- end }}' >> $(HELM_CRDS_FILE)
 	kustomize build config/kustomize-to-helm/overlays/templates | yq e "."  -p yaml - > charts/accurate/templates/generated/generated.yaml
 
 .PHONY: generate
-generate: setup ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
-	controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
+generate: setup generate-applyconfigurations ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
+	controller-gen object:headerFile="hack/boilerplate.go.txt" paths="{./api/...}"
+
+GO_MODULE = $(shell go list -m)
+API_DIRS = $(shell find api -mindepth 2 -type d | sed "s|^|$(shell go list -m)/|" | paste -sd ",")
+AC_PKG = internal/applyconfigurations
+.PHONY: generate-applyconfigurations
+generate-applyconfigurations: applyconfiguration-gen ## Generate applyconfigurations to support typesafe SSA.
+	rm -rf $(AC_PKG)
+	@echo ">> generating $(AC_PKG)..."
+	$(APPLYCONFIGURATION_GEN) \
+		--go-header-file 	hack/boilerplate.go.txt \
+		--input-dirs		"$(API_DIRS)" \
+		--output-package  	"$(GO_MODULE)/$(AC_PKG)" \
+		--trim-path-prefix 	"$(GO_MODULE)" \
+		--output-base    	"."
 
 .PHONY: apidoc
 apidoc: setup $(wildcard api/*/*_types.go)
-	crd-to-markdown --links docs/links.csv -f api/v1/subnamespace_types.go -n SubNamespace > docs/crd_subnamespace.md
+	crd-to-markdown --links docs/links.csv -f api/accurate/v1/subnamespace_types.go -n SubNamespace > docs/crd_subnamespace.md
 
 .PHONY: book
 book: setup
@@ -108,6 +122,13 @@ setup-envtest: $(SETUP_ENVTEST) ## Download setup-envtest locally if necessary
 $(SETUP_ENVTEST):
 	# see https://github.com/kubernetes-sigs/controller-runtime/tree/master/tools/setup-envtest
 	GOBIN=$(shell pwd)/bin go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
+
+APPLYCONFIGURATION_GEN := $(shell pwd)/bin/applyconfiguration-gen
+.PHONY: applyconfiguration-gen
+applyconfiguration-gen: $(APPLYCONFIGURATION_GEN) ## Download applyconfiguration-gen locally if necessary
+$(APPLYCONFIGURATION_GEN):
+	# see https://github.com/kubernetes/code-generator/tree/master/cmd/applyconfiguration-gen
+	GOBIN=$(shell pwd)/bin go install k8s.io/code-generator/cmd/applyconfiguration-gen@v0.28.3
 
 # go-get-tool will 'go get' any package $2 and install it to $1.
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))

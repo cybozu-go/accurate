@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	accuratev1 "github.com/cybozu-go/accurate/api/v1"
+	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	"github.com/cybozu-go/accurate/pkg/indexing"
 	. "github.com/onsi/ginkgo/v2"
