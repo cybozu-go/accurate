@@ -1,7 +1,7 @@
 package sub
 
 import (
-	accuratev1 "github.com/cybozu-go/accurate/api/v1"
+	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"

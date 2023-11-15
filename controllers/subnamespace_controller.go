@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	accuratev1 "github.com/cybozu-go/accurate/api/v1"
+	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"

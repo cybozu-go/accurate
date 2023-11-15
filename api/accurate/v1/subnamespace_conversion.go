@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	accuratev2alpha1 "github.com/cybozu-go/accurate/api/v2alpha1"
+	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -20,8 +20,8 @@ func (src *SubNamespace) ConvertTo(dstRaw conversion.Hub) error {
 	dst := dstRaw.(*accuratev2alpha1.SubNamespace)
 
 	logger := getConversionLogger(src).WithValues(
-		"source", GroupVersion.Version,
-		"destination", GroupVersion.Version,
+		"source", SchemeGroupVersion.Version,
+		"destination", SchemeGroupVersion.Version,
 	)
 	logger.V(5).Info("converting")
 
@@ -57,8 +57,8 @@ func (dst *SubNamespace) ConvertFrom(srcRaw conversion.Hub) error {
 	src := srcRaw.(*accuratev2alpha1.SubNamespace)
 
 	logger := getConversionLogger(src).WithValues(
-		"source", GroupVersion.Version,
-		"destination", GroupVersion.Version,
+		"source", SchemeGroupVersion.Version,
+		"destination", SchemeGroupVersion.Version,
 	)
 	logger.V(5).Info("converting")
 

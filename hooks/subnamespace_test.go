@@ -3,7 +3,7 @@ package hooks
 import (
 	"context"
 
-	accuratev1 "github.com/cybozu-go/accurate/api/v1"
+	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

@@ -8,7 +8,7 @@ import (
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	accuratev1 "github.com/cybozu-go/accurate/api/v1"
+	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
 	"github.com/cybozu-go/accurate/controllers"
 	"github.com/cybozu-go/accurate/hooks"
 	"github.com/cybozu-go/accurate/pkg/config"

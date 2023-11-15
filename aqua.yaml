@@ -3,6 +3,9 @@
 registries:
   - type: standard
     ref: v4.23.0 # renovate: depName=aquaproj/aqua-registry
+  - name: local
+    type: local
+    path: registry.yaml
 packages:
   - name: kubernetes/kubectl@v1.28.2
   - name: kubernetes-sigs/kubebuilder@v3.11.0
@@ -15,3 +18,5 @@ packages:
   - name: helm/helm@v3.12.1
   - name: bitnami-labs/sealed-secrets@v0.22.0
   - name: goreleaser/goreleaser@v1.19.1
+  - name: kubernetes/code-generator/applyconfiguration-gen@v0.28.3
+    registry: local

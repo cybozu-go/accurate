@@ -1,0 +1,9 @@
+packages:
+  - type: go_install
+    name: kubernetes/code-generator/applyconfiguration-gen
+    path: k8s.io/code-generator/cmd/applyconfiguration-gen
+    repo_owner: kubernetes
+    repo_name: code-generator
+    description: applyconfiguration-gen is a tool for auto-generating apply configuration functions.
+    files:
+      - name: applyconfiguration-gen
