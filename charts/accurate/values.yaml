@@ -1,3 +1,5 @@
+installCRDs: true
+
 image:
   # image.repository -- Accurate image repository to use.
   repository: ghcr.io/cybozu-go/accurate
