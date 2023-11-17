@@ -1,0 +1,12 @@
+---
+# aqua Policy
+# https://aquaproj.github.io/
+registries:
+  - name: local
+    type: local
+    path: registry.yaml
+  - type: standard
+    ref: semver(">= 3.0.0")
+packages:
+  - registry: local # allow all packages in the Registry
+  - registry: standard

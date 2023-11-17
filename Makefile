@@ -59,10 +59,10 @@ GO_MODULE = $(shell go list -m)
 API_DIRS = $(shell find api -mindepth 2 -type d | sed "s|^|$(shell go list -m)/|" | paste -sd ",")
 AC_PKG = internal/applyconfigurations
 .PHONY: generate-applyconfigurations
-generate-applyconfigurations: applyconfiguration-gen ## Generate applyconfigurations to support typesafe SSA.
+generate-applyconfigurations: setup ## Generate applyconfigurations to support typesafe SSA.
 	rm -rf $(AC_PKG)
 	@echo ">> generating $(AC_PKG)..."
-	$(APPLYCONFIGURATION_GEN) \
+	applyconfiguration-gen \
 		--go-header-file 	hack/boilerplate.go.txt \
 		--input-dirs		"$(API_DIRS)" \
 		--output-package  	"$(GO_MODULE)/$(AC_PKG)" \
@@ -114,6 +114,7 @@ release-build: setup
 ##@ Tools
 
 setup:
+	aqua policy allow ./aqua-policy.yaml
 	aqua i -l
 
 SETUP_ENVTEST := $(shell pwd)/bin/setup-envtest
@@ -122,13 +123,6 @@ setup-envtest: $(SETUP_ENVTEST) ## Download setup-envtest locally if necessary
 $(SETUP_ENVTEST):
 	# see https://github.com/kubernetes-sigs/controller-runtime/tree/master/tools/setup-envtest
 	GOBIN=$(shell pwd)/bin go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
-
-APPLYCONFIGURATION_GEN := $(shell pwd)/bin/applyconfiguration-gen
-.PHONY: applyconfiguration-gen
-applyconfiguration-gen: $(APPLYCONFIGURATION_GEN) ## Download applyconfiguration-gen locally if necessary
-$(APPLYCONFIGURATION_GEN):
-	# see https://github.com/kubernetes/code-generator/tree/master/cmd/applyconfiguration-gen
-	GOBIN=$(shell pwd)/bin go install k8s.io/code-generator/cmd/applyconfiguration-gen@v0.28.3
 
 # go-get-tool will 'go get' any package $2 and install it to $1.
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
