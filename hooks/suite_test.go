@@ -3,6 +3,7 @@ package hooks
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"net"
 	"path/filepath"
@@ -18,6 +19,7 @@ import (
 	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
 	"github.com/cybozu-go/accurate/pkg/config"
 	"github.com/cybozu-go/accurate/pkg/indexing"
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -28,6 +30,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+	"sigs.k8s.io/kustomize/api/krusty"
+	"sigs.k8s.io/kustomize/kyaml/filesys"
 )
 
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
@@ -49,10 +53,22 @@ var _ = BeforeSuite(func() {
 	ctx, cancel := context.WithCancel(context.TODO())
 	cancelMgr = cancel
 
+	scheme := runtime.NewScheme()
+	err := accuratev1.AddToScheme(scheme)
+	Expect(err).NotTo(HaveOccurred())
+	err = accuratev2alpha1.AddToScheme(scheme)
+	Expect(err).NotTo(HaveOccurred())
+	err = clientgoscheme.AddToScheme(scheme)
+	Expect(err).NotTo(HaveOccurred())
+	err = admissionv1beta1.AddToScheme(scheme)
+	Expect(err).NotTo(HaveOccurred())
+
+	//+kubebuilder:scaffold:scheme
+
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
-		CRDDirectoryPaths:     []string{filepath.Join("..", "config", "crd", "bases")},
-		ErrorIfCRDPathMissing: false,
+		Scheme: scheme,
+		CRDs:   loadCRDs(),
 		WebhookInstallOptions: envtest.WebhookInstallOptions{
 			Paths: []string{filepath.Join("..", "config", "webhook")},
 		},
@@ -61,19 +77,6 @@ var _ = BeforeSuite(func() {
 	cfg, err := testEnv.Start()
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
-
-	scheme := runtime.NewScheme()
-	err = accuratev1.AddToScheme(scheme)
-	Expect(err).NotTo(HaveOccurred())
-	err = accuratev2alpha1.AddToScheme(scheme)
-	Expect(err).NotTo(HaveOccurred())
-	err = clientgoscheme.AddToScheme(scheme)
-	Expect(err).NotTo(HaveOccurred())
-
-	err = admissionv1beta1.AddToScheme(scheme)
-	Expect(err).NotTo(HaveOccurred())
-
-	//+kubebuilder:scaffold:scheme
 
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme})
 	Expect(err).NotTo(HaveOccurred())
@@ -164,3 +167,25 @@ var _ = AfterSuite(func() {
 	err := testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())
 })
+
+func loadCRDs() []*apiextensionsv1.CustomResourceDefinition {
+	kOpts := krusty.MakeDefaultOptions()
+	k := krusty.MakeKustomizer(kOpts)
+	m, err := k.Run(filesys.FileSystemOrOnDisk{}, filepath.Join("..", "config", "crd"))
+	Expect(err).To(Succeed())
+	resources := m.Resources()
+
+	crds := make([]*apiextensionsv1.CustomResourceDefinition, len(resources))
+	for i := range resources {
+		bytes, err := resources[i].MarshalJSON()
+		Expect(err).To(Succeed())
+
+		crd := &apiextensionsv1.CustomResourceDefinition{}
+		err = json.Unmarshal(bytes, crd)
+		Expect(err).To(Succeed())
+
+		crds[i] = crd
+	}
+
+	return crds
+}

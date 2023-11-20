@@ -3,11 +3,14 @@ package hooks
 import (
 	"context"
 
-	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
-	"github.com/cybozu-go/accurate/pkg/constants"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
+	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
+	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
@@ -26,6 +29,7 @@ var _ = Describe("SubNamespace webhook", func() {
 		sn.Name = "foo"
 		err = k8sClient.Create(ctx, sn)
 		Expect(err).To(HaveOccurred())
+		Expect(errors.ReasonForError(err)).Should(Equal(metav1.StatusReasonForbidden))
 	})
 
 	It("should allow creation of SubNamespace in a root namespace", func() {
@@ -45,7 +49,7 @@ var _ = Describe("SubNamespace webhook", func() {
 
 		Expect(controllerutil.ContainsFinalizer(sn, constants.Finalizer)).To(BeTrue())
 
-		// deleting finalizer should succeeds
+		// deleting finalizer should succeed
 		sn.Finalizers = nil
 		err = k8sClient.Update(ctx, sn)
 		Expect(err).NotTo(HaveOccurred())
@@ -185,6 +189,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					sn.Name = "naming-policy-root-2--child"
 					err = k8sClient.Create(ctx, sn)
 					Expect(err).To(HaveOccurred())
+					Expect(errors.ReasonForError(err)).Should(Equal(metav1.StatusReasonForbidden))
 				})
 
 				It("should deny creation of SubNamespace in a root namespace - pattern2", func() {
@@ -199,6 +204,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					sn.Name = "child-2"
 					err = k8sClient.Create(ctx, sn)
 					Expect(err).To(HaveOccurred())
+					Expect(errors.ReasonForError(err)).Should(Equal(metav1.StatusReasonForbidden))
 				})
 
 				It("should deny creation of SubNamespace in a root namespace - pattern3", func() {
@@ -219,6 +225,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					sn.Name = "not-ns-root-2-parent-child"
 					err = k8sClient.Create(ctx, sn)
 					Expect(err).To(HaveOccurred())
+					Expect(errors.ReasonForError(err)).Should(Equal(metav1.StatusReasonForbidden))
 				})
 
 				It("should deny creation of SubNamespace in a root namespace - pattern4", func() {
@@ -233,6 +240,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					sn.Name = "app-team20-child"
 					err = k8sClient.Create(ctx, sn)
 					Expect(err).To(HaveOccurred())
+					Expect(errors.ReasonForError(err)).Should(Equal(metav1.StatusReasonForbidden))
 				})
 
 				It("should deny creation of SubNamespace in a root namespace - pattern5", func() {
@@ -247,6 +255,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					sn.Name = "unuse-naming-group-team2-foo"
 					err = k8sClient.Create(ctx, sn)
 					Expect(err).To(HaveOccurred())
+					Expect(errors.ReasonForError(err)).Should(Equal(metav1.StatusReasonForbidden))
 				})
 
 				It("should deny creation of SubNamespace in a root namespace - pattern6", func() {
@@ -262,6 +271,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					sn.Spec.Labels = map[string]string{"foo": "~"}
 					err = k8sClient.Create(ctx, sn)
 					Expect(err).To(HaveOccurred())
+					Expect(errors.ReasonForError(err)).Should(Equal(metav1.StatusReasonForbidden))
 				})
 
 				It("should deny creation of SubNamespace in a root namespace - pattern7", func() {
@@ -277,6 +287,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					sn.Spec.Annotations = map[string]string{"foo-": ""}
 					err = k8sClient.Create(ctx, sn)
 					Expect(err).To(HaveOccurred())
+					Expect(errors.ReasonForError(err)).Should(Equal(metav1.StatusReasonForbidden))
 				})
 
 				It("should deny creation of SubNamespace in a root namespace - pattern8", func() {
@@ -293,6 +304,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					sn.Spec.Annotations = map[string]string{"foo-": ""}
 					err = k8sClient.Create(ctx, sn)
 					Expect(err).To(HaveOccurred())
+					Expect(errors.ReasonForError(err)).Should(Equal(metav1.StatusReasonForbidden))
 				})
 			})
 		})
