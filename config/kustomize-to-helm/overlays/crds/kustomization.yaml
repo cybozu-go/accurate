@@ -1,8 +1,8 @@
 resources:
   - ../../../crd
 
-commonLabels:
-  app.kubernetes.io/name: accurate
+patchesStrategicMerge:
+  - crd_conversion_patch.yaml
 
 components:
   - ../../components/common-labels

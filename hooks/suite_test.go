@@ -15,6 +15,7 @@ import (
 	admissionv1beta1 "k8s.io/api/admission/v1beta1"
 	//+kubebuilder:scaffold:imports
 	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
+	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
 	"github.com/cybozu-go/accurate/pkg/config"
 	"github.com/cybozu-go/accurate/pkg/indexing"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -63,6 +64,8 @@ var _ = BeforeSuite(func() {
 
 	scheme := runtime.NewScheme()
 	err = accuratev1.AddToScheme(scheme)
+	Expect(err).NotTo(HaveOccurred())
+	err = accuratev2alpha1.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())
 	err = clientgoscheme.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())

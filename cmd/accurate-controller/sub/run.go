@@ -9,6 +9,7 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
 	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
+	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
 	"github.com/cybozu-go/accurate/controllers"
 	"github.com/cybozu-go/accurate/hooks"
 	"github.com/cybozu-go/accurate/pkg/config"
@@ -35,7 +36,10 @@ func subMain(ns, addr string, port int) error {
 		return fmt.Errorf("unable to add client-go objects: %w", err)
 	}
 	if err := accuratev1.AddToScheme(scheme); err != nil {
-		return fmt.Errorf("unable to add Accurate objects: %w", err)
+		return fmt.Errorf("unable to add Accurate v1 objects: %w", err)
+	}
+	if err := accuratev2alpha1.AddToScheme(scheme); err != nil {
+		return fmt.Errorf("unable to add Accurate v2alpha1 objects: %w", err)
 	}
 
 	cfgData, err := os.ReadFile(options.configFile)

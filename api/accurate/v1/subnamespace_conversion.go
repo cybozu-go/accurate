@@ -21,7 +21,7 @@ func (src *SubNamespace) ConvertTo(dstRaw conversion.Hub) error {
 
 	logger := getConversionLogger(src).WithValues(
 		"source", SchemeGroupVersion.Version,
-		"destination", SchemeGroupVersion.Version,
+		"destination", accuratev2alpha1.SchemeGroupVersion.Version,
 	)
 	logger.V(5).Info("converting")
 
@@ -57,7 +57,7 @@ func (dst *SubNamespace) ConvertFrom(srcRaw conversion.Hub) error {
 	src := srcRaw.(*accuratev2alpha1.SubNamespace)
 
 	logger := getConversionLogger(src).WithValues(
-		"source", SchemeGroupVersion.Version,
+		"source", accuratev2alpha1.SchemeGroupVersion.Version,
 		"destination", SchemeGroupVersion.Version,
 	)
 	logger.V(5).Info("converting")

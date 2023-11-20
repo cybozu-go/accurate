@@ -1,0 +1,13 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: '{{ .Release.Namespace }}/{{ template "accurate.fullname" . }}-serving-cert'
+  name: subnamespaces.accurate.cybozu.com
+spec:
+  conversion:
+    webhook:
+      clientConfig:
+        service:
+          name: '{{ template "accurate.fullname" . }}-webhook-service'
+          namespace: '{{ .Release.Namespace }}'

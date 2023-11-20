@@ -308,6 +308,14 @@ var _ = Describe("kubectl accurate", func() {
 		}).Should(Succeed())
 	})
 
+	It("should convert SubNamespace to new version", func() {
+		kubectlSafe(nil, "create", "ns", "rootv2")
+		kubectlSafe(nil, "accurate", "ns", "set-type", "rootv2", "root")
+		kubectlSafe(nil, "accurate", "sub", "create", "subv2", "rootv2")
+		kubectlSafe(nil, "get", "subnamespaces", "-n", "rootv2", "subv2")
+		kubectlSafe(nil, "get", "subnamespaces.v2alpha1.accurate.cybozu.com", "-n", "rootv2", "subv2")
+	})
+
 	It("should run other commands", func() {
 		kubectlSafe(nil, "accurate", "list")
 		kubectlSafe(nil, "accurate", "sub", "list")
