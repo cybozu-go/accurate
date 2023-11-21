@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
+	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	"github.com/cybozu-go/accurate/pkg/indexing"
 	. "github.com/onsi/ginkgo/v2"
@@ -529,7 +529,7 @@ var _ = Describe("Namespace controller", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		By("creating a SubNamespace for sub1 namespace")
-		sn := &accuratev1.SubNamespace{}
+		sn := &accuratev2alpha1.SubNamespace{}
 		sn.Namespace = "root"
 		sn.Name = "sub1"
 		sn.Spec.Labels = map[string]string{

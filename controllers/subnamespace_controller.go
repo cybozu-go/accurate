@@ -2,14 +2,20 @@ package controllers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"time"
 
-	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
+	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
+	accuratev2alpha1ac "github.com/cybozu-go/accurate/internal/applyconfigurations/accurate/v2alpha1"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/workqueue"
+	kstatus "sigs.k8s.io/cli-utils/pkg/kstatus/status"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -17,6 +23,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+)
+
+const (
+	fieldOwner client.FieldOwner = "accurate-controller"
 )
 
 // SubNamespaceReconciler reconciles a SubNamespace object
@@ -33,7 +43,7 @@ type SubNamespaceReconciler struct {
 func (r *SubNamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
-	sn := &accuratev1.SubNamespace{}
+	sn := &accuratev2alpha1.SubNamespace{}
 	if err := r.Get(ctx, req.NamespacedName, sn); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
@@ -54,7 +64,7 @@ func (r *SubNamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	return ctrl.Result{}, nil
 }
 
-func (r *SubNamespaceReconciler) finalize(ctx context.Context, sn *accuratev1.SubNamespace) error {
+func (r *SubNamespaceReconciler) finalize(ctx context.Context, sn *accuratev2alpha1.SubNamespace) error {
 	if !controllerutil.ContainsFinalizer(sn, constants.Finalizer) {
 		return nil
 	}
@@ -89,7 +99,7 @@ DELETE:
 	return r.Update(ctx, sn)
 }
 
-func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev1.SubNamespace) error {
+func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2alpha1.SubNamespace) error {
 	logger := log.FromContext(ctx)
 
 	ns := &corev1.Namespace{}
@@ -110,14 +120,27 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev1
 		logger.Info("created a sub namespace", "name", sn.Name)
 	}
 
-	if ns.Labels[constants.LabelParent] == sn.Namespace {
-		sn.Status = accuratev1.SubNamespaceOK
-	} else {
+	ac := accuratev2alpha1ac.SubNamespace(sn.Name, sn.Namespace).
+		WithStatus(
+			accuratev2alpha1ac.SubNamespaceStatus().
+				WithObservedGeneration(sn.Generation),
+		)
+
+	if ns.Labels[constants.LabelParent] != sn.Namespace {
 		logger.Info("a conflicting namespace already exists")
-		sn.Status = accuratev1.SubNamespaceConflict
+		ac.Status.WithConditions(
+			newStatusCondition(sn.Status.Conditions,
+				metav1.Condition{
+					Type:               string(kstatus.ConditionStalled),
+					Status:             metav1.ConditionTrue,
+					ObservedGeneration: sn.Generation,
+					Reason:             accuratev2alpha1.SubNamespaceConflict,
+					Message:            "Conflicting namespace already exists",
+				}),
+		)
 	}
 
-	return r.Update(ctx, sn)
+	return r.patchSubNamespaceStatus(ctx, ac)
 }
 
 // SetupWithManager sets up the controller with the Manager.
@@ -134,7 +157,7 @@ func (r *SubNamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	}
 
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&accuratev1.SubNamespace{}).
+		For(&accuratev2alpha1.SubNamespace{}).
 		Watches(&corev1.Namespace{}, handler.Funcs{
 			UpdateFunc: func(ctx context.Context, ev event.UpdateEvent, q workqueue.RateLimitingInterface) {
 				if ev.ObjectNew.GetDeletionTimestamp() != nil {
@@ -147,4 +170,47 @@ func (r *SubNamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			},
 		}).
 		Complete(r)
+}
+
+func newStatusCondition(existingConditions []metav1.Condition, newCondition metav1.Condition) metav1.Condition {
+	existingCondition := meta.FindStatusCondition(existingConditions, newCondition.Type)
+	if existingCondition != nil && existingCondition.Status == newCondition.Status {
+		newCondition.LastTransitionTime = existingCondition.LastTransitionTime
+	}
+
+	if newCondition.LastTransitionTime.IsZero() {
+		newCondition.LastTransitionTime = metav1.NewTime(time.Now())
+	}
+
+	return newCondition
+}
+
+func (r *SubNamespaceReconciler) patchSubNamespaceStatus(ctx context.Context, ac *accuratev2alpha1ac.SubNamespaceApplyConfiguration) error {
+	sn := &accuratev2alpha1.SubNamespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      *ac.Name,
+			Namespace: *ac.Namespace,
+		},
+	}
+
+	encodedPatch, err := json.Marshal(ac)
+	if err != nil {
+		return err
+	}
+
+	return r.Status().Patch(ctx, sn, applyPatch{encodedPatch}, fieldOwner, client.ForceOwnership)
+}
+
+type applyPatch struct {
+	patch []byte
+}
+
+var _ client.Patch = applyPatch{}
+
+func (p applyPatch) Type() types.PatchType {
+	return types.ApplyPatchType
+}
+
+func (p applyPatch) Data(_ client.Object) ([]byte, error) {
+	return p.patch, nil
 }
