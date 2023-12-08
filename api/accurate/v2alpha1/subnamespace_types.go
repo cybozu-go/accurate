@@ -32,6 +32,7 @@ type SubNamespaceSpec struct {
 }
 
 //+kubebuilder:object:root=true
+//+kubebuilder:storageversion
 //+kubebuilder:subresource:status
 //+genclient
 
@@ -61,3 +62,7 @@ type SubNamespaceList struct {
 func init() {
 	SchemeBuilder.Register(&SubNamespace{}, &SubNamespaceList{})
 }
+
+const (
+	SubNamespaceConflict string = "Conflict"
+)

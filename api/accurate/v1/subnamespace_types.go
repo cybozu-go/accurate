@@ -28,7 +28,6 @@ type SubNamespaceSpec struct {
 }
 
 //+kubebuilder:object:root=true
-//+kubebuilder:storageversion
 
 // SubNamespace is the Schema for the subnamespaces API
 type SubNamespace struct {

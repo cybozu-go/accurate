@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
+	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -57,7 +57,7 @@ var _ = Describe("SubNamespace controller", func() {
 		err := k8sClient.Create(ctx, ns)
 		Expect(err).NotTo(HaveOccurred())
 
-		sn := &accuratev1.SubNamespace{}
+		sn := &accuratev2alpha1.SubNamespace{}
 		sn.Namespace = "test1"
 		sn.Name = "test1-sub1"
 		sn.Finalizers = []string{constants.Finalizer}
@@ -72,14 +72,15 @@ var _ = Describe("SubNamespace controller", func() {
 
 		Expect(sub1.Labels).To(HaveKeyWithValue(constants.LabelCreatedBy, "accurate"))
 		Expect(sub1.Labels).To(HaveKeyWithValue(constants.LabelParent, "test1"))
-		Eventually(func() accuratev1.SubNamespaceStatus {
-			sn = &accuratev1.SubNamespace{}
+		Eventually(func() int64 {
+			sn = &accuratev2alpha1.SubNamespace{}
 			err = k8sClient.Get(ctx, client.ObjectKey{Namespace: "test1", Name: "test1-sub1"}, sn)
 			if err != nil {
-				return ""
+				return 0
 			}
-			return sn.Status
-		}).Should(Equal(accuratev1.SubNamespaceOK))
+			return sn.Status.ObservedGeneration
+		}).Should(BeNumerically(">", 0))
+		Expect(sn.Status.Conditions).To(BeEmpty())
 
 		err = k8sClient.Delete(ctx, sn)
 		Expect(err).NotTo(HaveOccurred())
@@ -105,19 +106,21 @@ var _ = Describe("SubNamespace controller", func() {
 		err = k8sClient.Create(ctx, ns2)
 		Expect(err).NotTo(HaveOccurred())
 
-		sn := &accuratev1.SubNamespace{}
+		sn := &accuratev2alpha1.SubNamespace{}
 		sn.Namespace = "test2"
 		sn.Name = "test2-sub1"
 		err = k8sClient.Create(ctx, sn)
 		Expect(err).NotTo(HaveOccurred())
 
-		Eventually(func() accuratev1.SubNamespaceStatus {
-			sn = &accuratev1.SubNamespace{}
+		Eventually(func() int64 {
+			sn = &accuratev2alpha1.SubNamespace{}
 			if err := k8sClient.Get(ctx, client.ObjectKey{Namespace: "test2", Name: "test2-sub1"}, sn); err != nil {
-				return ""
+				return 0
 			}
-			return sn.Status
-		}).Should(Equal(accuratev1.SubNamespaceConflict))
+			return sn.Status.ObservedGeneration
+		}).Should(BeNumerically(">", 0))
+		Expect(sn.Status.Conditions).To(HaveLen(1))
+		Expect(sn.Status.Conditions[0].Reason).To(Equal(accuratev2alpha1.SubNamespaceConflict))
 	})
 
 	It("should not delete a conflicting sub namespace", func() {
@@ -126,7 +129,7 @@ var _ = Describe("SubNamespace controller", func() {
 		err := k8sClient.Create(ctx, ns)
 		Expect(err).NotTo(HaveOccurred())
 
-		sn := &accuratev1.SubNamespace{}
+		sn := &accuratev2alpha1.SubNamespace{}
 		sn.Namespace = "test3"
 		sn.Name = "test3-sub1"
 		sn.Finalizers = []string{constants.Finalizer}
@@ -143,14 +146,15 @@ var _ = Describe("SubNamespace controller", func() {
 		err = k8sClient.Update(ctx, sub1)
 		Expect(err).NotTo(HaveOccurred())
 
-		Eventually(func() accuratev1.SubNamespaceStatus {
-			sn = &accuratev1.SubNamespace{}
+		Eventually(func() []metav1.Condition {
+			sn = &accuratev2alpha1.SubNamespace{}
 			err = k8sClient.Get(ctx, client.ObjectKey{Namespace: "test3", Name: "test3-sub1"}, sn)
 			if err != nil {
-				return ""
+				return nil
 			}
-			return sn.Status
-		}).Should(Equal(accuratev1.SubNamespaceConflict))
+			return sn.Status.Conditions
+		}).Should(HaveLen(1))
+		Expect(sn.Status.Conditions[0].Reason).To(Equal(accuratev2alpha1.SubNamespaceConflict))
 
 		err = k8sClient.Delete(ctx, sn)
 		Expect(err).NotTo(HaveOccurred())
@@ -170,7 +174,7 @@ var _ = Describe("SubNamespace controller", func() {
 		err := k8sClient.Create(ctx, ns)
 		Expect(err).NotTo(HaveOccurred())
 
-		sn := &accuratev1.SubNamespace{}
+		sn := &accuratev2alpha1.SubNamespace{}
 		sn.Namespace = "test4"
 		sn.Name = "test4-sub1"
 		err = k8sClient.Create(ctx, sn)
