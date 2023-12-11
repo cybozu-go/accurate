@@ -16,8 +16,10 @@ const (
 
 // Annotations
 const (
-	AnnFrom               = MetaPrefix + "from"
-	AnnPropagate          = MetaPrefix + "propagate"
+	AnnFrom      = MetaPrefix + "from"
+	AnnPropagate = MetaPrefix + "propagate"
+	// Deprecated: Part of the deprecated propagate-generated feature subject for
+	// removal soon.
 	AnnPropagateGenerated = MetaPrefix + "propagate-generated"
 	// Deprecated: Part of the deprecated propagate-generated feature subject for
 	// removal soon.

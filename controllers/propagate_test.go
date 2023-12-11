@@ -364,6 +364,7 @@ var _ = Describe("SubNamespace controller", func() {
 		cm1 := &corev1.ConfigMap{}
 		cm1.Namespace = rootNS
 		cm1.Name = "cm-generate"
+		//lint:ignore SA1019 subject for removal
 		cm1.Annotations = map[string]string{constants.AnnPropagateGenerated: constants.PropagateUpdate}
 		cm1.Data = map[string]string{"foo": "bar"}
 		err := k8sClient.Create(ctx, cm1)
