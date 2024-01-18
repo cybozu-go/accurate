@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
@@ -17,6 +16,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
 
@@ -103,8 +103,7 @@ var _ = Describe("Namespace controller", func() {
 			"memo":        "memo",
 			"team":        "cat",
 		}
-		err := k8sClient.Create(ctx, tmpl)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, tmpl)).To(Succeed())
 
 		role1 := roleRes.DeepCopy()
 		role1.SetNamespace("tmpl")
@@ -116,8 +115,7 @@ var _ = Describe("Namespace controller", func() {
 				"verbs":     []interface{}{"get", "watch", "list"},
 			},
 		}
-		err = k8sClient.Create(ctx, role1)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, role1)).To(Succeed())
 
 		role2 := roleRes.DeepCopy()
 		role2.SetNamespace("tmpl")
@@ -130,8 +128,7 @@ var _ = Describe("Namespace controller", func() {
 				"verbs":     []interface{}{"get", "watch", "list"},
 			},
 		}
-		err = k8sClient.Create(ctx, role2)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, role2)).To(Succeed())
 
 		secret := secretRes.DeepCopy()
 		secret.SetNamespace("tmpl")
@@ -140,13 +137,11 @@ var _ = Describe("Namespace controller", func() {
 			"foo": "MjAyMC0wOS0xM1QwNDozOToxMFo=",
 		}
 		secret.SetAnnotations(map[string]string{constants.AnnPropagate: constants.PropagateUpdate})
-		err = k8sClient.Create(ctx, secret)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, secret)).To(Succeed())
 
 		ns1 := &corev1.Namespace{}
 		ns1.Name = "ns1"
-		err = k8sClient.Create(ctx, ns1)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, ns1)).To(Succeed())
 
 		secret2 := secretRes.DeepCopy()
 		secret2.SetNamespace("ns1")
@@ -155,72 +150,56 @@ var _ = Describe("Namespace controller", func() {
 			"bar": "MjAyMC0wOS0xM1QwNDozOToxMFo=",
 		}
 		secret2.SetAnnotations(map[string]string{constants.AnnPropagate: constants.PropagateUpdate})
-		err = k8sClient.Create(ctx, secret2)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, secret2)).To(Succeed())
 
 		time.Sleep(100 * time.Millisecond)
 
 		By("setting the template namespace")
-		ns1.Labels = map[string]string{constants.LabelTemplate: "tmpl"}
-		err = k8sClient.Update(ctx, ns1)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(komega.Update(ns1, func() {
+			ns1.Labels = map[string]string{constants.LabelTemplate: "tmpl"}
+		})()).To(Succeed())
 
-		Eventually(func() string {
-			ns1 = &corev1.Namespace{}
-			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "ns1"}, ns1); err != nil {
-				return ""
-			}
-			return ns1.Labels["team"]
-		}).Should(Equal("neco"))
+		Eventually(komega.Object(ns1)).Should(HaveField("Labels", HaveKeyWithValue("team", "neco")))
 		Expect(ns1.Labels).To(HaveKeyWithValue("foo.bar/baz", "baz"))
 		Expect(ns1.Labels).NotTo(HaveKey("memo"))
 		Expect(ns1.Annotations).To(HaveKeyWithValue("foo.bar/zot", "zot"))
 		Expect(ns1.Annotations).To(HaveKeyWithValue("memo", "memo"))
 		Expect(ns1.Annotations).NotTo(HaveKey("team"))
 
-		var pRole *rbacv1.Role
-		Eventually(func() error {
-			pRole = &rbacv1.Role{}
-			return k8sClient.Get(ctx, client.ObjectKey{Namespace: "ns1", Name: "role2"}, pRole)
-		}).Should(Succeed())
+		pRole := &rbacv1.Role{}
+		pRole.Name = "role2"
+		pRole.Namespace = ns1.Name
+		Eventually(komega.Get(pRole)).Should(Succeed())
 		Expect(pRole.Labels).To(HaveKeyWithValue(constants.LabelCreatedBy, constants.CreatedBy))
 		Expect(pRole.Annotations).To(HaveKeyWithValue(constants.AnnFrom, "tmpl"))
 		Expect(pRole.Annotations).To(HaveKeyWithValue(constants.AnnPropagate, constants.PropagateCreate))
 		Expect(pRole.Rules).To(HaveLen(1))
 
-		var pSecret *corev1.Secret
-		Eventually(func() error {
-			pSecret = &corev1.Secret{}
-			return k8sClient.Get(ctx, client.ObjectKey{Namespace: "ns1", Name: "foo"}, pSecret)
-		}).Should(Succeed())
+		pSecret := &corev1.Secret{}
+		pSecret.Name = "foo"
+		pSecret.Namespace = ns1.Name
+		Eventually(komega.Get(pSecret)).Should(Succeed())
 		Expect(pSecret.Labels).To(HaveKeyWithValue(constants.LabelCreatedBy, constants.CreatedBy))
 		Expect(pSecret.Annotations).To(HaveKeyWithValue(constants.AnnFrom, "tmpl"))
 		Expect(pSecret.Annotations).To(HaveKeyWithValue(constants.AnnPropagate, constants.PropagateUpdate))
 		Expect(pSecret.Data).To(HaveKey("foo"))
 
 		pRole2 := &rbacv1.Role{}
-		err = k8sClient.Get(ctx, client.ObjectKey{Namespace: "ns1", Name: "role1"}, pRole2)
-		Expect(apierrors.IsNotFound(err)).To(BeTrue())
+		pRole2.Name = "role1"
+		pRole2.Namespace = ns1.Name
+		Expect(komega.Get(pRole2)()).To(WithTransform(apierrors.IsNotFound, BeTrue()))
 
 		pSecret2 := &corev1.Secret{}
-		err = k8sClient.Get(ctx, client.ObjectKey{Namespace: "ns1", Name: "bar"}, pSecret2)
-		Expect(err).NotTo(HaveOccurred())
+		pSecret2.Name = "bar"
+		pSecret2.Namespace = ns1.Name
+		Expect(komega.Get(pSecret2)()).To(Succeed())
 
 		By("changing a label of template namespace")
-		tmpl = &corev1.Namespace{}
-		err = k8sClient.Get(ctx, client.ObjectKey{Name: "tmpl"}, tmpl)
-		Expect(err).NotTo(HaveOccurred())
-		tmpl.Labels["foo.bar/baz"] = "123"
-		err = k8sClient.Update(ctx, tmpl)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(komega.Update(tmpl, func() {
+			tmpl.Labels["foo.bar/baz"] = "123"
+		})()).To(Succeed())
 
-		Eventually(func() string {
-			ns1 = &corev1.Namespace{}
-			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "ns1"}, ns1); err != nil {
-				return ""
-			}
-			return ns1.Labels["foo.bar/baz"]
-		}).Should(Equal("123"))
+		Eventually(komega.Object(ns1)).Should(HaveField("Labels", HaveKeyWithValue("foo.bar/baz", "123")))
 
 		tmpl2 := &corev1.Namespace{}
 		tmpl2.Name = "tmpl2"
@@ -228,55 +207,35 @@ var _ = Describe("Namespace controller", func() {
 			constants.LabelType: constants.NSTypeTemplate,
 			"team":              "maneki",
 		}
-		err = k8sClient.Create(ctx, tmpl2)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, tmpl2)).To(Succeed())
 
 		sec2 := &corev1.Secret{}
-		sec2.Namespace = "tmpl2"
+		sec2.Namespace = tmpl2.Name
 		sec2.Name = "sec2"
 		sec2.Annotations = map[string]string{constants.AnnPropagate: constants.PropagateUpdate}
 		sec2.Data = map[string][]byte{"foo": []byte("barbar")}
-		err = k8sClient.Create(ctx, sec2)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, sec2)).To(Succeed())
 
 		By("changing the template namespace to tmpl2")
-		ns1.Labels[constants.LabelTemplate] = "tmpl2"
-		err = k8sClient.Update(ctx, ns1)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(komega.Update(ns1, func() {
+			ns1.Labels[constants.LabelTemplate] = "tmpl2"
+		})()).To(Succeed())
 
-		Eventually(func() bool {
-			secret := &corev1.Secret{}
-			err := k8sClient.Get(ctx, client.ObjectKey{Namespace: "ns1", Name: "foo"}, secret)
-			return apierrors.IsNotFound(err)
-		}).Should(BeTrue())
+		Eventually(komega.Get(pSecret)).Should(WithTransform(apierrors.IsNotFound, BeTrue()))
 
-		Eventually(func() error {
-			secret := &corev1.Secret{}
-			return k8sClient.Get(ctx, client.ObjectKey{Namespace: "ns1", Name: "sec2"}, secret)
-		}).Should(Succeed())
+		pSec2 := &corev1.Secret{}
+		pSec2.Name = "sec2"
+		pSec2.Namespace = ns1.Name
+		Eventually(komega.Get(pSec2)).Should(Succeed())
 
-		Eventually(func() string {
-			ns1 = &corev1.Namespace{}
-			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "ns1"}, ns1); err != nil {
-				return ""
-			}
-			return ns1.Labels["team"]
-		}).Should(Equal("maneki"))
+		Eventually(komega.Object(ns1)).Should(HaveField("Labels", HaveKeyWithValue("team", "maneki")))
 
 		By("unsetting the template")
-		ns1 = &corev1.Namespace{}
-		err = k8sClient.Get(ctx, client.ObjectKey{Name: "ns1"}, ns1)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(komega.Update(ns1, func() {
+			delete(ns1.Labels, constants.LabelTemplate)
+		})()).To(Succeed())
 
-		delete(ns1.Labels, constants.LabelTemplate)
-		err = k8sClient.Update(ctx, ns1)
-		Expect(err).NotTo(HaveOccurred())
-
-		Eventually(func() bool {
-			secret := &corev1.Secret{}
-			err := k8sClient.Get(ctx, client.ObjectKey{Namespace: "ns1", Name: "sec2"}, secret)
-			return apierrors.IsNotFound(err)
-		}).Should(BeTrue())
+		Eventually(komega.Get(pSec2)).Should(WithTransform(apierrors.IsNotFound, BeTrue()))
 	})
 
 	It("should handle propagation between template namespaces", func() {
@@ -286,8 +245,7 @@ var _ = Describe("Namespace controller", func() {
 			constants.LabelType: constants.NSTypeTemplate,
 			"team":              "neco",
 		}
-		err := k8sClient.Create(ctx, tmpl1)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, tmpl1)).To(Succeed())
 
 		tmpl2 := &corev1.Namespace{}
 		tmpl2.Name = "tree-tmpl-2"
@@ -296,47 +254,30 @@ var _ = Describe("Namespace controller", func() {
 			constants.LabelTemplate: "tree-tmpl-1",
 		}
 		tmpl2.Annotations = map[string]string{"memo": "mome"}
-		err = k8sClient.Create(ctx, tmpl2)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, tmpl2)).To(Succeed())
 
 		instance := &corev1.Namespace{}
 		instance.Name = "tree-instance"
 		instance.Labels = map[string]string{
 			constants.LabelTemplate: "tree-tmpl-2",
 		}
-		err = k8sClient.Create(ctx, instance)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, instance)).To(Succeed())
 
-		Eventually(func() string {
-			instance = &corev1.Namespace{}
-			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "tree-instance"}, instance); err != nil {
-				return ""
-			}
-			return instance.Labels["team"] + instance.Annotations["memo"]
-		}).Should(Equal("necomome"))
+		Eventually(komega.Object(instance)).Should(And(
+			HaveField("Labels", HaveKeyWithValue("team", "neco")),
+			HaveField("Annotations", HaveKeyWithValue("memo", "mome")),
+		))
 
-		tmpl2 = &corev1.Namespace{}
-		err = k8sClient.Get(ctx, client.ObjectKey{Name: "tree-tmpl-2"}, tmpl2)
-		Expect(err).NotTo(HaveOccurred())
-		tmpl2.Labels["team"] = "hoge"
-		tmpl2.Annotations["memo"] = "test"
-		err = k8sClient.Update(ctx, tmpl2)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(komega.Update(tmpl2, func() {
+			tmpl2.Labels["team"] = "hoge"
+			tmpl2.Annotations["memo"] = "test"
+		})()).To(Succeed())
 
-		Consistently(func() string {
-			instance = &corev1.Namespace{}
-			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "tree-instance"}, instance); err != nil {
-				return ""
-			}
-			return instance.Labels["team"]
-		}).Should(Equal("neco"))
+		Consistently(komega.Object(instance)).Should(HaveField("Labels", HaveKeyWithValue("team", "neco")))
 
 		Expect(instance.Annotations["memo"]).Should(Equal("test"))
 
-		tmpl2 = &corev1.Namespace{}
-		err = k8sClient.Get(ctx, client.ObjectKey{Name: "tree-tmpl-2"}, tmpl2)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(tmpl2.Labels["team"]).Should(Equal("neco"))
+		Expect(komega.Object(tmpl2)()).To(HaveField("Labels", HaveKeyWithValue("team", "neco")))
 	})
 
 	It("should not delete resources in an independent namespace", func() {
@@ -346,26 +287,20 @@ var _ = Describe("Namespace controller", func() {
 		secret.Annotations = map[string]string{constants.AnnPropagate: constants.PropagateUpdate}
 		secret.Data = map[string][]byte{"foo": []byte("bar")}
 
-		err := k8sClient.Create(ctx, secret)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, secret)).To(Succeed())
 
 		time.Sleep(100 * time.Millisecond)
 
 		ns := &corev1.Namespace{}
-		err = k8sClient.Get(ctx, client.ObjectKey{Name: "default"}, ns)
-		Expect(err).NotTo(HaveOccurred())
+		ns.Name = "default"
+		Expect(komega.Update(ns, func() {
+			if ns.Labels == nil {
+				ns.Labels = make(map[string]string)
+			}
+			ns.Labels["accurate-test"] = "test"
+		})()).To(Succeed())
 
-		if ns.Labels == nil {
-			ns.Labels = make(map[string]string)
-		}
-		ns.Labels["accurate-test"] = "test"
-		err = k8sClient.Update(ctx, ns)
-		Expect(err).NotTo(HaveOccurred())
-
-		Consistently(func() error {
-			s := &corev1.Secret{}
-			return k8sClient.Get(ctx, client.ObjectKey{Namespace: "default", Name: "independent"}, s)
-		}, 1, 0.1).Should(Succeed())
+		Consistently(komega.Get(secret), 1, 0.1).Should(Succeed())
 	})
 
 	It("should implement a sub namespace correctly", func() {
@@ -383,46 +318,35 @@ var _ = Describe("Namespace controller", func() {
 			"baz.glob/c":               "delete-me",
 			"do.not.match/glob.patten": "glob",
 		}
-		err := k8sClient.Create(ctx, root)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, root)).To(Succeed())
 
 		sec1 := &corev1.Secret{}
 		sec1.Namespace = "root"
 		sec1.Name = "sec1"
 		sec1.Data = map[string][]byte{"foo": []byte("bar")}
-		err = k8sClient.Create(ctx, sec1)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, sec1)).To(Succeed())
 
 		sec2 := &corev1.Secret{}
 		sec2.Namespace = "root"
 		sec2.Name = "sec2"
 		sec2.Annotations = map[string]string{constants.AnnPropagate: constants.PropagateCreate}
 		sec2.Data = map[string][]byte{"foo": []byte("bar")}
-		err = k8sClient.Create(ctx, sec2)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, sec2)).To(Succeed())
 
 		sec3 := &corev1.Secret{}
 		sec3.Namespace = "root"
 		sec3.Name = "sec3"
 		sec3.Annotations = map[string]string{constants.AnnPropagate: constants.PropagateUpdate}
 		sec3.Data = map[string][]byte{"foo": []byte("bar")}
-		err = k8sClient.Create(ctx, sec3)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, sec3)).To(Succeed())
 
 		By("creating a sub namespace")
 		sub1 := &corev1.Namespace{}
 		sub1.Name = "sub1"
 		sub1.Labels = map[string]string{constants.LabelParent: "root"}
-		err = k8sClient.Create(ctx, sub1)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, sub1)).To(Succeed())
 
-		Eventually(func() string {
-			sub1 = &corev1.Namespace{}
-			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "sub1"}, sub1); err != nil {
-				return ""
-			}
-			return sub1.Labels["team"]
-		}).Should(Equal("neco"))
+		Eventually(komega.Object(sub1)).Should(HaveField("Labels", HaveKeyWithValue("team", "neco")))
 		Expect(sub1.Labels).Should(HaveKeyWithValue("foo.glob/a", "glob"))
 		Expect(sub1.Labels).NotTo(HaveKey(constants.LabelType))
 		Expect(sub1.Labels).NotTo(HaveKey("do.not.match/glob/patten"))
@@ -431,70 +355,47 @@ var _ = Describe("Namespace controller", func() {
 		Expect(sub1.Annotations).NotTo(HaveKey("foo"))
 		Expect(sub1.Annotations).NotTo(HaveKey("do.not.match/glob/patten"))
 
-		Eventually(func() error {
-			cSec2 := &corev1.Secret{}
-			return k8sClient.Get(ctx, client.ObjectKey{Namespace: "sub1", Name: "sec2"}, cSec2)
-		}).Should(Succeed())
-		Eventually(func() error {
-			cSec3 := &corev1.Secret{}
-			return k8sClient.Get(ctx, client.ObjectKey{Namespace: "sub1", Name: "sec3"}, cSec3)
-		}).Should(Succeed())
+		cSec2 := &corev1.Secret{}
+		cSec2.Name = "sec2"
+		cSec2.Namespace = sub1.Name
+		Eventually(komega.Get(cSec2)).Should(Succeed())
+		cSec3 := &corev1.Secret{}
+		cSec3.Name = "sec3"
+		cSec3.Namespace = sub1.Name
+		Eventually(komega.Get(cSec3)).Should(Succeed())
 
 		By("creating a grandchild namespace")
 		sub2 := &corev1.Namespace{}
 		sub2.Name = "sub2"
 		sub2.Labels = map[string]string{constants.LabelParent: "sub1"}
-		err = k8sClient.Create(ctx, sub2)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, sub2)).To(Succeed())
 
-		Eventually(func() string {
-			sub2 = &corev1.Namespace{}
-			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "sub2"}, sub2); err != nil {
-				return ""
-			}
-			return sub2.Labels["team"]
-		}).Should(Equal("neco"))
-		Eventually(func() error {
-			cSec2 := &corev1.Secret{}
-			return k8sClient.Get(ctx, client.ObjectKey{Namespace: "sub2", Name: "sec2"}, cSec2)
-		}).Should(Succeed())
-		Eventually(func() error {
-			cSec3 := &corev1.Secret{}
-			return k8sClient.Get(ctx, client.ObjectKey{Namespace: "sub2", Name: "sec3"}, cSec3)
-		}).Should(Succeed())
+		Eventually(komega.Object(sub2)).Should(HaveField("Labels", HaveKeyWithValue("team", "neco")))
+		gcSec2 := &corev1.Secret{}
+		gcSec2.Name = sec2.Name
+		gcSec2.Namespace = sub2.Name
+		Eventually(komega.Get(gcSec2)).Should(Succeed())
+		gcSec3 := &corev1.Secret{}
+		gcSec3.Name = sec3.Name
+		gcSec3.Namespace = sub2.Name
+		Eventually(komega.Get(gcSec3)).Should(Succeed())
 
 		By("editing a label of root namespace")
-		root.Labels["team"] = "nuco"
-		err = k8sClient.Update(ctx, root)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(komega.Update(root, func() {
+			root.Labels["team"] = "nuco"
+		})()).To(Succeed())
 
-		Eventually(func() string {
-			sub1 = &corev1.Namespace{}
-			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "sub1"}, sub1); err != nil {
-				return ""
-			}
-			return sub1.Labels["team"]
-		}).Should(Equal("nuco"))
-		Eventually(func() string {
-			sub2 = &corev1.Namespace{}
-			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "sub2"}, sub2); err != nil {
-				return ""
-			}
-			return sub2.Labels["team"]
-		}).Should(Equal("nuco"))
+		Eventually(komega.Object(sub1)).Should(HaveField("Labels", HaveKeyWithValue("team", "nuco")))
+		Eventually(komega.Object(sub2)).Should(HaveField("Labels", HaveKeyWithValue("team", "nuco")))
 
 		By("deleting an annotation in root namespace")
-		delete(root.Labels, "baz.glob/c")
-		Eventually(func() error {
-			sub1 = &corev1.Namespace{}
-			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "sub1"}, sub1); err != nil {
-				return err
-			}
-			if _, ok := sub1.Annotations["baz.glob/c"]; !ok {
-				return errors.New("annotation has been deleted")
-			}
-			return nil
-		}).Should(Succeed())
+		Expect(komega.Update(root, func() {
+			delete(root.Labels, "baz.glob/c")
+		})()).To(Succeed())
+		// Cleaning up obsolete labels/annotations from sub-namespaces is currently unsupported
+		// See https://github.com/cybozu-go/accurate/issues/98
+		Consistently(komega.Object(sub1)).Should(HaveField("Annotations", HaveKey("baz.glob/c")))
+		//Eventually(komega.Object(sub1)).Should(HaveField("Annotations", Not(HaveKey("baz.glob/c"))))
 
 		By("changing the parent of sub2")
 		root2 := &corev1.Namespace{}
@@ -503,30 +404,17 @@ var _ = Describe("Namespace controller", func() {
 			constants.LabelType: constants.NSTypeRoot,
 			"foo.bar/baz":       "baz",
 		}
-		err = k8sClient.Create(ctx, root2)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, root2)).To(Succeed())
 
-		sub2.Labels[constants.LabelParent] = "root2"
-		err = k8sClient.Update(ctx, sub2)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(komega.Update(sub2, func() {
+			sub2.Labels[constants.LabelParent] = "root2"
+		})()).To(Succeed())
 
-		Eventually(func() string {
-			sub2 = &corev1.Namespace{}
-			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "sub2"}, sub2); err != nil {
-				return ""
-			}
-			return sub2.Labels["foo.bar/baz"]
-		}).Should(Equal("baz"))
+		Eventually(komega.Object(sub2)).Should(HaveField("Labels", HaveKeyWithValue("foo.bar/baz", "baz")))
 
-		Eventually(func() bool {
-			sec := &corev1.Secret{}
-			err := k8sClient.Get(ctx, client.ObjectKey{Namespace: "sub2", Name: "sec3"}, sec)
-			return apierrors.IsNotFound(err)
-		}).Should(BeTrue())
+		Eventually(komega.Get(gcSec3)).Should(WithTransform(apierrors.IsNotFound, BeTrue()))
 
-		cSec2 := &corev1.Secret{}
-		err = k8sClient.Get(ctx, client.ObjectKey{Namespace: "sub2", Name: "sec2"}, cSec2)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(komega.Get(gcSec2)()).To(Succeed())
 
 		By("creating a SubNamespace for sub1 namespace")
 		sn := &accuratev2alpha1.SubNamespace{}
@@ -541,91 +429,37 @@ var _ = Describe("Namespace controller", func() {
 			"empty": "true",
 		}
 		sn.Finalizers = []string{constants.Finalizer}
-		err = k8sClient.Create(ctx, sn)
-		Expect(err).NotTo(HaveOccurred())
-		Eventually(func() error {
-			sub1 := &corev1.Namespace{}
-			err := k8sClient.Get(ctx, client.ObjectKey{Name: "sub1"}, sub1)
-			if err != nil {
-				return err
-			}
-
-			if sub1.Labels["team"] != "neco" {
-				return errors.New("team label is not neco")
-			}
-			if _, ok := sub1.Labels["empty"]; ok {
-				return errors.New("empty label is propagated")
-			}
-
-			if sub1.Annotations["memo"] != "neco" {
-				return errors.New("memo annotation is not neco")
-			}
-			if _, ok := sub1.Annotations["empty"]; ok {
-				return errors.New("empty annotation is propagated")
-			}
-			return nil
-		}).Should(Succeed())
+		Expect(k8sClient.Create(ctx, sn)).To(Succeed())
+		Eventually(komega.Object(sub1)).Should(And(
+			HaveField("Labels", HaveKeyWithValue("team", "neco")),
+			HaveField("Labels", Not(HaveKey("empty"))),
+			HaveField("Annotations", HaveKeyWithValue("memo", "neco")),
+			HaveField("Annotations", Not(HaveKey("empty"))),
+		))
 
 		By("returning the parent of sub2")
-		sub2.Labels[constants.LabelParent] = "sub1"
-		err = k8sClient.Update(ctx, sub2)
-		Expect(err).NotTo(HaveOccurred())
-		Eventually(func() error {
-			sub2 := &corev1.Namespace{}
-			err := k8sClient.Get(ctx, client.ObjectKey{Name: "sub2"}, sub2)
-			if err != nil {
-				return err
-			}
-
-			if sub2.Labels["team"] != "neco" {
-				return errors.New("team label is not neco")
-			}
-			if _, ok := sub2.Labels["empty"]; ok {
-				return errors.New("empty label is propagated")
-			}
-
-			if sub2.Annotations["memo"] != "neco" {
-				return errors.New("memo annotation is not neco")
-			}
-			if _, ok := sub2.Annotations["empty"]; ok {
-				return errors.New("empty annotation is propagated")
-			}
-			return nil
-		}).Should(Succeed())
+		Expect(komega.Update(sub2, func() {
+			sub2.Labels[constants.LabelParent] = "sub1"
+		})()).To(Succeed())
+		Eventually(komega.Object(sub2)).Should(And(
+			HaveField("Labels", HaveKeyWithValue("team", "neco")),
+			HaveField("Labels", Not(HaveKey("empty"))),
+			HaveField("Annotations", HaveKeyWithValue("memo", "neco")),
+			HaveField("Annotations", Not(HaveKey("empty"))),
+		))
 
 		By("updating labels and annotations of SubNamespace for sub1 namespace")
-		sn.Spec.Labels["team"] = "tama"
-		sn.Spec.Annotations["memo"] = "tama"
-		err = k8sClient.Update(ctx, sn)
-		Expect(err).NotTo(HaveOccurred())
-		Eventually(func() error {
-			sub1 := &corev1.Namespace{}
-			err := k8sClient.Get(ctx, client.ObjectKey{Name: "sub1"}, sub1)
-			if err != nil {
-				return err
-			}
-			if sub1.Labels["team"] != "tama" {
-				return errors.New("team label is not tama")
-			}
-			if sub1.Annotations["memo"] != "tama" {
-				return errors.New("memo annotation is not tama")
-			}
-			return nil
-		}).Should(Succeed())
-
-		Eventually(func() error {
-			sub2 := &corev1.Namespace{}
-			err := k8sClient.Get(ctx, client.ObjectKey{Name: "sub2"}, sub2)
-			if err != nil {
-				return err
-			}
-			if sub2.Labels["team"] != "tama" {
-				return errors.New("team label is not tama")
-			}
-			if sub2.Annotations["memo"] != "tama" {
-				return errors.New("memo annotation is not tama")
-			}
-			return nil
-		}).Should(Succeed())
+		Expect(komega.Update(sn, func() {
+			sn.Spec.Labels["team"] = "tama"
+			sn.Spec.Annotations["memo"] = "tama"
+		})()).To(Succeed())
+		Eventually(komega.Object(sub1)).Should(And(
+			HaveField("Labels", HaveKeyWithValue("team", "tama")),
+			HaveField("Annotations", HaveKeyWithValue("memo", "tama")),
+		))
+		Eventually(komega.Object(sub2)).Should(And(
+			HaveField("Labels", HaveKeyWithValue("team", "tama")),
+			HaveField("Annotations", HaveKeyWithValue("memo", "tama")),
+		))
 	})
 })

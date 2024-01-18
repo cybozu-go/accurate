@@ -9,11 +9,10 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
 
@@ -54,71 +53,43 @@ var _ = Describe("SubNamespace controller", func() {
 	It("should create and delete sub namespaces", func() {
 		ns := &corev1.Namespace{}
 		ns.Name = "test1"
-		err := k8sClient.Create(ctx, ns)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, ns)).To(Succeed())
 
 		sn := &accuratev2alpha1.SubNamespace{}
 		sn.Namespace = "test1"
 		sn.Name = "test1-sub1"
 		sn.Finalizers = []string{constants.Finalizer}
-		err = k8sClient.Create(ctx, sn)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, sn)).To(Succeed())
 
-		var sub1 *corev1.Namespace
-		Eventually(func() error {
-			sub1 = &corev1.Namespace{}
-			return k8sClient.Get(ctx, client.ObjectKey{Name: "test1-sub1"}, sub1)
-		}).Should(Succeed())
+		sub1 := &corev1.Namespace{}
+		sub1.Name = "test1-sub1"
+		Eventually(komega.Get(sub1)).Should(Succeed())
 
 		Expect(sub1.Labels).To(HaveKeyWithValue(constants.LabelCreatedBy, "accurate"))
 		Expect(sub1.Labels).To(HaveKeyWithValue(constants.LabelParent, "test1"))
-		Eventually(func() int64 {
-			sn = &accuratev2alpha1.SubNamespace{}
-			err = k8sClient.Get(ctx, client.ObjectKey{Namespace: "test1", Name: "test1-sub1"}, sn)
-			if err != nil {
-				return 0
-			}
-			return sn.Status.ObservedGeneration
-		}).Should(BeNumerically(">", 0))
+		Eventually(komega.Object(sn)).Should(HaveField("Status.ObservedGeneration", BeNumerically(">", 0)))
 		Expect(sn.Status.Conditions).To(BeEmpty())
 
-		err = k8sClient.Delete(ctx, sn)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Delete(ctx, sn)).To(Succeed())
 
-		Eventually(func() bool {
-			sub1 = &corev1.Namespace{}
-			err := k8sClient.Get(ctx, client.ObjectKey{Name: "test1-sub1"}, sub1)
-			if err != nil {
-				return apierrors.IsNotFound(err)
-			}
-			return sub1.DeletionTimestamp != nil
-		}).Should(BeTrue())
+		Eventually(komega.Object(sub1)).Should(HaveField("DeletionTimestamp", Not(BeNil())))
 	})
 
 	It("should detect conflicts", func() {
 		ns := &corev1.Namespace{}
 		ns.Name = "test2"
-		err := k8sClient.Create(ctx, ns)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, ns)).To(Succeed())
 
 		ns2 := &corev1.Namespace{}
 		ns2.Name = "test2-sub1"
-		err = k8sClient.Create(ctx, ns2)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, ns2)).To(Succeed())
 
 		sn := &accuratev2alpha1.SubNamespace{}
 		sn.Namespace = "test2"
 		sn.Name = "test2-sub1"
-		err = k8sClient.Create(ctx, sn)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, sn)).To(Succeed())
 
-		Eventually(func() int64 {
-			sn = &accuratev2alpha1.SubNamespace{}
-			if err := k8sClient.Get(ctx, client.ObjectKey{Namespace: "test2", Name: "test2-sub1"}, sn); err != nil {
-				return 0
-			}
-			return sn.Status.ObservedGeneration
-		}).Should(BeNumerically(">", 0))
+		Eventually(komega.Object(sn)).Should(HaveField("Status.ObservedGeneration", BeNumerically(">", 0)))
 		Expect(sn.Status.Conditions).To(HaveLen(1))
 		Expect(sn.Status.Conditions[0].Reason).To(Equal(accuratev2alpha1.SubNamespaceConflict))
 	})
@@ -126,68 +97,45 @@ var _ = Describe("SubNamespace controller", func() {
 	It("should not delete a conflicting sub namespace", func() {
 		ns := &corev1.Namespace{}
 		ns.Name = "test3"
-		err := k8sClient.Create(ctx, ns)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, ns)).To(Succeed())
 
 		sn := &accuratev2alpha1.SubNamespace{}
 		sn.Namespace = "test3"
 		sn.Name = "test3-sub1"
 		sn.Finalizers = []string{constants.Finalizer}
-		err = k8sClient.Create(ctx, sn)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, sn)).To(Succeed())
 
-		var sub1 *corev1.Namespace
-		Eventually(func() error {
-			sub1 = &corev1.Namespace{}
-			return k8sClient.Get(ctx, client.ObjectKey{Name: "test3-sub1"}, sub1)
-		}).Should(Succeed())
+		sub1 := &corev1.Namespace{}
+		sub1.Name = "test3-sub1"
+		Eventually(komega.Get(sub1)).Should(Succeed())
 
-		sub1.Labels[constants.LabelParent] = "foo"
-		err = k8sClient.Update(ctx, sub1)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(komega.Update(sub1, func() {
+			sub1.Labels[constants.LabelParent] = "foo"
+		})()).To(Succeed())
 
-		Eventually(func() []metav1.Condition {
-			sn = &accuratev2alpha1.SubNamespace{}
-			err = k8sClient.Get(ctx, client.ObjectKey{Namespace: "test3", Name: "test3-sub1"}, sn)
-			if err != nil {
-				return nil
-			}
-			return sn.Status.Conditions
-		}).Should(HaveLen(1))
+		Eventually(komega.Object(sn)).Should(HaveField("Status.Conditions", HaveLen(1)))
 		Expect(sn.Status.Conditions[0].Reason).To(Equal(accuratev2alpha1.SubNamespaceConflict))
 
-		err = k8sClient.Delete(ctx, sn)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Delete(ctx, sn)).To(Succeed())
 
-		Consistently(func() bool {
-			sub1 = &corev1.Namespace{}
-			if err := k8sClient.Get(ctx, client.ObjectKey{Name: "test3-sub1"}, sub1); err != nil {
-				return false
-			}
-			return sub1.DeletionTimestamp == nil
-		}).Should(BeTrue())
+		Consistently(komega.Object(sub1)).Should(HaveField("DeletionTimestamp", BeNil()))
 	})
 
 	It("should re-create a subnamespace if it is deleted", func() {
 		ns := &corev1.Namespace{}
 		ns.Name = "test4"
-		err := k8sClient.Create(ctx, ns)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, ns)).To(Succeed())
 
 		sn := &accuratev2alpha1.SubNamespace{}
 		sn.Namespace = "test4"
 		sn.Name = "test4-sub1"
-		err = k8sClient.Create(ctx, sn)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, sn)).To(Succeed())
 
-		var sub1 *corev1.Namespace
-		Eventually(func() error {
-			sub1 = &corev1.Namespace{}
-			return k8sClient.Get(ctx, client.ObjectKey{Name: "test4-sub1"}, sub1)
-		}).Should(Succeed())
+		sub1 := &corev1.Namespace{}
+		sub1.Name = "test4-sub1"
+		Eventually(komega.Get(sub1)).Should(Succeed())
 
-		err = k8sClient.Delete(ctx, sub1)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Delete(ctx, sub1)).To(Succeed())
 
 		uid := sub1.UID
 		sub1 = &corev1.Namespace{}
@@ -197,13 +145,6 @@ var _ = Describe("SubNamespace controller", func() {
 		_, err = cs.CoreV1().Namespaces().Finalize(ctx, sub1, metav1.UpdateOptions{})
 		Expect(err).NotTo(HaveOccurred())
 
-		Eventually(func() bool {
-			sub1 = &corev1.Namespace{}
-			err := k8sClient.Get(ctx, client.ObjectKey{Name: "test4-sub1"}, sub1)
-			if err != nil {
-				return false
-			}
-			return sub1.UID != uid
-		}).Should(BeTrue())
+		Eventually(komega.Object(sub1)).Should(HaveField("UID", Not(Equal(uid))))
 	})
 })

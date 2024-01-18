@@ -15,6 +15,7 @@ import (
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
+	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
@@ -79,43 +80,38 @@ var _ = BeforeSuite(func() {
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme})
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
+	komega.SetClient(k8sClient)
 
 	// prepare resources
 	ns := &corev1.Namespace{}
 	ns.Name = "prop-root"
 	ns.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
-	err = k8sClient.Create(context.Background(), ns)
-	Expect(err).NotTo(HaveOccurred())
+	Expect(k8sClient.Create(context.Background(), ns)).To(Succeed())
 
 	ns = &corev1.Namespace{}
 	ns.Name = "prop-sub1"
 	ns.Labels = map[string]string{constants.LabelParent: "prop-root"}
-	err = k8sClient.Create(context.Background(), ns)
-	Expect(err).NotTo(HaveOccurred())
+	Expect(k8sClient.Create(context.Background(), ns)).To(Succeed())
 
 	ns = &corev1.Namespace{}
 	ns.Name = "prop-sub2"
 	ns.Labels = map[string]string{constants.LabelParent: "prop-root"}
-	err = k8sClient.Create(context.Background(), ns)
-	Expect(err).NotTo(HaveOccurred())
+	Expect(k8sClient.Create(context.Background(), ns)).To(Succeed())
 
 	ns = &corev1.Namespace{}
 	ns.Name = "prop-sub1-sub"
 	ns.Labels = map[string]string{constants.LabelParent: "prop-sub1"}
-	err = k8sClient.Create(context.Background(), ns)
-	Expect(err).NotTo(HaveOccurred())
+	Expect(k8sClient.Create(context.Background(), ns)).To(Succeed())
 
 	ns = &corev1.Namespace{}
 	ns.Name = "prop-tmpl"
 	ns.Labels = map[string]string{constants.LabelType: constants.NSTypeTemplate}
-	err = k8sClient.Create(context.Background(), ns)
-	Expect(err).NotTo(HaveOccurred())
+	Expect(k8sClient.Create(context.Background(), ns)).To(Succeed())
 
 	ns = &corev1.Namespace{}
 	ns.Name = "prop-instance"
 	ns.Labels = map[string]string{constants.LabelTemplate: "prop-tmpl"}
-	err = k8sClient.Create(context.Background(), ns)
-	Expect(err).NotTo(HaveOccurred())
+	Expect(k8sClient.Create(context.Background(), ns)).To(Succeed())
 
 })
 

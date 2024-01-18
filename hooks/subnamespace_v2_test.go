@@ -22,13 +22,12 @@ var _ = Describe("SubNamespace webhook", func() {
 	It("should deny creation of v2 SubNamespace in a namespace that is neither root nor subnamespace", func() {
 		ns := &corev1.Namespace{}
 		ns.Name = "v2alpha1-ns1"
-		err := k8sClient.Create(ctx, ns)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(k8sClient.Create(ctx, ns)).To(Succeed())
 
 		sn := &accuratev2alpha1.SubNamespace{}
 		sn.Namespace = "v2alpha1-ns1"
 		sn.Name = "v2alpha1-foo"
-		err = k8sClient.Create(ctx, sn)
+		err := k8sClient.Create(ctx, sn)
 		Expect(err).To(HaveOccurred())
 		Expect(errors.ReasonForError(err)).Should(Equal(metav1.StatusReasonForbidden))
 	})
@@ -37,27 +36,23 @@ var _ = Describe("SubNamespace webhook", func() {
 		ns := &corev1.Namespace{}
 		ns.Name = "v2alpha1-ns2"
 		ns.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
-		err := k8sClient.Create(ctx, ns)
-		Expect(err).To(Succeed())
+		Expect(k8sClient.Create(ctx, ns)).To(Succeed())
 
 		sn := &accuratev2alpha1.SubNamespace{}
 		sn.Namespace = "v2alpha1-ns2"
 		sn.Name = "v2alpha1-foo"
 		sn.Spec.Labels = map[string]string{"foo": "bar"}
 		sn.Spec.Annotations = map[string]string{"foo": "bar"}
-		err = k8sClient.Create(ctx, sn)
-		Expect(err).To(Succeed())
+		Expect(k8sClient.Create(ctx, sn)).To(Succeed())
 
 		Expect(controllerutil.ContainsFinalizer(sn, constants.Finalizer)).To(BeTrue())
 
 		// deleting finalizer should succeed
 		sn.Finalizers = nil
-		err = k8sClient.Update(ctx, sn)
-		Expect(err).To(Succeed())
+		Expect(k8sClient.Update(ctx, sn)).To(Succeed())
 
 		sn = &accuratev2alpha1.SubNamespace{}
-		err = k8sClient.Get(ctx, client.ObjectKey{Namespace: "v2alpha1-ns2", Name: "v2alpha1-foo"}, sn)
-		Expect(err).To(Succeed())
+		Expect(k8sClient.Get(ctx, client.ObjectKey{Namespace: "v2alpha1-ns2", Name: "v2alpha1-foo"}, sn)).To(Succeed())
 		Expect(sn.Finalizers).To(BeEmpty())
 	})
 
