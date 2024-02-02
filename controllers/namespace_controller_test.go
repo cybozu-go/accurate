@@ -201,6 +201,12 @@ var _ = Describe("Namespace controller", func() {
 
 		Eventually(komega.Object(ns1)).Should(HaveField("Labels", HaveKeyWithValue("foo.bar/baz", "123")))
 
+		By("removing a label of template namespace")
+		Expect(komega.Update(tmpl, func() {
+			delete(tmpl.Labels, "foo.bar/baz")
+		})()).To(Succeed())
+		Eventually(komega.Object(ns1)).Should(HaveField("Labels", Not(HaveKey("foo.bar/baz"))))
+
 		tmpl2 := &corev1.Namespace{}
 		tmpl2.Name = "tmpl2"
 		tmpl2.Labels = map[string]string{
@@ -229,12 +235,17 @@ var _ = Describe("Namespace controller", func() {
 		Eventually(komega.Get(pSec2)).Should(Succeed())
 
 		Eventually(komega.Object(ns1)).Should(HaveField("Labels", HaveKeyWithValue("team", "maneki")))
+		// assert that annotations/labels from previous template are removed
+		Expect(ns1.Annotations).To(Not(HaveKey("foo.bar/zot")))
+		Expect(ns1.Annotations).To(Not(HaveKey("memo")))
+		Expect(ns1.Annotations).To(Not(HaveKey("team")))
+		Expect(ns1.Labels).To(Not(HaveKey("foo.bar/baz")))
+		Expect(ns1.Labels).To(Not(HaveKey("memo")))
 
 		By("unsetting the template")
 		Expect(komega.Update(ns1, func() {
 			delete(ns1.Labels, constants.LabelTemplate)
 		})()).To(Succeed())
-
 		Eventually(komega.Get(pSec2)).Should(WithTransform(apierrors.IsNotFound, BeTrue()))
 	})
 
@@ -278,6 +289,12 @@ var _ = Describe("Namespace controller", func() {
 		Expect(instance.Annotations["memo"]).Should(Equal("test"))
 
 		Expect(komega.Object(tmpl2)()).To(HaveField("Labels", HaveKeyWithValue("team", "neco")))
+
+		By("removing a label from root template namespace")
+		Expect(komega.Update(tmpl1, func() {
+			delete(tmpl1.Labels, "team")
+		})()).To(Succeed())
+		Eventually(komega.Object(instance)).Should(HaveField("Labels", Not(HaveKey("team"))))
 	})
 
 	It("should not delete resources in an independent namespace", func() {
@@ -390,12 +407,9 @@ var _ = Describe("Namespace controller", func() {
 
 		By("deleting an annotation in root namespace")
 		Expect(komega.Update(root, func() {
-			delete(root.Labels, "baz.glob/c")
+			delete(root.Annotations, "baz.glob/c")
 		})()).To(Succeed())
-		// Cleaning up obsolete labels/annotations from sub-namespaces is currently unsupported
-		// See https://github.com/cybozu-go/accurate/issues/98
-		Consistently(komega.Object(sub1)).Should(HaveField("Annotations", HaveKey("baz.glob/c")))
-		//Eventually(komega.Object(sub1)).Should(HaveField("Annotations", Not(HaveKey("baz.glob/c"))))
+		Eventually(komega.Object(sub1)).Should(HaveField("Annotations", Not(HaveKey("baz.glob/c"))))
 
 		By("changing the parent of sub2")
 		root2 := &corev1.Namespace{}
@@ -461,5 +475,61 @@ var _ = Describe("Namespace controller", func() {
 			HaveField("Labels", HaveKeyWithValue("team", "tama")),
 			HaveField("Annotations", HaveKeyWithValue("memo", "tama")),
 		))
+	})
+
+	Context("templated namespace", func() {
+		var ns1 *corev1.Namespace
+
+		BeforeEach(func() {
+			tmpl := &corev1.Namespace{}
+			tmpl.GenerateName = "tmpl"
+			tmpl.Labels = map[string]string{
+				constants.LabelType: constants.NSTypeTemplate,
+				"team":              "label",
+			}
+			tmpl.Annotations = map[string]string{"memo": "annot"}
+			Expect(k8sClient.Create(ctx, tmpl)).To(Succeed())
+
+			ns1 = &corev1.Namespace{}
+			ns1.GenerateName = "ns1"
+			ns1.Labels = map[string]string{constants.LabelTemplate: tmpl.Name}
+			Expect(k8sClient.Create(ctx, ns1)).To(Succeed())
+
+			Eventually(komega.Object(ns1)).Should(HaveField("Labels", HaveKeyWithValue("team", "label")))
+			Expect(ns1.Annotations).To(HaveKeyWithValue("memo", "annot"))
+		})
+
+		It("should have stable resourceVersion", func() {
+			resourceVersion := ns1.ResourceVersion
+			Consistently(komega.Object(ns1)).Should(HaveField("ResourceVersion", Equal(resourceVersion)))
+		})
+	})
+
+	Context("sub namespace", func() {
+		var sub1 *corev1.Namespace
+
+		BeforeEach(func() {
+			root := &corev1.Namespace{}
+			root.GenerateName = "root"
+			root.Labels = map[string]string{
+				constants.LabelType: constants.NSTypeRoot,
+				"team":              "label",
+			}
+			root.Annotations = map[string]string{"memo": "annot"}
+			Expect(k8sClient.Create(ctx, root)).To(Succeed())
+
+			sub1 = &corev1.Namespace{}
+			sub1.GenerateName = "sub1"
+			sub1.Labels = map[string]string{constants.LabelParent: root.Name}
+			Expect(k8sClient.Create(ctx, sub1)).To(Succeed())
+
+			Eventually(komega.Object(sub1)).Should(HaveField("Labels", HaveKeyWithValue("team", "label")))
+			Expect(sub1.Annotations).To(HaveKeyWithValue("memo", "annot"))
+		})
+
+		It("should have stable resourceVersion", func() {
+			resourceVersion := sub1.ResourceVersion
+			Consistently(komega.Object(sub1)).Should(HaveField("ResourceVersion", Equal(resourceVersion)))
+		})
 	})
 })
