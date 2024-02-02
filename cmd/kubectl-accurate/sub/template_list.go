@@ -8,16 +8,17 @@ import (
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/cli-runtime/pkg/genericiooptions"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type templateListOpts struct {
-	streams  genericclioptions.IOStreams
+	streams  genericiooptions.IOStreams
 	client   client.Client
 	template string
 }
 
-func newTemplateListCmd(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
+func newTemplateListCmd(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
 	opts := &templateListOpts{}
 
 	cmd := &cobra.Command{
@@ -38,7 +39,7 @@ If TEMPLATE is given, only the tree under the TEMPLATE namespace will be shown.`
 	return cmd
 }
 
-func (o *templateListOpts) Fill(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
+func (o *templateListOpts) Fill(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
 	o.streams = streams
 	cl, err := makeClient(config)
 	if err != nil {

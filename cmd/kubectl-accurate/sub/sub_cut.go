@@ -10,16 +10,17 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/cli-runtime/pkg/genericiooptions"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type subCutOpts struct {
-	streams genericclioptions.IOStreams
+	streams genericiooptions.IOStreams
 	client  client.Client
 	name    string
 }
 
-func newSubCutCmd(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
+func newSubCutCmd(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
 	opts := &subCutOpts{}
 
 	cmd := &cobra.Command{
@@ -39,7 +40,7 @@ The child sub-namespaces under NS will be moved along with it.`,
 	return cmd
 }
 
-func (o *subCutOpts) Fill(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
+func (o *subCutOpts) Fill(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
 	o.streams = streams
 	cl, err := makeClient(config)
 	if err != nil {

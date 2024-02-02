@@ -16,17 +16,18 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/cli-runtime/pkg/genericiooptions"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type nsDescribeOpts struct {
-	streams    genericclioptions.IOStreams
+	streams    genericiooptions.IOStreams
 	client     client.Client
 	name       string
 	accurateNS string
 }
 
-func newNSDescribeCmd(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
+func newNSDescribeCmd(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
 	opts := &nsDescribeOpts{}
 	cmd := &cobra.Command{
 		Use:   "describe NS",
@@ -45,7 +46,7 @@ func newNSDescribeCmd(streams genericclioptions.IOStreams, config *genericcliopt
 	return cmd
 }
 
-func (o *nsDescribeOpts) Fill(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
+func (o *nsDescribeOpts) Fill(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
 	o.streams = streams
 	cl, err := makeClient(config)
 	if err != nil {

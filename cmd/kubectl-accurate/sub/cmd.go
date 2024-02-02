@@ -10,10 +10,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/cli-runtime/pkg/genericiooptions"
 )
 
 // NewCmd creates the root *cobra.Command of `kubectl-accurate`.
-func NewCmd(streams genericclioptions.IOStreams) *cobra.Command {
+func NewCmd(streams genericiooptions.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "accurate",
 		Short:   "Subcommand for Accurate",
@@ -41,7 +42,7 @@ func Execute() {
 	flags := pflag.NewFlagSet("kubectl-accurate", pflag.ExitOnError)
 	pflag.CommandLine = flags
 
-	cmd := NewCmd(genericclioptions.IOStreams{
+	cmd := NewCmd(genericiooptions.IOStreams{
 		In:     os.Stdin,
 		Out:    os.Stdout,
 		ErrOut: os.Stderr,

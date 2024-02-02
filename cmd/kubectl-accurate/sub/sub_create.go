@@ -9,11 +9,12 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/cli-runtime/pkg/genericiooptions"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type subCreateOpts struct {
-	streams     genericclioptions.IOStreams
+	streams     genericiooptions.IOStreams
 	client      client.Client
 	name        string
 	parent      string
@@ -21,7 +22,7 @@ type subCreateOpts struct {
 	annotations map[string]string
 }
 
-func newSubCreateCmd(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
+func newSubCreateCmd(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
 	opts := &subCreateOpts{}
 
 	cmd := &cobra.Command{
@@ -43,7 +44,7 @@ This effectively creates a namespace named NAME as a sub-namespace of NS.`,
 	return cmd
 }
 
-func (o *subCreateOpts) Fill(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
+func (o *subCreateOpts) Fill(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
 	o.streams = streams
 	cl, err := makeClient(config)
 	if err != nil {
