@@ -10,18 +10,19 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/cli-runtime/pkg/genericiooptions"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type subMoveOpts struct {
-	streams genericclioptions.IOStreams
+	streams genericiooptions.IOStreams
 	client  client.Client
 	name    string
 	parent  string
 	orphan  bool
 }
 
-func newSubMoveCmd(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
+func newSubMoveCmd(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
 	opts := &subMoveOpts{}
 
 	cmd := &cobra.Command{
@@ -49,7 +50,7 @@ In this case, the original SubNamespace will be marked as conflicted.`,
 	return cmd
 }
 
-func (o *subMoveOpts) Fill(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
+func (o *subMoveOpts) Fill(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
 	o.streams = streams
 	cl, err := makeClient(config)
 	if err != nil {

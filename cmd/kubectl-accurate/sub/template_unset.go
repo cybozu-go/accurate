@@ -8,16 +8,17 @@ import (
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/cli-runtime/pkg/genericiooptions"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type templateUnsetCmd struct {
-	streams genericclioptions.IOStreams
+	streams genericiooptions.IOStreams
 	client  client.Client
 	name    string
 }
 
-func newTemplateUnsetCmd(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
+func newTemplateUnsetCmd(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
 	opts := &templateUnsetCmd{}
 
 	cmd := &cobra.Command{
@@ -36,7 +37,7 @@ func newTemplateUnsetCmd(streams genericclioptions.IOStreams, config *genericcli
 	return cmd
 }
 
-func (o *templateUnsetCmd) Fill(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
+func (o *templateUnsetCmd) Fill(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
 	o.streams = streams
 	cl, err := makeClient(config)
 	if err != nil {

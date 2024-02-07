@@ -89,7 +89,7 @@ var _ = Describe("SubNamespace controller", func() {
 		svc1.Name = "svc1"
 		svc1.Annotations = map[string]string{constants.AnnPropagate: constants.PropagateCreate}
 		svc1.Spec.ClusterIP = "None"
-		svc1.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt(3333)}}
+		svc1.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt32(3333)}}
 		Expect(k8sClient.Create(ctx, svc1)).To(Succeed())
 		Expect(komega.UpdateStatus(svc1, func() {
 			svc1.Status.Conditions = []metav1.Condition{{
@@ -104,7 +104,7 @@ var _ = Describe("SubNamespace controller", func() {
 		svc2 := &corev1.Service{}
 		svc2.Namespace = rootNS
 		svc2.Name = "svc2"
-		svc2.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt(3333)}}
+		svc2.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt32(3333)}}
 		Expect(k8sClient.Create(ctx, svc2)).To(Succeed())
 
 		svc1Sub1 := &corev1.Service{}
@@ -172,7 +172,7 @@ var _ = Describe("SubNamespace controller", func() {
 		svc1.Name = "svc1"
 		svc1.Annotations = map[string]string{constants.AnnPropagate: constants.PropagateCreate}
 		svc1.Spec.ClusterIP = "None"
-		svc1.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt(3333)}}
+		svc1.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt32(3333)}}
 		Expect(k8sClient.Create(ctx, svc1)).To(Succeed())
 		Expect(komega.UpdateStatus(svc1, func() {
 			svc1.Status.Conditions = []metav1.Condition{{
@@ -187,7 +187,7 @@ var _ = Describe("SubNamespace controller", func() {
 		svc2 := &corev1.Service{}
 		svc2.Namespace = tmplNS
 		svc2.Name = "svc2"
-		svc2.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt(3333)}}
+		svc2.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt32(3333)}}
 		Expect(k8sClient.Create(ctx, svc2)).To(Succeed())
 
 		svc1Instance := &corev1.Service{}
@@ -216,7 +216,7 @@ var _ = Describe("SubNamespace controller", func() {
 		svc1.Name = "svc1"
 		svc1.Annotations = map[string]string{constants.AnnPropagate: constants.PropagateUpdate}
 		svc1.Spec.ClusterIP = "None"
-		svc1.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt(3333)}}
+		svc1.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt32(3333)}}
 		Expect(k8sClient.Create(ctx, svc1)).To(Succeed())
 		Expect(komega.UpdateStatus(svc1, func() {
 			svc1.Status.Conditions = []metav1.Condition{{
@@ -309,7 +309,7 @@ var _ = Describe("SubNamespace controller", func() {
 		svc1.Name = "svc1"
 		ctrl.SetControllerReference(cm1, svc1, scheme)
 		svc1.Spec.ClusterIP = "None"
-		svc1.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt(3333)}}
+		svc1.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt32(3333)}}
 		Expect(k8sClient.Create(ctx, svc1)).To(Succeed())
 
 		Eventually(komega.Object(svc1)).Should(HaveField("Annotations", HaveKeyWithValue(constants.AnnPropagate, constants.PropagateUpdate)))
@@ -321,7 +321,7 @@ var _ = Describe("SubNamespace controller", func() {
 		svc2.Name = "svc2"
 		Expect(ctrl.SetControllerReference(cm2, svc2, scheme)).To(Succeed())
 		svc2.Spec.ClusterIP = "None"
-		svc2.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt(3333)}}
+		svc2.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt32(3333)}}
 		Expect(k8sClient.Create(ctx, svc2)).To(Succeed())
 
 		//lint:ignore SA1019 subject for removal

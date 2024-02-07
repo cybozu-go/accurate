@@ -8,18 +8,19 @@ import (
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/cli-runtime/pkg/genericiooptions"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const indent = 4
 
 type listOptions struct {
-	streams genericclioptions.IOStreams
+	streams genericiooptions.IOStreams
 	client  client.Client
 	root    string
 }
 
-func newListCmd(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
+func newListCmd(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
 	opts := &listOptions{}
 
 	cmd := &cobra.Command{
@@ -40,7 +41,7 @@ If ROOT is given, only the tree under the ROOT namespace will be shown.`,
 	return cmd
 }
 
-func (o *listOptions) Fill(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
+func (o *listOptions) Fill(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
 	o.streams = streams
 	cl, err := makeClient(config)
 	if err != nil {

@@ -8,17 +8,18 @@ import (
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/cli-runtime/pkg/genericiooptions"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type templateSetOpts struct {
-	streams  genericclioptions.IOStreams
+	streams  genericiooptions.IOStreams
 	client   client.Client
 	name     string
 	template string
 }
 
-func newTemplateSetCmd(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
+func newTemplateSetCmd(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
 	opts := &templateSetOpts{}
 
 	cmd := &cobra.Command{
@@ -39,7 +40,7 @@ NS must be a root or an independent namespace.`,
 	return cmd
 }
 
-func (o *templateSetOpts) Fill(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
+func (o *templateSetOpts) Fill(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
 	o.streams = streams
 	cl, err := makeClient(config)
 	if err != nil {

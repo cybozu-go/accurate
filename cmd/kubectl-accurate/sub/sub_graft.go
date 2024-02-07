@@ -9,17 +9,18 @@ import (
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/cli-runtime/pkg/genericiooptions"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type subGraftOpts struct {
-	streams genericclioptions.IOStreams
+	streams genericiooptions.IOStreams
 	client  client.Client
 	name    string
 	parent  string
 }
 
-func newSubGraftCmd(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
+func newSubGraftCmd(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags) *cobra.Command {
 	opts := &subGraftOpts{}
 
 	cmd := &cobra.Command{
@@ -45,7 +46,7 @@ A SubNamespace resource will be created in the PARENT namespace.`,
 	return cmd
 }
 
-func (o *subGraftOpts) Fill(streams genericclioptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
+func (o *subGraftOpts) Fill(streams genericiooptions.IOStreams, config *genericclioptions.ConfigFlags, args []string) error {
 	o.streams = streams
 	cl, err := makeClient(config)
 	if err != nil {
