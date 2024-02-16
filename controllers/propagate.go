@@ -270,11 +270,10 @@ func (r *PropagateController) propagateUpdate(ctx context.Context, obj, parent *
 	if parent != nil {
 		clone := cloneResource(parent, obj.GetNamespace())
 		if !equality.Semantic.DeepDerivative(clone, obj) {
-			clone.SetResourceVersion(obj.GetResourceVersion())
-			if err := r.Update(ctx, clone); err != nil {
-				return fmt.Errorf("failed to update: %w", err)
+			if err := r.Patch(ctx, clone, applyPatch{clone}, fieldOwner, client.ForceOwnership); err != nil {
+				return fmt.Errorf("failed to apply %s/%s: %w", clone.GetNamespace(), clone.GetName(), err)
 			}
-			logger.Info("updated", "from", parent.GetNamespace())
+			logger.Info("applied", "from", parent.GetNamespace())
 			return nil
 		}
 	}
@@ -307,12 +306,10 @@ func (r *PropagateController) propagateUpdate(ctx context.Context, obj, parent *
 			continue
 		}
 
-		clone.SetResourceVersion(cres.GetResourceVersion())
-		if err := r.Update(ctx, clone); err != nil {
-			return fmt.Errorf("failed to update %s/%s: %w", child.Name, name, err)
+		if err := r.Patch(ctx, clone, applyPatch{clone}, fieldOwner, client.ForceOwnership); err != nil {
+			return fmt.Errorf("failed to apply %s/%s: %w", clone.GetNamespace(), clone.GetName(), err)
 		}
-
-		logger.Info("updated a child resource", "subnamespace", child.Name)
+		logger.Info("applied a child resource", "subnamespace", child.Name)
 	}
 
 	return nil

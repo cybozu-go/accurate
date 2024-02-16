@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"path"
-	"reflect"
 
 	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
 	"github.com/cybozu-go/accurate/pkg/constants"
@@ -13,6 +12,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
+	corev1ac "k8s.io/client-go/applyconfigurations/core/v1"
 	"k8s.io/client-go/util/workqueue"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -85,18 +85,17 @@ func (r *NamespaceReconciler) reconcile(ctx context.Context, ns *corev1.Namespac
 }
 
 func (r *NamespaceReconciler) propagateMeta(ctx context.Context, ns, parent *corev1.Namespace) error {
-	orig := ns.DeepCopy()
+	labels := make(map[string]string)
+	annotations := make(map[string]string)
+
 	for k, v := range parent.Labels {
 		if ok := r.matchLabelKey(k); ok {
-			ns.Labels[k] = v
+			labels[k] = v
 		}
 	}
 	for k, v := range parent.Annotations {
 		if ok := r.matchAnnotationKey(k); ok {
-			if ns.Annotations == nil {
-				ns.Annotations = make(map[string]string)
-			}
-			ns.Annotations[k] = v
+			annotations[k] = v
 		}
 	}
 
@@ -110,24 +109,26 @@ func (r *NamespaceReconciler) propagateMeta(ctx context.Context, ns, parent *cor
 		} else {
 			for k, v := range subNS.Spec.Labels {
 				if ok := r.matchSubNamespaceLabelKey(k); ok {
-					ns.Labels[k] = v
+					labels[k] = v
 				}
 			}
 			for k, v := range subNS.Spec.Annotations {
 				if ok := r.matchSubNamespaceAnnotationKey(k); ok {
-					if ns.Annotations == nil {
-						ns.Annotations = make(map[string]string)
-					}
-					ns.Annotations[k] = v
+					annotations[k] = v
 				}
 			}
 		}
 	}
 
-	if !reflect.DeepEqual(ns.ObjectMeta, orig.ObjectMeta) {
-		if err := r.Update(ctx, ns); err != nil {
-			return fmt.Errorf("failed to propagate labels/annotations for namespace %s: %w", ns.Name, err)
-		}
+	ac := corev1ac.Namespace(ns.Name).
+		WithLabels(labels).
+		WithAnnotations(annotations)
+	ns, p, err := newNamespacePatch(ac)
+	if err != nil {
+		return err
+	}
+	if err := r.Patch(ctx, ns, p, fieldOwner, client.ForceOwnership); err != nil {
+		return fmt.Errorf("failed to propagate labels/annotations for namespace %s: %w", ns.Name, err)
 	}
 	return nil
 }
@@ -250,12 +251,11 @@ func (r *NamespaceReconciler) propagateUpdate(ctx context.Context, res *unstruct
 		return nil
 	}
 
-	c2.SetResourceVersion(c.GetResourceVersion())
-	if err := r.Update(ctx, c2); err != nil {
-		return err
+	if err := r.Patch(ctx, c2, applyPatch{c2}, fieldOwner, client.ForceOwnership); err != nil {
+		return fmt.Errorf("failed to apply %s/%s: %w", c2.GetNamespace(), c2.GetName(), err)
 	}
 
-	logger.Info("updated a resource", "namespace", ns, "name", res.GetName(), "gvk", gvk.String())
+	logger.Info("applied a resource", "namespace", ns, "name", res.GetName(), "gvk", gvk.String())
 	return nil
 }
 

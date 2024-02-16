@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -23,10 +22,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-)
-
-const (
-	fieldOwner client.FieldOwner = "accurate-controller"
 )
 
 // SubNamespaceReconciler reconciles a SubNamespace object
@@ -95,8 +90,9 @@ func (r *SubNamespaceReconciler) finalize(ctx context.Context, sn *accuratev2alp
 	logger.Info("deleted namespace", "name", sn.Name)
 
 DELETE:
+	orig := sn.DeepCopy()
 	controllerutil.RemoveFinalizer(sn, constants.Finalizer)
-	return r.Update(ctx, sn)
+	return r.Patch(ctx, sn, client.MergeFrom(orig))
 }
 
 func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2alpha1.SubNamespace) error {
@@ -140,7 +136,11 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2
 		)
 	}
 
-	return r.patchSubNamespaceStatus(ctx, ac)
+	sn, p, err := newSubNamespacePatch(ac)
+	if err != nil {
+		return err
+	}
+	return r.Status().Patch(ctx, sn, p, fieldOwner, client.ForceOwnership)
 }
 
 // SetupWithManager sets up the controller with the Manager.
@@ -183,34 +183,4 @@ func newStatusCondition(existingConditions []metav1.Condition, newCondition meta
 	}
 
 	return newCondition
-}
-
-func (r *SubNamespaceReconciler) patchSubNamespaceStatus(ctx context.Context, ac *accuratev2alpha1ac.SubNamespaceApplyConfiguration) error {
-	sn := &accuratev2alpha1.SubNamespace{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      *ac.Name,
-			Namespace: *ac.Namespace,
-		},
-	}
-
-	encodedPatch, err := json.Marshal(ac)
-	if err != nil {
-		return err
-	}
-
-	return r.Status().Patch(ctx, sn, applyPatch{encodedPatch}, fieldOwner, client.ForceOwnership)
-}
-
-type applyPatch struct {
-	patch []byte
-}
-
-var _ client.Patch = applyPatch{}
-
-func (p applyPatch) Type() types.PatchType {
-	return types.ApplyPatchType
-}
-
-func (p applyPatch) Data(_ client.Object) ([]byte, error) {
-	return p.patch, nil
 }
