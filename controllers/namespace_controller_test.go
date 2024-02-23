@@ -477,6 +477,28 @@ var _ = Describe("Namespace controller", func() {
 		))
 	})
 
+	It("should remove sub namespace labels/annotations set pre SSA migration", func() {
+		ns := &corev1.Namespace{}
+		ns.Name = "pre-ssa-child"
+		Expect(komega.Get(ns)()).To(Succeed())
+		Expect(ns.Labels).To(HaveKeyWithValue("bar.glob/l", "delete-me"))
+		Expect(ns.Annotations).To(HaveKeyWithValue("bar.glob/a", "delete-me"))
+		sn := &accuratev2alpha1.SubNamespace{}
+		sn.Name = "pre-ssa-child"
+		sn.Namespace = "pre-ssa-root"
+		Expect(komega.Update(sn, func() {
+			delete(sn.Spec.Labels, "bar.glob/l")
+			delete(sn.Spec.Annotations, "bar.glob/a")
+		})()).To(Succeed())
+
+		Eventually(komega.Object(ns)).Should(And(
+			HaveField("Labels", Not(HaveKey("bar.glob/l"))),
+			HaveField("Annotations", Not(HaveKey("bar.glob/a"))),
+		))
+		Expect(ns.Labels).To(HaveKeyWithValue("foo.glob/l", "glob"))
+		Expect(ns.Annotations).To(HaveKeyWithValue("foo.glob/a", "glob"))
+	})
+
 	Context("templated namespace", func() {
 		var ns1 *corev1.Namespace
 
