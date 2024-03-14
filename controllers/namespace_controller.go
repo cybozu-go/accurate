@@ -118,6 +118,15 @@ func (r *NamespaceReconciler) propagateMeta(ctx context.Context, ns, parent *cor
 				}
 			}
 		}
+		// Must ensure we set all fields we care for, also labels added when creating namespace
+		labels[constants.LabelCreatedBy] = constants.CreatedBy
+		labels[constants.LabelParent] = parent.Name
+	}
+
+	// Ensure that managed fields are upgraded to SSA before the following SSA.
+	// TODO(migration): This code could be removed after a couple of releases.
+	if err := upgradeManagedFields(ctx, r.Client, ns); err != nil {
+		return err
 	}
 
 	ac := corev1ac.Namespace(ns.Name).
@@ -247,6 +256,13 @@ func (r *NamespaceReconciler) propagateUpdate(ctx context.Context, res *unstruct
 	}
 
 	c2 := cloneResource(res, ns)
+
+	// Ensure that managed fields are upgraded to SSA before the following SSA.
+	// TODO(migration): This code could be removed after a couple of releases.
+	if err := upgradeManagedFields(ctx, r.Client, c2); err != nil {
+		return err
+	}
+
 	if equality.Semantic.Equalities.DeepDerivative(c2, c) {
 		return nil
 	}

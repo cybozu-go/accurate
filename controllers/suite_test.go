@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"maps"
 	"path/filepath"
 	"testing"
 	"time"
@@ -113,6 +114,33 @@ var _ = BeforeSuite(func() {
 	ns.Labels = map[string]string{constants.LabelTemplate: "prop-tmpl"}
 	Expect(k8sClient.Create(context.Background(), ns)).To(Succeed())
 
+	// Create resources as they would look like before migration to SSA
+	ns = &corev1.Namespace{}
+	ns.Name = "pre-ssa-root"
+	ns.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
+	Expect(k8sClient.Create(context.Background(), ns)).To(Succeed())
+
+	sn := &accuratev2alpha1.SubNamespace{}
+	sn.Name = "pre-ssa-child"
+	sn.Namespace = "pre-ssa-root"
+	sn.Spec.Labels = map[string]string{
+		"foo.glob/l": "glob",
+		"bar.glob/l": "delete-me",
+	}
+	sn.Spec.Annotations = map[string]string{
+		"foo.glob/a": "glob",
+		"bar.glob/a": "delete-me",
+	}
+	Expect(k8sClient.Create(context.Background(), sn)).To(Succeed())
+
+	ns = &corev1.Namespace{}
+	ns.Name = sn.Name
+	ns.Finalizers = []string{constants.Finalizer}
+	ns.Labels = map[string]string{constants.LabelCreatedBy: constants.CreatedBy, constants.LabelParent: sn.Namespace}
+	maps.Copy(ns.Labels, sn.Spec.Labels)
+	ns.Annotations = sn.Spec.Annotations
+	// Setting accurate-controller as field owner to simulate existing resource created by Accurate
+	Expect(k8sClient.Create(context.Background(), ns, fieldOwner)).To(Succeed())
 })
 
 var _ = AfterSuite(func() {

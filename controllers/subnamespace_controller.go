@@ -136,6 +136,8 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2
 		)
 	}
 
+	// TODO: upgrade managed fields to SSA when https://github.com/kubernetes/kubernetes/pull/123484 is released
+
 	sn, p, err := newSubNamespacePatch(ac)
 	if err != nil {
 		return err

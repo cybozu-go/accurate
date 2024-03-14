@@ -269,6 +269,13 @@ func (r *PropagateController) propagateUpdate(ctx context.Context, obj, parent *
 
 	if parent != nil {
 		clone := cloneResource(parent, obj.GetNamespace())
+
+		// Ensure that managed fields are upgraded to SSA before the following SSA.
+		// TODO(migration): This code could be removed after a couple of releases.
+		if err := upgradeManagedFields(ctx, r.Client, clone); err != nil {
+			return err
+		}
+
 		if !equality.Semantic.DeepDerivative(clone, obj) {
 			if err := r.Patch(ctx, clone, applyPatch{clone}, fieldOwner, client.ForceOwnership); err != nil {
 				return fmt.Errorf("failed to apply %s/%s: %w", clone.GetNamespace(), clone.GetName(), err)
@@ -302,6 +309,13 @@ func (r *PropagateController) propagateUpdate(ctx context.Context, obj, parent *
 		}
 
 		clone := cloneResource(obj, child.Name)
+
+		// Ensure that managed fields are upgraded to SSA before the following SSA.
+		// TODO(migration): This code could be removed after a couple of releases.
+		if err := upgradeManagedFields(ctx, r.Client, clone); err != nil {
+			return err
+		}
+
 		if equality.Semantic.DeepDerivative(clone, cres) {
 			continue
 		}
