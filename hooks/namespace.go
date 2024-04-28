@@ -19,7 +19,7 @@ import (
 
 type namespaceValidator struct {
 	client.Client
-	dec *admission.Decoder
+	dec admission.Decoder
 }
 
 var _ admission.Handler = &namespaceValidator{}
@@ -198,7 +198,7 @@ func (v *namespaceValidator) handleDelete(ctx context.Context, ns *corev1.Namesp
 }
 
 // SetupNamespaceWebhook registers the webhook for Namespace
-func SetupNamespaceWebhook(mgr manager.Manager, dec *admission.Decoder) {
+func SetupNamespaceWebhook(mgr manager.Manager, dec admission.Decoder) {
 	v := &namespaceValidator{
 		Client: mgr.GetClient(),
 		dec:    dec,
