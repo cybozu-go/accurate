@@ -23,8 +23,8 @@ const (
 // fields from the Update operation to the Apply operation. This is required
 // to ensure that the apply operations will also remove fields that were
 // set by the Update operation.
-func upgradeManagedFields(ctx context.Context, c client.Client, obj client.Object) error {
-	patch, err := csaupgrade.UpgradeManagedFieldsPatch(obj, sets.New(string(fieldOwner)), string(fieldOwner))
+func upgradeManagedFields(ctx context.Context, c client.Client, obj client.Object, opts ...csaupgrade.Option) error {
+	patch, err := csaupgrade.UpgradeManagedFieldsPatch(obj, sets.New(string(fieldOwner)), string(fieldOwner), opts...)
 	if err != nil {
 		return err
 	}

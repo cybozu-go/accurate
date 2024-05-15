@@ -14,6 +14,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	metav1ac "k8s.io/client-go/applyconfigurations/meta/v1"
+	"k8s.io/client-go/util/csaupgrade"
 	"k8s.io/client-go/util/workqueue"
 	kstatus "sigs.k8s.io/cli-utils/pkg/kstatus/status"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -137,7 +138,11 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2
 		)
 	}
 
-	// TODO: upgrade managed fields to SSA when https://github.com/kubernetes/kubernetes/pull/123484 is released
+	// Ensure that status managed fields are upgraded to SSA before the following SSA.
+	// TODO(migration): This code could be removed after a couple of releases.
+	if err := upgradeManagedFields(ctx, r.Client, sn, csaupgrade.Subresource("status")); err != nil {
+		return err
+	}
 
 	sn, p, err := newSubNamespacePatch(ac)
 	if err != nil {
