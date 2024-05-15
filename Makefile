@@ -56,18 +56,16 @@ generate: setup generate-applyconfigurations ## Generate code containing DeepCop
 	controller-gen object:headerFile="hack/boilerplate.go.txt" paths="{./api/...}"
 
 GO_MODULE = $(shell go list -m)
-API_DIRS = $(shell find api -mindepth 2 -type d | sed "s|^|$(shell go list -m)/|" | paste -sd ",")
+API_DIRS = $(shell find api -mindepth 2 -type d | sed "s|^|$(shell go list -m)/|" | paste -sd " ")
 AC_PKG = internal/applyconfigurations
 .PHONY: generate-applyconfigurations
 generate-applyconfigurations: setup ## Generate applyconfigurations to support typesafe SSA.
-	rm -rf $(AC_PKG)
 	@echo ">> generating $(AC_PKG)..."
 	applyconfiguration-gen \
 		--go-header-file 	hack/boilerplate.go.txt \
-		--input-dirs		"$(API_DIRS)" \
-		--output-package  	"$(GO_MODULE)/$(AC_PKG)" \
-		--trim-path-prefix 	"$(GO_MODULE)" \
-		--output-base    	"."
+		--output-dir "$(AC_PKG)" \
+		--output-pkg "$(GO_MODULE)/$(AC_PKG)" \
+		  $(API_DIRS)
 
 .PHONY: apidoc
 apidoc: setup $(wildcard api/*/*_types.go)

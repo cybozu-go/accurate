@@ -28,7 +28,7 @@ import (
 //+kubebuilder:webhook:path=/mutate-accurate-cybozu-com-v1-subnamespace,mutating=true,failurePolicy=fail,sideEffects=None,groups=accurate.cybozu.com,resources=subnamespaces,verbs=create;update,versions=v1,matchPolicy=Equivalent,name=subnamespace.accurate.cybozu.io,admissionReviewVersions={v1}
 
 type subNamespaceMutator struct {
-	dec *admission.Decoder
+	dec admission.Decoder
 }
 
 var _ admission.Handler = &subNamespaceMutator{}
@@ -56,7 +56,7 @@ func (m *subNamespaceMutator) Handle(ctx context.Context, req admission.Request)
 
 type subNamespaceValidator struct {
 	client.Client
-	dec            *admission.Decoder
+	dec            admission.Decoder
 	namingPolicies []config.NamingPolicyRegexp
 }
 
@@ -139,7 +139,7 @@ func (v *subNamespaceValidator) notMatchingNamingPolicy(ctx context.Context, ns,
 }
 
 // SetupSubNamespaceWebhook registers the webhooks for SubNamespace
-func SetupSubNamespaceWebhook(mgr manager.Manager, dec *admission.Decoder, namingPolicyRegexps []config.NamingPolicyRegexp) error {
+func SetupSubNamespaceWebhook(mgr manager.Manager, dec admission.Decoder, namingPolicyRegexps []config.NamingPolicyRegexp) error {
 	for _, s := range []runtime.Object{&accuratev1.SubNamespace{}, &accuratev2alpha1.SubNamespace{}} {
 		err := ctrl.NewWebhookManagedBy(mgr).
 			For(s).

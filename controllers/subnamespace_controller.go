@@ -13,6 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	metav1ac "k8s.io/client-go/applyconfigurations/meta/v1"
 	"k8s.io/client-go/util/workqueue"
 	kstatus "sigs.k8s.io/cli-utils/pkg/kstatus/status"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -125,14 +126,14 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2
 	if ns.Labels[constants.LabelParent] != sn.Namespace {
 		logger.Info("a conflicting namespace already exists")
 		ac.Status.WithConditions(
-			newStatusCondition(sn.Status.Conditions,
-				metav1.Condition{
-					Type:               string(kstatus.ConditionStalled),
-					Status:             metav1.ConditionTrue,
-					ObservedGeneration: sn.Generation,
-					Reason:             accuratev2alpha1.SubNamespaceConflict,
-					Message:            "Conflicting namespace already exists",
-				}),
+			conditionPatch(sn.Status.Conditions,
+				metav1ac.Condition().
+					WithType(string(kstatus.ConditionStalled)).
+					WithStatus(metav1.ConditionTrue).
+					WithObservedGeneration(sn.Generation).
+					WithReason(accuratev2alpha1.SubNamespaceConflict).
+					WithMessage("Conflicting namespace already exists"),
+			),
 		)
 	}
 
@@ -174,15 +175,15 @@ func (r *SubNamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func newStatusCondition(existingConditions []metav1.Condition, newCondition metav1.Condition) metav1.Condition {
-	existingCondition := meta.FindStatusCondition(existingConditions, newCondition.Type)
-	if existingCondition != nil && existingCondition.Status == newCondition.Status {
-		newCondition.LastTransitionTime = existingCondition.LastTransitionTime
+func conditionPatch(existingConditions []metav1.Condition, condition *metav1ac.ConditionApplyConfiguration) *metav1ac.ConditionApplyConfiguration {
+	if condition.LastTransitionTime.IsZero() {
+		existingCondition := meta.FindStatusCondition(existingConditions, *condition.Type)
+		if existingCondition != nil && existingCondition.Status == *condition.Status {
+			condition.WithLastTransitionTime(existingCondition.LastTransitionTime)
+		} else {
+			condition.WithLastTransitionTime(metav1.NewTime(time.Now()))
+		}
 	}
 
-	if newCondition.LastTransitionTime.IsZero() {
-		newCondition.LastTransitionTime = metav1.NewTime(time.Now())
-	}
-
-	return newCondition
+	return condition
 }
