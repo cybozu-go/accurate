@@ -20,3 +20,5 @@ packages:
   - name: goreleaser/goreleaser@v1.19.1
   - name: kubernetes/code-generator/applyconfiguration-gen@v0.30.0
     registry: local
+  - name: kubernetes/code-generator/conversion-gen@v0.30.0
+    registry: local

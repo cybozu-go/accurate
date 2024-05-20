@@ -52,12 +52,13 @@ manifests: setup ## Generate WebhookConfiguration, ClusterRole and CustomResourc
 	kustomize build config/kustomize-to-helm/overlays/templates | yq e "."  -p yaml - > charts/accurate/templates/generated/generated.yaml
 
 .PHONY: generate
-generate: setup generate-applyconfigurations ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
+generate: setup generate-applyconfigurations generate-conversion ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	controller-gen object:headerFile="hack/boilerplate.go.txt" paths="{./api/...}"
 
 GO_MODULE = $(shell go list -m)
 API_DIRS = $(shell find api -mindepth 2 -type d | sed "s|^|$(shell go list -m)/|" | paste -sd " ")
 AC_PKG = internal/applyconfigurations
+
 .PHONY: generate-applyconfigurations
 generate-applyconfigurations: setup ## Generate applyconfigurations to support typesafe SSA.
 	@echo ">> generating $(AC_PKG)..."
@@ -66,6 +67,13 @@ generate-applyconfigurations: setup ## Generate applyconfigurations to support t
 		--output-dir "$(AC_PKG)" \
 		--output-pkg "$(GO_MODULE)/$(AC_PKG)" \
 		  $(API_DIRS)
+
+.PHONY: generate-conversion
+generate-conversion: setup ## Generate conversion functions to support API conversion.
+	@echo ">> generating $(AC_PKG)..."
+	conversion-gen \
+		--output-file zz_generated.conversion.go \
+		$(API_DIRS)
 
 .PHONY: apidoc
 apidoc: setup $(wildcard api/*/*_types.go)
