@@ -18,6 +18,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
@@ -28,8 +29,10 @@ import (
 )
 
 func subMain(ns, addr string, port int) error {
-	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&options.zapOpts)))
-	logger := ctrl.Log.WithName("setup")
+	logger := zap.New(zap.UseFlagOptions(&options.zapOpts))
+	ctrl.SetLogger(logger)
+	klog.SetLogger(logger)
+	logger = ctrl.Log.WithName("setup")
 
 	scheme := runtime.NewScheme()
 	if err := clientgoscheme.AddToScheme(scheme); err != nil {
