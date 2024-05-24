@@ -7,3 +7,11 @@ packages:
     description: applyconfiguration-gen is a tool for auto-generating apply configuration functions.
     files:
       - name: applyconfiguration-gen
+  - type: go_install
+    name: kubernetes/code-generator/conversion-gen
+    path: k8s.io/code-generator/cmd/conversion-gen
+    repo_owner: kubernetes
+    repo_name: code-generator
+    description: conversion-gen is a tool for auto-generating API conversion functions.
+    files:
+      - name: conversion-gen
