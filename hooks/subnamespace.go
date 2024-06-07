@@ -8,6 +8,7 @@ import (
 	"regexp"
 
 	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
 	"github.com/cybozu-go/accurate/pkg/config"
 	"github.com/cybozu-go/accurate/pkg/constants"
@@ -140,7 +141,7 @@ func (v *subNamespaceValidator) notMatchingNamingPolicy(ctx context.Context, ns,
 
 // SetupSubNamespaceWebhook registers the webhooks for SubNamespace
 func SetupSubNamespaceWebhook(mgr manager.Manager, dec admission.Decoder, namingPolicyRegexps []config.NamingPolicyRegexp) error {
-	for _, s := range []runtime.Object{&accuratev1.SubNamespace{}, &accuratev2alpha1.SubNamespace{}} {
+	for _, s := range []runtime.Object{&accuratev1.SubNamespace{}, &accuratev2alpha1.SubNamespace{}, &accuratev2.SubNamespace{}} {
 		err := ctrl.NewWebhookManagedBy(mgr).
 			For(s).
 			Complete()

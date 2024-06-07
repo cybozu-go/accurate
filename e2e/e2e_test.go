@@ -246,7 +246,7 @@ var _ = Describe("kubectl accurate", func() {
 		kubectlSafe(nil, "get", "subnamespaces", "-n", "subroot1", "sn1")
 
 		Eventually(func() string {
-			out, err := kubectl(nil, "get", "-n", "subroot2", "subnamespaces", "sn1", "-o", "json")
+			out, err := kubectl(nil, "get", "-n", "subroot2", "subnamespaces.v1.accurate.cybozu.com", "sn1", "-o", "json")
 			if err != nil {
 				return ""
 			}

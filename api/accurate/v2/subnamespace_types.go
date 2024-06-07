@@ -32,7 +32,6 @@ type SubNamespaceSpec struct {
 }
 
 //+kubebuilder:object:root=true
-//+kubebuilder:unservedversion
 //+kubebuilder:subresource:status
 //+genclient
 
