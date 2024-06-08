@@ -162,7 +162,6 @@ controller:
           - list
           - watch
           - create
-          - update
           - patch
           - delete
 <snip>

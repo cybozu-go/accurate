@@ -11,6 +11,7 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/restmapper"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -22,6 +23,8 @@ import (
 
 var testEnv *envtest.Environment
 var mapper meta.RESTMapper
+var fullAccessClient client.Client
+var noAccessClient client.Client
 
 func TestAPIs(t *testing.T) {
 	if os.Getenv("TEST_CONFIG") != "1" {
@@ -41,6 +44,13 @@ var _ = BeforeSuite(func() {
 	cfg, err := testEnv.Start()
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
+	fullAccessClient, err = client.New(cfg, client.Options{})
+	Expect(err).NotTo(HaveOccurred())
+
+	noAccessUser, err := testEnv.AddUser(envtest.User{Name: "no-access-user"}, nil)
+	Expect(err).NotTo(HaveOccurred())
+	noAccessClient, err = client.New(noAccessUser.Config(), client.Options{})
+	Expect(err).NotTo(HaveOccurred())
 
 	dc, err := discovery.NewDiscoveryClientForConfig(cfg)
 	Expect(err).NotTo(HaveOccurred())

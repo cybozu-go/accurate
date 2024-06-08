@@ -101,7 +101,6 @@ controller:
           - list
           - watch
           - create
-          - update
           - patch
           - delete
     # controller.additionalRBAC.clusterRoles -- Specify additional ClusterRoles to be granted

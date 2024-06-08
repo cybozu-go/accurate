@@ -1,14 +1,18 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"path"
 	"regexp"
 	"strings"
 
+	authv1 "k8s.io/api/authorization/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/errors"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
 
 	"github.com/cybozu-go/accurate/pkg/constants"
@@ -97,6 +101,36 @@ func (c *Config) Validate(mapper meta.RESTMapper) error {
 		c.NamingPolicyRegexps = append(c.NamingPolicyRegexps, NamingPolicyRegexp{Root: root, Match: policy.Match})
 	}
 	return nil
+}
+
+// ValidateRBAC validates that the manager has RBAC permissions to support configuration
+func (c *Config) ValidateRBAC(ctx context.Context, client client.Client, mapper meta.RESTMapper) error {
+	var errList []error
+
+	for _, gvk := range c.Watches {
+		mapping, err := mapper.RESTMapping(schema.GroupKind{Group: gvk.Group, Kind: gvk.Kind}, gvk.Version)
+		if err != nil {
+			return fmt.Errorf("error mapping GVK %s: %w", gvk.String(), err)
+		}
+
+		selfCheck := &authv1.SelfSubjectAccessReview{}
+		selfCheck.Spec.ResourceAttributes = &authv1.ResourceAttributes{
+			Group:    mapping.Resource.Group,
+			Version:  mapping.Resource.Version,
+			Resource: mapping.Resource.Resource,
+		}
+		for _, verb := range []string{"get", "list", "watch", "create", "patch", "delete"} {
+			selfCheck.Spec.ResourceAttributes.Verb = verb
+			if err := client.Create(ctx, selfCheck); err != nil {
+				return fmt.Errorf("error creating SelfSubjectAccessReview: %w", err)
+			}
+			if !selfCheck.Status.Allowed {
+				errList = append(errList, fmt.Errorf("missing permission to %s %s", verb, mapping.Resource.String()))
+			}
+		}
+	}
+
+	return errors.NewAggregate(errList)
 }
 
 // Load loads configurations.
