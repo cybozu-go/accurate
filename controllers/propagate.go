@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	utilerrors "github.com/cybozu-go/accurate/internal/util/errors"
 	"github.com/cybozu-go/accurate/pkg/config"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	"github.com/cybozu-go/accurate/pkg/feature"
@@ -200,6 +201,9 @@ func (r *PropagateController) handleDelete(ctx context.Context, req ctrl.Request
 			switch obj.GetAnnotations()[constants.AnnPropagate] {
 			case constants.PropagateCreate, constants.PropagateUpdate:
 				if err := r.Create(ctx, cloneResource(obj, req.Namespace)); err != nil {
+					if utilerrors.IsNamespaceTerminating(err) {
+						return nil
+					}
 					return fmt.Errorf("failed to re-create %s/%s: %w", req.Namespace, req.Name, err)
 				}
 				logger.Info("re-created", "from", fmt.Sprintf("%s/%s", p, req.Name))
@@ -254,6 +258,9 @@ func (r *PropagateController) propagateCreate(ctx context.Context, obj *unstruct
 		}
 
 		if err := r.Create(ctx, cloneResource(obj, child.Name)); err != nil {
+			if utilerrors.IsNamespaceTerminating(err) {
+				return nil
+			}
 			return fmt.Errorf("failed to create %s/%s: %w", child.Name, name, err)
 		}
 
@@ -301,6 +308,9 @@ func (r *PropagateController) propagateUpdate(ctx context.Context, obj, parent *
 
 			clone := cloneResource(obj, child.Name)
 			if err := r.Create(ctx, clone); err != nil {
+				if utilerrors.IsNamespaceTerminating(err) {
+					return nil
+				}
 				return fmt.Errorf("failed to create %s/%s: %w", child.Name, name, err)
 			}
 

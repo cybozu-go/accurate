@@ -7,6 +7,7 @@ import (
 
 	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
 	accuratev2alpha1ac "github.com/cybozu-go/accurate/internal/applyconfigurations/accurate/v2alpha1"
+	utilerrors "github.com/cybozu-go/accurate/internal/util/errors"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -113,7 +114,7 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2
 			constants.LabelParent:    sn.Namespace,
 		}
 		if err := r.Create(ctx, ns); err != nil {
-			return err
+			return utilerrors.Ignore(err, utilerrors.IsNamespaceTerminating)
 		}
 		logger.Info("created a sub namespace", "name", sn.Name)
 	}
