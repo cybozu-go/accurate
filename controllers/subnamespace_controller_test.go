@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -55,7 +55,7 @@ var _ = Describe("SubNamespace controller", func() {
 		ns.Name = "test1"
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed())
 
-		sn := &accuratev2alpha1.SubNamespace{}
+		sn := &accuratev2.SubNamespace{}
 		sn.Namespace = "test1"
 		sn.Name = "test1-sub1"
 		sn.Finalizers = []string{constants.Finalizer}
@@ -84,14 +84,14 @@ var _ = Describe("SubNamespace controller", func() {
 		ns2.Name = "test2-sub1"
 		Expect(k8sClient.Create(ctx, ns2)).To(Succeed())
 
-		sn := &accuratev2alpha1.SubNamespace{}
+		sn := &accuratev2.SubNamespace{}
 		sn.Namespace = "test2"
 		sn.Name = "test2-sub1"
 		Expect(k8sClient.Create(ctx, sn)).To(Succeed())
 
 		Eventually(komega.Object(sn)).Should(HaveField("Status.ObservedGeneration", BeNumerically(">", 0)))
 		Expect(sn.Status.Conditions).To(HaveLen(1))
-		Expect(sn.Status.Conditions[0].Reason).To(Equal(accuratev2alpha1.SubNamespaceConflict))
+		Expect(sn.Status.Conditions[0].Reason).To(Equal(accuratev2.SubNamespaceConflict))
 	})
 
 	It("should not delete a conflicting sub namespace", func() {
@@ -99,7 +99,7 @@ var _ = Describe("SubNamespace controller", func() {
 		ns.Name = "test3"
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed())
 
-		sn := &accuratev2alpha1.SubNamespace{}
+		sn := &accuratev2.SubNamespace{}
 		sn.Namespace = "test3"
 		sn.Name = "test3-sub1"
 		sn.Finalizers = []string{constants.Finalizer}
@@ -114,7 +114,7 @@ var _ = Describe("SubNamespace controller", func() {
 		})()).To(Succeed())
 
 		Eventually(komega.Object(sn)).Should(HaveField("Status.Conditions", HaveLen(1)))
-		Expect(sn.Status.Conditions[0].Reason).To(Equal(accuratev2alpha1.SubNamespaceConflict))
+		Expect(sn.Status.Conditions[0].Reason).To(Equal(accuratev2.SubNamespaceConflict))
 
 		Expect(k8sClient.Delete(ctx, sn)).To(Succeed())
 
@@ -126,7 +126,7 @@ var _ = Describe("SubNamespace controller", func() {
 		ns.Name = "test4"
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed())
 
-		sn := &accuratev2alpha1.SubNamespace{}
+		sn := &accuratev2.SubNamespace{}
 		sn.Namespace = "test4"
 		sn.Name = "test4-sub1"
 		Expect(k8sClient.Create(ctx, sn)).To(Succeed())
