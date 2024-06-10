@@ -6,6 +6,7 @@ import (
 	"path"
 
 	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
+	utilerrors "github.com/cybozu-go/accurate/internal/util/errors"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
@@ -229,7 +230,7 @@ func (r *NamespaceReconciler) propagateCreate(ctx context.Context, res *unstruct
 	}
 
 	if err := r.Create(ctx, cloneResource(res, ns)); err != nil {
-		return err
+		return utilerrors.Ignore(err, utilerrors.IsNamespaceTerminating)
 	}
 
 	logger := log.FromContext(ctx)
@@ -249,7 +250,7 @@ func (r *NamespaceReconciler) propagateUpdate(ctx context.Context, res *unstruct
 			return err
 		}
 		if err := r.Create(ctx, cloneResource(res, ns)); err != nil {
-			return err
+			return utilerrors.Ignore(err, utilerrors.IsNamespaceTerminating)
 		}
 		logger.Info("created a resource", "namespace", ns, "name", res.GetName(), "gvk", gvk.String())
 		return nil
