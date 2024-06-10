@@ -168,7 +168,7 @@ spec:
                 type: integer
             type: object
         type: object
-    served: false
+    served: true
     storage: false
     subresources:
       status: {}
