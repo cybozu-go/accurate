@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	_ "embed"
 	"testing"
 
@@ -85,6 +86,30 @@ var _ = Describe("Validate", func() {
 			}},
 		}
 		Expect(c.Validate(mapper)).NotTo(Succeed())
+	})
+})
+
+var _ = Describe("ValidateRBAC", func() {
+	var c *Config
+	var ctx context.Context
+
+	BeforeEach(func() {
+		c = &Config{
+			Watches: []metav1.GroupVersionKind{{
+				Group:   "rbac.authorization.k8s.io",
+				Version: "v1",
+				Kind:    "Role",
+			}},
+		}
+		ctx = context.Background()
+	})
+
+	It("should succeed when RBAC present to watched resources", func() {
+		Expect(c.ValidateRBAC(ctx, fullAccessClient, mapper)).To(Succeed())
+	})
+
+	It("should error when missing RBAC to watched resources", func() {
+		Expect(c.ValidateRBAC(ctx, noAccessClient, mapper)).To(MatchError(ContainSubstring("missing permission to patch rbac.authorization.k8s.io/v1, Resource=roles")))
 	})
 })
 

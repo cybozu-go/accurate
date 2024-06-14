@@ -89,8 +89,13 @@ func subMain(ns, addr string, port int) error {
 		return fmt.Errorf("unable to start manager: %w", err)
 	}
 
+	ctx := ctrl.SetupSignalHandler()
+
 	if err := cfg.Validate(mgr.GetRESTMapper()); err != nil {
 		return fmt.Errorf("invalid configurations: %w", err)
+	}
+	if err := cfg.ValidateRBAC(ctx, mgr.GetClient(), mgr.GetRESTMapper()); err != nil {
+		return fmt.Errorf("when validating RBAC to support configuration: %w", err)
 	}
 
 	watched := make([]*unstructured.Unstructured, len(cfg.Watches))
@@ -104,7 +109,6 @@ func subMain(ns, addr string, port int) error {
 		})
 	}
 
-	ctx := ctrl.SetupSignalHandler()
 	dec := admission.NewDecoder(scheme)
 
 	// Namespace reconciler & webhook
