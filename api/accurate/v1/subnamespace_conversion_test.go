@@ -3,14 +3,14 @@ package v1
 import (
 	"testing"
 
-	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kstatus "sigs.k8s.io/cli-utils/pkg/kstatus/status"
 )
 
 func TestSubNamespace_ConvertFrom(t *testing.T) {
 	tests := map[string]struct {
-		src       *accuratev2alpha1.SubNamespace
+		src       *accuratev2.SubNamespace
 		expStatus SubNamespaceStatus
 		wantErr   bool
 	}{
@@ -42,8 +42,8 @@ func TestSubNamespace_ConvertFrom(t *testing.T) {
 	}
 }
 
-func newSubNamespaceWithStatus(gen, obsGen int, conds ...metav1.Condition) *accuratev2alpha1.SubNamespace {
-	subNS := &accuratev2alpha1.SubNamespace{}
+func newSubNamespaceWithStatus(gen, obsGen int, conds ...metav1.Condition) *accuratev2.SubNamespace {
+	subNS := &accuratev2.SubNamespace{}
 	subNS.Generation = int64(gen)
 	subNS.Status.ObservedGeneration = int64(obsGen)
 	subNS.Status.Conditions = conds

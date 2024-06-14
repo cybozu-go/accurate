@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"strconv"
 
-	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/conversion"
 	kstatus "sigs.k8s.io/cli-utils/pkg/kstatus/status"
 )
 
-// Convert_v1_SubNamespace_To_v2alpha1_SubNamespace complements the generated conversion functions since status needs special handling
-func Convert_v1_SubNamespace_To_v2alpha1_SubNamespace(in *SubNamespace, out *accuratev2alpha1.SubNamespace, s conversion.Scope) error {
-	if err := autoConvert_v1_SubNamespace_To_v2alpha1_SubNamespace(in, out, s); err != nil {
+// Convert_v1_SubNamespace_To_v2_SubNamespace complements the generated conversion functions since status needs special handling
+func Convert_v1_SubNamespace_To_v2_SubNamespace(in *SubNamespace, out *accuratev2.SubNamespace, s conversion.Scope) error {
+	if err := autoConvert_v1_SubNamespace_To_v2_SubNamespace(in, out, s); err != nil {
 		return err
 	}
 
@@ -40,9 +40,9 @@ func Convert_v1_SubNamespace_To_v2alpha1_SubNamespace(in *SubNamespace, out *acc
 	return nil
 }
 
-// Convert_v2alpha1_SubNamespace_To_v1_SubNamespace complements the generated conversion functions since status needs special handling
-func Convert_v2alpha1_SubNamespace_To_v1_SubNamespace(in *accuratev2alpha1.SubNamespace, out *SubNamespace, s conversion.Scope) error {
-	if err := autoConvert_v2alpha1_SubNamespace_To_v1_SubNamespace(in, out, s); err != nil {
+// Convert_v2_SubNamespace_To_v1_SubNamespace complements the generated conversion functions since status needs special handling
+func Convert_v2_SubNamespace_To_v1_SubNamespace(in *accuratev2.SubNamespace, out *SubNamespace, s conversion.Scope) error {
+	if err := autoConvert_v2_SubNamespace_To_v1_SubNamespace(in, out, s); err != nil {
 		return err
 	}
 
