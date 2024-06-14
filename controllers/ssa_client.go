@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 
-	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
-	accuratev2alpha1ac "github.com/cybozu-go/accurate/internal/applyconfigurations/accurate/v2alpha1"
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	accuratev2ac "github.com/cybozu-go/accurate/internal/applyconfigurations/accurate/v2"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -35,8 +35,8 @@ func upgradeManagedFields(ctx context.Context, c client.Client, obj client.Objec
 	return nil
 }
 
-func newSubNamespacePatch(ac *accuratev2alpha1ac.SubNamespaceApplyConfiguration) (*accuratev2alpha1.SubNamespace, client.Patch, error) {
-	sn := &accuratev2alpha1.SubNamespace{}
+func newSubNamespacePatch(ac *accuratev2ac.SubNamespaceApplyConfiguration) (*accuratev2.SubNamespace, client.Patch, error) {
+	sn := &accuratev2.SubNamespace{}
 	sn.Name = *ac.Name
 	sn.Namespace = *ac.Namespace
 

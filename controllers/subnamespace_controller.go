@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
-	accuratev2alpha1ac "github.com/cybozu-go/accurate/internal/applyconfigurations/accurate/v2alpha1"
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	accuratev2ac "github.com/cybozu-go/accurate/internal/applyconfigurations/accurate/v2"
 	utilerrors "github.com/cybozu-go/accurate/internal/util/errors"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
@@ -41,7 +41,7 @@ type SubNamespaceReconciler struct {
 func (r *SubNamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
-	sn := &accuratev2alpha1.SubNamespace{}
+	sn := &accuratev2.SubNamespace{}
 	if err := r.Get(ctx, req.NamespacedName, sn); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
@@ -62,7 +62,7 @@ func (r *SubNamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	return ctrl.Result{}, nil
 }
 
-func (r *SubNamespaceReconciler) finalize(ctx context.Context, sn *accuratev2alpha1.SubNamespace) error {
+func (r *SubNamespaceReconciler) finalize(ctx context.Context, sn *accuratev2.SubNamespace) error {
 	if !controllerutil.ContainsFinalizer(sn, constants.Finalizer) {
 		return nil
 	}
@@ -98,7 +98,7 @@ DELETE:
 	return r.Patch(ctx, sn, client.MergeFrom(orig))
 }
 
-func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2alpha1.SubNamespace) error {
+func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2.SubNamespace) error {
 	logger := log.FromContext(ctx)
 
 	ns := &corev1.Namespace{}
@@ -119,9 +119,9 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2
 		logger.Info("created a sub namespace", "name", sn.Name)
 	}
 
-	ac := accuratev2alpha1ac.SubNamespace(sn.Name, sn.Namespace).
+	ac := accuratev2ac.SubNamespace(sn.Name, sn.Namespace).
 		WithStatus(
-			accuratev2alpha1ac.SubNamespaceStatus().
+			accuratev2ac.SubNamespaceStatus().
 				WithObservedGeneration(sn.Generation),
 		)
 
@@ -133,7 +133,7 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2
 					WithType(string(kstatus.ConditionStalled)).
 					WithStatus(metav1.ConditionTrue).
 					WithObservedGeneration(sn.Generation).
-					WithReason(accuratev2alpha1.SubNamespaceConflict).
+					WithReason(accuratev2.SubNamespaceConflict).
 					WithMessage("Conflicting namespace already exists"),
 			),
 		)
@@ -166,7 +166,7 @@ func (r *SubNamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	}
 
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&accuratev2alpha1.SubNamespace{}).
+		For(&accuratev2.SubNamespace{}).
 		Watches(&corev1.Namespace{}, handler.Funcs{
 			UpdateFunc: func(ctx context.Context, ev event.UpdateEvent, q workqueue.RateLimitingInterface) {
 				if ev.ObjectNew.GetDeletionTimestamp() != nil {

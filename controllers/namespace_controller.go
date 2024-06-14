@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"path"
 
-	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	utilerrors "github.com/cybozu-go/accurate/internal/util/errors"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
@@ -101,7 +101,7 @@ func (r *NamespaceReconciler) propagateMeta(ctx context.Context, ns, parent *cor
 	}
 
 	if _, ok := ns.Labels[constants.LabelParent]; ok {
-		subNS := &accuratev2alpha1.SubNamespace{}
+		subNS := &accuratev2.SubNamespace{}
 		err := r.Get(ctx, types.NamespacedName{Name: ns.Name, Namespace: parent.Name}, subNS)
 		if err != nil {
 			if !apierrors.IsNotFound(err) {
@@ -402,7 +402,7 @@ func (r *NamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&corev1.Namespace{}).
-		Watches(&accuratev2alpha1.SubNamespace{}, handler.Funcs{
+		Watches(&accuratev2.SubNamespace{}, handler.Funcs{
 			CreateFunc: func(ctx context.Context, ev event.CreateEvent, q workqueue.RateLimitingInterface) {
 				subNSHandler(ev.Object, q)
 			},

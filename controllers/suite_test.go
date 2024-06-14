@@ -123,7 +123,7 @@ var _ = BeforeSuite(func() {
 	ns.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 	Expect(k8sClient.Create(context.Background(), ns)).To(Succeed())
 
-	sn := &accuratev2alpha1.SubNamespace{}
+	sn := &accuratev2.SubNamespace{}
 	sn.Name = "pre-ssa-child"
 	sn.Namespace = "pre-ssa-root"
 	sn.Spec.Labels = map[string]string{

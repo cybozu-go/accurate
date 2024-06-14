@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	"github.com/cybozu-go/accurate/pkg/indexing"
 	. "github.com/onsi/ginkgo/v2"
@@ -431,7 +431,7 @@ var _ = Describe("Namespace controller", func() {
 		Expect(komega.Get(gcSec2)()).To(Succeed())
 
 		By("creating a SubNamespace for sub1 namespace")
-		sn := &accuratev2alpha1.SubNamespace{}
+		sn := &accuratev2.SubNamespace{}
 		sn.Namespace = "root"
 		sn.Name = "sub1"
 		sn.Spec.Labels = map[string]string{
@@ -483,7 +483,7 @@ var _ = Describe("Namespace controller", func() {
 		Expect(komega.Get(ns)()).To(Succeed())
 		Expect(ns.Labels).To(HaveKeyWithValue("bar.glob/l", "delete-me"))
 		Expect(ns.Annotations).To(HaveKeyWithValue("bar.glob/a", "delete-me"))
-		sn := &accuratev2alpha1.SubNamespace{}
+		sn := &accuratev2.SubNamespace{}
 		sn.Name = "pre-ssa-child"
 		sn.Namespace = "pre-ssa-root"
 		Expect(komega.Update(sn, func() {
