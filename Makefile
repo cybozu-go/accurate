@@ -46,7 +46,8 @@ HELM_CRDS_FILE := charts/accurate/templates/generated/crds.yaml
 .PHONY: manifests
 manifests: setup ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	controller-gen $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="{./api/..., ./controllers/..., ./hooks/...}" output:crd:artifacts:config=config/crd/bases
-	echo '{{- if .Values.installCRDs }}' > $(HELM_CRDS_FILE)
+	echo '{{- include "accurate.crd-check" . }}' > $(HELM_CRDS_FILE)
+	echo '{{- if or .Values.crds.enabled .Values.installCRDs }}' >> $(HELM_CRDS_FILE)
 	kustomize build config/kustomize-to-helm/overlays/crds | yq e "." -p yaml - >> $(HELM_CRDS_FILE)
 	echo '{{- end }}' >> $(HELM_CRDS_FILE)
 	kustomize build config/kustomize-to-helm/overlays/templates | yq e "."  -p yaml - > charts/accurate/templates/generated/generated.yaml
