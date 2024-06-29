@@ -3,6 +3,7 @@ resources:
 
 patches:
   - path: crd_conversion_patch.yaml
+  - path: crd_resource_policy_patch.yaml
 
 components:
   - ../../components/common-labels
