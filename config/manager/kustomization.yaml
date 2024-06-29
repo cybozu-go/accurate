@@ -1,5 +1,5 @@
 resources:
 - manager.yaml
 
-patchesStrategicMerge:
-- config_patch.yaml
+patches:
+- path: config_patch.yaml

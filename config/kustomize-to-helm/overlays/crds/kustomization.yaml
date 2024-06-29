@@ -1,8 +1,8 @@
 resources:
   - ../../../crd
 
-patchesStrategicMerge:
-  - crd_conversion_patch.yaml
+patches:
+  - path: crd_conversion_patch.yaml
 
 components:
   - ../../components/common-labels

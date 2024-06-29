@@ -12,5 +12,5 @@ resources:
 - subnamespace_editor_role.yaml
 - subnamespace_viewer_role.yaml
 
-patchesStrategicMerge:
-- role_patch.yaml
+patches:
+- path: role_patch.yaml
