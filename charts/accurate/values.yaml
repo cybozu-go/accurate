@@ -1,4 +1,17 @@
+# Deprecated: Use crds.enabled and crds.keep instead.
 installCRDs: true
+
+crds:
+  # This option decides if the CRDs should be installed
+  # as part of the Helm installation.
+  enabled: true
+
+  # This option makes it so that the "helm.sh/resource-policy": keep
+  # annotation is added to the CRD. This will prevent Helm from uninstalling
+  # the CRD when the Helm release is uninstalled.
+  # WARNING: when the CRDs are removed, all Accurate custom resources
+  # like subnamespaces will be removed too by the garbage collector.
+  keep: true
 
 image:
   # image.repository -- Accurate image repository to use.

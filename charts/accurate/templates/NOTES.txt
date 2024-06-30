@@ -1,0 +1,3 @@
+{{- if not .Values.installCRDs }}
+⚠️  WARNING: `installCRDs` is deprecated, use `crds.enabled` instead.
+{{- end }}
