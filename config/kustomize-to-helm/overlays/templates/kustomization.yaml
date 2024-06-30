@@ -6,8 +6,8 @@ namespace: '{{ .Release.Namespace }}'
 
 namePrefix: '{{ template "accurate.fullname" . }}-'
 
-patchesStrategicMerge:
-  - webhookcainjection_patch.yaml
+patches:
+  - path: webhookcainjection_patch.yaml
 
 components:
   - ../../components/common-labels
