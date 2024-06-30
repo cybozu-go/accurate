@@ -31,13 +31,15 @@ type NamingPolicyRegexp struct {
 
 // Config represents the configuration file of Accurate.
 type Config struct {
-	LabelKeys                  []string                  `json:"labelKeys,omitempty"`
-	AnnotationKeys             []string                  `json:"annotationKeys,omitempty"`
-	SubNamespaceLabelKeys      []string                  `json:"subNamespaceLabelKeys,omitempty"`
-	SubNamespaceAnnotationKeys []string                  `json:"subNamespaceAnnotationKeys,omitempty"`
-	Watches                    []metav1.GroupVersionKind `json:"watches,omitempty"`
-	NamingPolicies             []NamingPolicy            `json:"namingPolicies,omitempty"`
-	NamingPolicyRegexps        []NamingPolicyRegexp
+	LabelKeys                      []string                  `json:"labelKeys,omitempty"`
+	AnnotationKeys                 []string                  `json:"annotationKeys,omitempty"`
+	SubNamespaceLabelKeys          []string                  `json:"subNamespaceLabelKeys,omitempty"`
+	SubNamespaceAnnotationKeys     []string                  `json:"subNamespaceAnnotationKeys,omitempty"`
+	Watches                        []metav1.GroupVersionKind `json:"watches,omitempty"`
+	PropagateLabelKeyExcludes      []string                  `json:"propagateLabelKeyExcludes,omitempty"`
+	PropagateAnnotationKeyExcludes []string                  `json:"propagateAnnotationKeyExcludes,omitempty"`
+	NamingPolicies                 []NamingPolicy            `json:"namingPolicies,omitempty"`
+	NamingPolicyRegexps            []NamingPolicyRegexp
 }
 
 // Validate validates the configurations.
@@ -90,6 +92,20 @@ func (c *Config) Validate(mapper meta.RESTMapper) error {
 
 		if mapping.Scope.Name() != meta.RESTScopeNameNamespace {
 			return fmt.Errorf("%s is not namespace-scoped", gvk.String())
+		}
+	}
+
+	for _, key := range c.PropagateLabelKeyExcludes {
+		// Verify that pattern is a valid format.
+		if _, err := path.Match(key, ""); err != nil {
+			return fmt.Errorf("malformed pattern for propagateLabelKeyExcludes %s: %w", key, err)
+		}
+	}
+
+	for _, key := range c.PropagateAnnotationKeyExcludes {
+		// Verify that pattern is a valid format.
+		if _, err := path.Match(key, ""); err != nil {
+			return fmt.Errorf("malformed pattern for propagateAnnotationKeyExcludes %s: %w", key, err)
 		}
 	}
 

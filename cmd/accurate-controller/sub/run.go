@@ -109,6 +109,10 @@ func subMain(ns, addr string, port int) error {
 		})
 	}
 
+	cloner := controllers.ResourceCloner{
+		LabelKeyExcludes:      cfg.PropagateLabelKeyExcludes,
+		AnnotationKeyExcludes: cfg.PropagateAnnotationKeyExcludes,
+	}
 	dec := admission.NewDecoder(scheme)
 
 	// Namespace reconciler & webhook
@@ -117,6 +121,7 @@ func subMain(ns, addr string, port int) error {
 	}
 	if err := (&controllers.NamespaceReconciler{
 		Client:                     mgr.GetClient(),
+		ResourceCloner:             cloner,
 		LabelKeys:                  cfg.LabelKeys,
 		AnnotationKeys:             cfg.AnnotationKeys,
 		SubNamespaceLabelKeys:      cfg.SubNamespaceLabelKeys,
@@ -142,7 +147,7 @@ func subMain(ns, addr string, port int) error {
 		if err := indexing.SetupIndexForResource(ctx, mgr, res); err != nil {
 			return fmt.Errorf("failed to setup indexer for %s: %w", res.GroupVersionKind().String(), err)
 		}
-		if err := controllers.NewPropagateController(res).SetupWithManager(mgr); err != nil {
+		if err := controllers.NewPropagateController(res, cloner).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("unable to create %s controller: %w", res.GroupVersionKind().String(), err)
 		}
 		logger.Info("watching", "gvk", res.GroupVersionKind().String())

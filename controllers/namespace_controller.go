@@ -26,6 +26,7 @@ import (
 // NamespaceReconciler reconciles a Namespace object
 type NamespaceReconciler struct {
 	client.Client
+	ResourceCloner
 	LabelKeys                  []string
 	AnnotationKeys             []string
 	SubNamespaceLabelKeys      []string
@@ -229,7 +230,7 @@ func (r *NamespaceReconciler) propagateCreate(ctx context.Context, res *unstruct
 		return err
 	}
 
-	if err := r.Create(ctx, cloneResource(res, ns)); err != nil {
+	if err := r.Create(ctx, r.cloneResource(res, ns)); err != nil {
 		return utilerrors.Ignore(err, utilerrors.IsNamespaceTerminating)
 	}
 
@@ -249,14 +250,14 @@ func (r *NamespaceReconciler) propagateUpdate(ctx context.Context, res *unstruct
 		if !apierrors.IsNotFound(err) {
 			return err
 		}
-		if err := r.Create(ctx, cloneResource(res, ns)); err != nil {
+		if err := r.Create(ctx, r.cloneResource(res, ns)); err != nil {
 			return utilerrors.Ignore(err, utilerrors.IsNamespaceTerminating)
 		}
 		logger.Info("created a resource", "namespace", ns, "name", res.GetName(), "gvk", gvk.String())
 		return nil
 	}
 
-	c2 := cloneResource(res, ns)
+	c2 := r.cloneResource(res, ns)
 
 	// Ensure that managed fields are upgraded to SSA before the following SSA.
 	// TODO(migration): This code could be removed after a couple of releases.
