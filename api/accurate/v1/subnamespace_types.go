@@ -28,8 +28,10 @@ type SubNamespaceSpec struct {
 }
 
 //+kubebuilder:object:root=true
+//+kubebuilder:deprecatedversion:warning="The v1 version of SubNamespace has been deprecated and will be removed in a future release of the API. Please upgrade."
 
 // SubNamespace is the Schema for the subnamespaces API
+// Deprecated: This type will be removed in one of the next releases.
 type SubNamespace struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -46,6 +48,7 @@ type SubNamespace struct {
 //+kubebuilder:object:root=true
 
 // SubNamespaceList contains a list of SubNamespace
+// Deprecated: This type will be removed in one of the next releases.
 type SubNamespaceList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`

@@ -14,10 +14,15 @@ spec:
     singular: subnamespace
   scope: Namespaced
   versions:
-  - name: v1
+  - deprecated: true
+    deprecationWarning: The v1 version of SubNamespace has been deprecated and will
+      be removed in a future release of the API. Please upgrade.
+    name: v1
     schema:
       openAPIV3Schema:
-        description: SubNamespace is the Schema for the subnamespaces API
+        description: |-
+          SubNamespace is the Schema for the subnamespaces API
+          Deprecated: This type will be removed in one of the next releases.
         properties:
           apiVersion:
             description: |-
@@ -172,10 +177,15 @@ spec:
     storage: true
     subresources:
       status: {}
-  - name: v2alpha1
+  - deprecated: true
+    deprecationWarning: The v2alpha1 version of SubNamespace has been deprecated and
+      will be removed in a future release of the API. Please upgrade.
+    name: v2alpha1
     schema:
       openAPIV3Schema:
-        description: SubNamespace is the Schema for the subnamespaces API
+        description: |-
+          SubNamespace is the Schema for the subnamespaces API
+          Deprecated: This type will be removed in one of the next releases.
         properties:
           apiVersion:
             description: |-

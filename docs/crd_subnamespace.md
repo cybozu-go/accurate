@@ -10,7 +10,7 @@
 
 #### SubNamespace
 
-SubNamespace is the Schema for the subnamespaces API
+SubNamespace is the Schema for the subnamespaces API Deprecated: This type will be removed in one of the next releases.
 
 | Field | Description | Scheme | Required |
 | ----- | ----------- | ------ | -------- |
@@ -22,7 +22,7 @@ SubNamespace is the Schema for the subnamespaces API
 
 #### SubNamespaceList
 
-SubNamespaceList contains a list of SubNamespace
+SubNamespaceList contains a list of SubNamespace Deprecated: This type will be removed in one of the next releases.
 
 | Field | Description | Scheme | Required |
 | ----- | ----------- | ------ | -------- |
