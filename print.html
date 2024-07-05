@@ -482,13 +482,20 @@ helm repo update
 <pre><code class="language-console">$ curl -fsL https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml | kubectl apply -f -
 </code></pre>
 <h3 id="installing-customresourcedefinitions-optional"><a class="header" href="#installing-customresourcedefinitions-optional">Installing CustomResourceDefinitions (optional)</a></h3>
-<p>You must now decide if Accurate CRDs are to be managed by Helm or not. Please read
-<a href="helm.html#crd-considerations">CRD considerations</a> and make sure you understand the pros and cons with the different approaches.</p>
-<p>The Accurate Helm chart default is to install and manage CRDs with Helm, but if you want to manage them yourself,
-now is the time.</p>
-<pre><code class="language-console">$  kubectl apply -k https://github.com/cybozu-go/accurate//config/crd/
+<p>Accurate does not use the <a href="https://helm.sh/docs/chart_best_practices/custom_resource_definitions/">official helm method</a> of installing CRD resources.
+This is because it makes upgrading CRDs impossible with helm CLI alone.
+The helm team explain the limitations of their approach <a href="https://helm.sh/docs/chart_best_practices/custom_resource_definitions/#some-caveats-and-explanations">here</a>.</p>
+<p>The Accurate Helm chart default is to install and manage CRDs with Helm and
+add annotations preventing Helm from uninstalling the CRD when the Helm release is uninstalled.</p>
+<p>The recommended approach is to let helm manage CRDs, but if you want to manage CRDs yourself, now is the time.</p>
+<pre><code class="language-console">$  kubectl apply -k https://github.com/cybozu-go/accurate//config/crd-only/
 </code></pre>
-<p>If you decided to manage CRDs outside of Helm, make sure you set the <code>installCRDs</code> Helm value to <code>false</code>.</p>
+<blockquote>
+<p>NOTE:</p>
+<p>Since the CRDs contain configuration of conversion webhooks, you may have to tweak the webhook settings
+if installing the chart using non-standard values.</p>
+</blockquote>
+<p>If you decided to manage CRDs outside of Helm, make sure you set the <code>crds.enabled</code> Helm value to <code>false</code>.</p>
 <h3 id="installing-the-chart"><a class="header" href="#installing-the-chart">Installing the Chart</a></h3>
 <blockquote>
 <p>NOTE:</p>
@@ -517,20 +524,15 @@ now is the time.</p>
 <tr><td>image.pullPolicy</td><td>string</td><td><code>nil</code></td><td>Accurate image pullPolicy.</td></tr>
 <tr><td>image.repository</td><td>string</td><td><code>&quot;ghcr.io/cybozu-go/accurate&quot;</code></td><td>Accurate image repository to use.</td></tr>
 <tr><td>image.tag</td><td>string</td><td><code>{{ .Chart.AppVersion }}</code></td><td>Accurate image tag to use.</td></tr>
-<tr><td>installCRDs</td><td>bool</td><td><code>true</code></td><td>Controls if CRDs are automatically installed and managed as part of your Helm release.</td></tr>
+<tr><td>crds.enabled</td><td>bool</td><td><code>true</code></td><td>Decides if the CRDs should be installed as part of the Helm installation.</td></tr>
+<tr><td>crds.keep</td><td>bool</td><td><code>true</code></td><td>Setting this to <code>true</code> will prevent Helm from uninstalling the CRD when the Helm release is uninstalled.</td></tr>
+<tr><td>installCRDs</td><td>bool</td><td><code>true</code></td><td>Controls if CRDs are automatically installed and managed as part of your Helm release. Deprecated: Use <code>crds.enabled</code> and <code>crds.keep</code> instead.</td></tr>
 </tbody></table>
 </div>
 <h2 id="generate-manifests"><a class="header" href="#generate-manifests">Generate Manifests</a></h2>
 <p>You can use the <code>helm template</code> command to render manifests.</p>
 <pre><code class="language-console">$ helm template --namespace accurate accurate accurate/accurate
 </code></pre>
-<h2 id="crd-considerations"><a class="header" href="#crd-considerations">CRD considerations</a></h2>
-<p>Accurate does not use the <a href="https://helm.sh/docs/chart_best_practices/custom_resource_definitions/">official helm method</a> of installing CRD resources.
-This is because it makes upgrading CRDs impossible with helm CLI alone.
-The helm team explain the limitations of their approach <a href="https://helm.sh/docs/chart_best_practices/custom_resource_definitions/#some-caveats-and-explanations">here</a>.</p>
-<p>Managing CRDs with Helm is probably the easiest, but also has some drawbacks.
-The <a href="https://cert-manager.io/docs/installation/helm/#crd-considerations">cert-manager documentation</a>
-debates some pros and cons that are worth reading.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="installing-kubectl-plugin"><a class="header" href="#installing-kubectl-plugin">Installing kubectl plugin</a></h1>
 <p><code>kubectl-accurate</code> is a plugin for <code>kubectl</code> to make operations of Accurate easy.</p>
 <p>It is strongly recommended to install <code>kubectl-accurate</code> though Accurate can be used without the plugin.</p>
