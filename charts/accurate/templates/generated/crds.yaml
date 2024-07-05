@@ -1,10 +1,12 @@
-{{- if .Values.installCRDs }}
+{{- include "accurate.crd-check" . }}
+{{- if or .Values.crds.enabled .Values.installCRDs }}
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
     cert-manager.io/inject-ca-from: '{{ .Release.Namespace }}/{{ template "accurate.fullname" . }}-serving-cert'
     controller-gen.kubebuilder.io/version: v0.15.0
+    helm.sh/resource-policy: '{{ .Values.crds.keep | ternary "keep" "delete" }}'
   labels:
     app.kubernetes.io/managed-by: '{{ .Release.Service }}'
     app.kubernetes.io/name: '{{ include "accurate.name" . }}'

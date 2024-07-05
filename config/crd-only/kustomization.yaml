@@ -1,0 +1,7 @@
+labels:
+  - pairs:
+      app.kubernetes.io/name: accurate
+resources:
+- ../crd
+patches:
+  - path: crd_conversion_patch.yaml

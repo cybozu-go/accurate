@@ -19,17 +19,25 @@ $ curl -fsL https://github.com/jetstack/cert-manager/releases/latest/download/ce
 
 ### Installing CustomResourceDefinitions (optional)
 
-You must now decide if Accurate CRDs are to be managed by Helm or not. Please read
-[CRD considerations](#crd-considerations) and make sure you understand the pros and cons with the different approaches.
+Accurate does not use the [official helm method](https://helm.sh/docs/chart_best_practices/custom_resource_definitions/) of installing CRD resources.
+This is because it makes upgrading CRDs impossible with helm CLI alone.
+The helm team explain the limitations of their approach [here](https://helm.sh/docs/chart_best_practices/custom_resource_definitions/#some-caveats-and-explanations).
 
-The Accurate Helm chart default is to install and manage CRDs with Helm, but if you want to manage them yourself,
-now is the time.
+The Accurate Helm chart default is to install and manage CRDs with Helm and
+add annotations preventing Helm from uninstalling the CRD when the Helm release is uninstalled.
+
+The recommended approach is to let helm manage CRDs, but if you want to manage CRDs yourself, now is the time.
 
 ```console
-$  kubectl apply -k https://github.com/cybozu-go/accurate//config/crd/
+$  kubectl apply -k https://github.com/cybozu-go/accurate//config/crd-only/
 ```
 
-If you decided to manage CRDs outside of Helm, make sure you set the `installCRDs` Helm value to `false`.
+> NOTE:
+>
+> Since the CRDs contain configuration of conversion webhooks, you may have to tweak the webhook settings
+> if installing the chart using non-standard values.
+
+If you decided to manage CRDs outside of Helm, make sure you set the `crds.enabled` Helm value to `false`.
 
 ### Installing the Chart
 
@@ -69,7 +77,9 @@ $ helm install --create-namespace --namespace accurate accurate -f values.yaml a
 | image.pullPolicy                                 | string | `nil`                                                                                                                                                                             | Accurate image pullPolicy.                                                                                                                                                                                                    |
 | image.repository                                 | string | `"ghcr.io/cybozu-go/accurate"`                                                                                                                                                    | Accurate image repository to use.                                                                                                                                                                                             |
 | image.tag                                        | string | `{{ .Chart.AppVersion }}`                                                                                                                                                         | Accurate image tag to use.                                                                                                                                                                                                    |
-| installCRDs                                      | bool   | `true`                                                                                                                                                                            | Controls if CRDs are automatically installed and managed as part of your Helm release.                                                                                                                                        |
+| crds.enabled                                     | bool   | `true`                                                                                                                                                                            | Decides if the CRDs should be installed as part of the Helm installation.                                                                                                                                                     |
+| crds.keep                                        | bool   | `true`                                                                                                                                                                            | Setting this to `true` will prevent Helm from uninstalling the CRD when the Helm release is uninstalled.                                                                                                                      |
+| installCRDs                                      | bool   | `true`                                                                                                                                                                            | Controls if CRDs are automatically installed and managed as part of your Helm release. Deprecated: Use `crds.enabled` and `crds.keep` instead.                                                                                |
 
 ## Generate Manifests
 
@@ -78,13 +88,3 @@ You can use the `helm template` command to render manifests.
 ```console
 $ helm template --namespace accurate accurate accurate/accurate
 ```
-
-## CRD considerations
-
-Accurate does not use the [official helm method](https://helm.sh/docs/chart_best_practices/custom_resource_definitions/) of installing CRD resources.
-This is because it makes upgrading CRDs impossible with helm CLI alone.
-The helm team explain the limitations of their approach [here](https://helm.sh/docs/chart_best_practices/custom_resource_definitions/#some-caveats-and-explanations).
-
-Managing CRDs with Helm is probably the easiest, but also has some drawbacks.
-The [cert-manager documentation](https://cert-manager.io/docs/installation/helm/#crd-considerations)
-debates some pros and cons that are worth reading.
