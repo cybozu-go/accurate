@@ -6,11 +6,12 @@ import (
 	"errors"
 	"os"
 
-	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 //go:embed testdata/role.yaml
@@ -245,17 +246,22 @@ var _ = Describe("kubectl accurate", func() {
 		kubectlSafe(nil, "get", "subnamespaces", "-n", "subroot2", "sn1")
 		kubectlSafe(nil, "get", "subnamespaces", "-n", "subroot1", "sn1")
 
-		Eventually(func() string {
-			out, err := kubectl(nil, "get", "-n", "subroot2", "subnamespaces.v1.accurate.cybozu.com", "sn1", "-o", "json")
+		var conditions []metav1.Condition
+		Eventually(func() ([]metav1.Condition, error) {
+			out, err := kubectl(nil, "get", "-n", "subroot2", "subnamespaces", "sn1", "-o", "json")
 			if err != nil {
-				return ""
+				return nil, err
 			}
-			sn := &accuratev1.SubNamespace{}
+			sn := &accuratev2.SubNamespace{}
 			if err := json.Unmarshal(out, sn); err != nil {
-				return ""
+				return nil, err
 			}
-			return string(sn.Status)
-		}).Should(Equal("conflict"))
+			conditions = sn.Status.Conditions
+			return conditions, nil
+		}).Should(HaveLen(1))
+		Expect(conditions[0].Type).To(Equal("Stalled"))
+		Expect(conditions[0].Reason).To(Equal("Conflict"))
+		Expect(conditions[0].Status).To(Equal(metav1.ConditionTrue))
 
 		kubectlSafe(nil, "accurate", "sub", "cut", "sn2")
 		_, err = kubectl(nil, "get", "-n", "sn1", "subnamespaces", "sn2")

@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -23,7 +23,7 @@ var _ = Describe("SubNamespace webhook", func() {
 		ns.Name = "ns1"
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed())
 
-		sn := &accuratev1.SubNamespace{}
+		sn := &accuratev2.SubNamespace{}
 		sn.Namespace = "ns1"
 		sn.Name = "foo"
 		err := k8sClient.Create(ctx, sn)
@@ -37,7 +37,7 @@ var _ = Describe("SubNamespace webhook", func() {
 		ns.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed())
 
-		sn := &accuratev1.SubNamespace{}
+		sn := &accuratev2.SubNamespace{}
 		sn.Namespace = "ns2"
 		sn.Name = "foo"
 		sn.Spec.Labels = map[string]string{"foo": "bar"}
@@ -50,7 +50,7 @@ var _ = Describe("SubNamespace webhook", func() {
 		sn.Finalizers = nil
 		Expect(k8sClient.Update(ctx, sn)).To(Succeed())
 
-		sn = &accuratev1.SubNamespace{}
+		sn = &accuratev2.SubNamespace{}
 		Expect(k8sClient.Get(ctx, client.ObjectKey{Namespace: "ns2", Name: "foo"}, sn)).To(Succeed())
 		Expect(sn.Finalizers).To(BeEmpty())
 	})
@@ -66,7 +66,7 @@ var _ = Describe("SubNamespace webhook", func() {
 		ns.Labels = map[string]string{constants.LabelParent: "ns-parent"}
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed())
 
-		sn := &accuratev1.SubNamespace{}
+		sn := &accuratev2.SubNamespace{}
 		sn.Namespace = "ns3"
 		sn.Name = "bar"
 		Expect(k8sClient.Create(ctx, sn)).To(Succeed())
@@ -83,7 +83,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					ns.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 					Expect(k8sClient.Create(ctx, ns)).To(Succeed())
 
-					sn := &accuratev1.SubNamespace{}
+					sn := &accuratev2.SubNamespace{}
 					sn.Namespace = "naming-policy-root-1"
 					sn.Name = "naming-policy-root-1-child"
 					Expect(k8sClient.Create(ctx, sn)).To(Succeed())
@@ -95,7 +95,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					ns.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 					Expect(k8sClient.Create(ctx, ns)).To(Succeed())
 
-					sn := &accuratev1.SubNamespace{}
+					sn := &accuratev2.SubNamespace{}
 					sn.Namespace = "root-ns-match-1"
 					sn.Name = "child-match-1"
 					Expect(k8sClient.Create(ctx, sn)).To(Succeed())
@@ -112,7 +112,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					parent.Labels = map[string]string{constants.LabelParent: "ns-root-1"}
 					Expect(k8sClient.Create(ctx, parent)).To(Succeed())
 
-					sn := &accuratev1.SubNamespace{}
+					sn := &accuratev2.SubNamespace{}
 					sn.Namespace = "ns-root-1-parent"
 					sn.Name = "ns-root-1-parent-child"
 					Expect(k8sClient.Create(ctx, sn)).To(Succeed())
@@ -124,7 +124,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 					Expect(k8sClient.Create(ctx, root)).To(Succeed())
 
-					sn := &accuratev1.SubNamespace{}
+					sn := &accuratev2.SubNamespace{}
 					sn.Namespace = "app-team1"
 					sn.Name = "app-team1-child"
 					Expect(k8sClient.Create(ctx, sn)).To(Succeed())
@@ -136,7 +136,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 					Expect(k8sClient.Create(ctx, root)).To(Succeed())
 
-					sn := &accuratev1.SubNamespace{}
+					sn := &accuratev2.SubNamespace{}
 					sn.Namespace = "app-team2-app1"
 					sn.Name = "app-team2-app1-subapp1"
 					Expect(k8sClient.Create(ctx, sn)).To(Succeed())
@@ -148,7 +148,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 					Expect(k8sClient.Create(ctx, root)).To(Succeed())
 
-					sn := &accuratev1.SubNamespace{}
+					sn := &accuratev2.SubNamespace{}
 					sn.Namespace = "unuse-naming-group-team1"
 					sn.Name = "unuse-naming-group-child1"
 					Expect(k8sClient.Create(ctx, sn)).To(Succeed())
@@ -162,7 +162,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					ns.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 					Expect(k8sClient.Create(ctx, ns)).To(Succeed())
 
-					sn := &accuratev1.SubNamespace{}
+					sn := &accuratev2.SubNamespace{}
 					sn.Namespace = "naming-policy-root-2"
 					sn.Name = "naming-policy-root-2--child"
 					err := k8sClient.Create(ctx, sn)
@@ -176,7 +176,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					ns.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 					Expect(k8sClient.Create(ctx, ns)).To(Succeed())
 
-					sn := &accuratev1.SubNamespace{}
+					sn := &accuratev2.SubNamespace{}
 					sn.Namespace = "root-ns-match-2"
 					sn.Name = "child-2"
 					err := k8sClient.Create(ctx, sn)
@@ -195,7 +195,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					parent.Labels = map[string]string{constants.LabelParent: "ns-root-1"}
 					Expect(k8sClient.Create(ctx, parent)).To(Succeed())
 
-					sn := &accuratev1.SubNamespace{}
+					sn := &accuratev2.SubNamespace{}
 					sn.Namespace = "ns-root-2-parent"
 					sn.Name = "not-ns-root-2-parent-child"
 					err := k8sClient.Create(ctx, sn)
@@ -209,7 +209,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 					Expect(k8sClient.Create(ctx, root)).To(Succeed())
 
-					sn := &accuratev1.SubNamespace{}
+					sn := &accuratev2.SubNamespace{}
 					sn.Namespace = "app-team10"
 					sn.Name = "app-team20-child"
 					err := k8sClient.Create(ctx, sn)
@@ -223,7 +223,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 					Expect(k8sClient.Create(ctx, root)).To(Succeed())
 
-					sn := &accuratev1.SubNamespace{}
+					sn := &accuratev2.SubNamespace{}
 					sn.Namespace = "unuse-naming-group-team2"
 					sn.Name = "unuse-naming-group-team2-foo"
 					err := k8sClient.Create(ctx, sn)
@@ -237,7 +237,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 					Expect(k8sClient.Create(ctx, root)).To(Succeed())
 
-					sn := &accuratev1.SubNamespace{}
+					sn := &accuratev2.SubNamespace{}
 					sn.Namespace = "labels-invalid-1"
 					sn.Name = "labels-invalid-1-sub"
 					sn.Spec.Labels = map[string]string{"foo": "~"}
@@ -252,7 +252,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 					Expect(k8sClient.Create(ctx, root)).To(Succeed())
 
-					sn := &accuratev1.SubNamespace{}
+					sn := &accuratev2.SubNamespace{}
 					sn.Namespace = "annotations-invalid-1"
 					sn.Name = "annotations-invalid-1-sub"
 					sn.Spec.Annotations = map[string]string{"foo-": ""}
@@ -267,7 +267,7 @@ var _ = Describe("SubNamespace webhook", func() {
 					root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
 					Expect(k8sClient.Create(ctx, root)).To(Succeed())
 
-					sn := &accuratev1.SubNamespace{}
+					sn := &accuratev2.SubNamespace{}
 					sn.Namespace = "both-invalid-1"
 					sn.Name = "both-invalid-1-sub"
 					sn.Spec.Labels = map[string]string{"foo": "~"}
