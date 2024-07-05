@@ -20,12 +20,12 @@ data:
     subNamespaceAnnotationKeys: {{ toYaml . | nindent 6 }}
     {{- end }}
     watches: {{ toYaml .Values.controller.config.watches | nindent 6 }}
-    {{- with .Values.controller.config.namingPolicies }}
     {{- with .Values.controller.config.propagateLabelKeyExcludes }}
     propagateLabelKeyExcludes: {{ toYaml . | nindent 6 }}
     {{- end }}
     {{- with .Values.controller.config.propagateAnnotationKeyExcludes }}
     propagateAnnotationKeyExcludes: {{ toYaml . | nindent 6 }}
     {{- end }}
+    {{- with .Values.controller.config.namingPolicies }}
     namingPolicies: {{ toYaml . | nindent 6 }}
     {{- end }}
