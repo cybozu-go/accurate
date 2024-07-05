@@ -3,7 +3,6 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	utilerrors "github.com/cybozu-go/accurate/internal/util/errors"
 	"github.com/cybozu-go/accurate/pkg/config"
@@ -26,7 +25,12 @@ import (
 // removal soon.
 const notGenerated = "false"
 
-func cloneResource(res *unstructured.Unstructured, ns string) *unstructured.Unstructured {
+type ResourceCloner struct {
+	LabelKeyExcludes      []string
+	AnnotationKeyExcludes []string
+}
+
+func (rc *ResourceCloner) cloneResource(res *unstructured.Unstructured, ns string) *unstructured.Unstructured {
 	c := res.DeepCopy()
 	delete(c.Object, "metadata")
 	delete(c.Object, "status")
@@ -34,7 +38,7 @@ func cloneResource(res *unstructured.Unstructured, ns string) *unstructured.Unst
 	c.SetName(res.GetName())
 	labels := make(map[string]string)
 	for k, v := range res.GetLabels() {
-		if strings.Contains(k, "kubernetes.io/") {
+		if matchKey(k, rc.LabelKeyExcludes) {
 			continue
 		}
 		labels[k] = v
@@ -43,7 +47,7 @@ func cloneResource(res *unstructured.Unstructured, ns string) *unstructured.Unst
 	c.SetLabels(labels)
 	annotations := make(map[string]string)
 	for k, v := range res.GetAnnotations() {
-		if strings.Contains(k, "kubernetes.io/") {
+		if matchKey(k, rc.AnnotationKeyExcludes) {
 			continue
 		}
 		annotations[k] = v
@@ -62,18 +66,20 @@ func cloneResource(res *unstructured.Unstructured, ns string) *unstructured.Unst
 // PropagateController propagates objects of a namespace-scoped resource.
 type PropagateController struct {
 	client.Client
+	ResourceCloner
 	reader client.Reader
 	res    *unstructured.Unstructured
 }
 
 // NewPropagateController creates a new PropagateController.
 // The GroupVersionKind of `res` must be set.
-func NewPropagateController(res *unstructured.Unstructured) *PropagateController {
+func NewPropagateController(res *unstructured.Unstructured, cloner ResourceCloner) *PropagateController {
 	if res.GetKind() == "" {
 		panic("no group version kind")
 	}
 	return &PropagateController{
-		res: res.DeepCopy(),
+		res:            res.DeepCopy(),
+		ResourceCloner: cloner,
 	}
 }
 
@@ -200,7 +206,7 @@ func (r *PropagateController) handleDelete(ctx context.Context, req ctrl.Request
 		} else {
 			switch obj.GetAnnotations()[constants.AnnPropagate] {
 			case constants.PropagateCreate, constants.PropagateUpdate:
-				if err := r.Create(ctx, cloneResource(obj, req.Namespace)); err != nil {
+				if err := r.Create(ctx, r.cloneResource(obj, req.Namespace)); err != nil {
 					if utilerrors.IsNamespaceTerminating(err) {
 						return nil
 					}
@@ -257,7 +263,7 @@ func (r *PropagateController) propagateCreate(ctx context.Context, obj *unstruct
 			return fmt.Errorf("failed to look up %s/%s: %w", child.Name, name, err)
 		}
 
-		if err := r.Create(ctx, cloneResource(obj, child.Name)); err != nil {
+		if err := r.Create(ctx, r.cloneResource(obj, child.Name)); err != nil {
 			if utilerrors.IsNamespaceTerminating(err) {
 				return nil
 			}
@@ -275,7 +281,7 @@ func (r *PropagateController) propagateUpdate(ctx context.Context, obj, parent *
 	name := obj.GetName()
 
 	if parent != nil {
-		clone := cloneResource(parent, obj.GetNamespace())
+		clone := r.cloneResource(parent, obj.GetNamespace())
 
 		// Ensure that managed fields are upgraded to SSA before the following SSA.
 		// TODO(migration): This code could be removed after a couple of releases.
@@ -306,7 +312,7 @@ func (r *PropagateController) propagateUpdate(ctx context.Context, obj, parent *
 				return fmt.Errorf("failed to lookup %s/%s: %w", child.Name, name, err)
 			}
 
-			clone := cloneResource(obj, child.Name)
+			clone := r.cloneResource(obj, child.Name)
 			if err := r.Create(ctx, clone); err != nil {
 				if utilerrors.IsNamespaceTerminating(err) {
 					return nil
@@ -318,7 +324,7 @@ func (r *PropagateController) propagateUpdate(ctx context.Context, obj, parent *
 			continue
 		}
 
-		clone := cloneResource(obj, child.Name)
+		clone := r.cloneResource(obj, child.Name)
 
 		// Ensure that managed fields are upgraded to SSA before the following SSA.
 		// TODO(migration): This code could be removed after a couple of releases.

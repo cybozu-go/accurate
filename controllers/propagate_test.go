@@ -62,7 +62,11 @@ var _ = Describe("SubNamespace controller", func() {
 		err = indexing.SetupIndexForResource(ctx, mgr, svcRes)
 		Expect(err).NotTo(HaveOccurred())
 
-		pc := NewPropagateController(svcRes)
+		cloner := ResourceCloner{
+			AnnotationKeyExcludes: []string{"*excluded-annotation.io/*"},
+			LabelKeyExcludes:      []string{"*excluded-label.io/*"},
+		}
+		pc := NewPropagateController(svcRes, cloner)
 		err = pc.SetupWithManager(mgr)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -288,6 +292,41 @@ var _ = Describe("SubNamespace controller", func() {
 			Eventually(komega.Get(svc)).Should(WithTransform(apierrors.IsNotFound, BeTrue()))
 		}
 	})
+
+	DescribeTable("should NOT propagate excluded resource labels/annotations",
+		func(sourceNs, targetNs string) {
+			const excludedAnnotation = "excluded-annotation.io/foo"
+			const excludedLabel = "excluded-label.io/foo"
+
+			svc := &corev1.Service{}
+			svc.Namespace = sourceNs
+			svc.Name = "svc"
+			svc.Annotations = map[string]string{
+				constants.AnnPropagate: constants.PropagateUpdate,
+				excludedAnnotation:     "bar",
+				"foo.bar/baz":          "baz",
+			}
+			svc.Labels = map[string]string{
+				excludedLabel: "bar",
+				"foo.bar/baz": "baz",
+			}
+			svc.Spec.ClusterIP = "None"
+			svc.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt32(3333)}}
+			Expect(k8sClient.Create(ctx, svc)).To(Succeed())
+
+			clone := &corev1.Service{}
+			clone.Name = "svc"
+			clone.Namespace = targetNs
+			Eventually(komega.Get(clone)).Should(Succeed())
+
+			Expect(clone.Annotations).To(Not(HaveKey(excludedAnnotation)))
+			Expect(clone.Annotations).To(HaveKeyWithValue("foo.bar/baz", "baz"))
+			Expect(clone.Labels).To(Not(HaveKey(excludedLabel)))
+			Expect(clone.Labels).To(HaveKeyWithValue("foo.bar/baz", "baz"))
+		},
+		Entry("to sub-namespaces", rootNS, sub1NS),
+		Entry("from a template namespace", tmplNS, instanceNS),
+	)
 
 	It("should manage generated resources", func() {
 		cm1 := &corev1.ConfigMap{}
