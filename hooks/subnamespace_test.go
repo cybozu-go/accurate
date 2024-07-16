@@ -74,6 +74,32 @@ var _ = Describe("SubNamespace webhook", func() {
 		Expect(controllerutil.ContainsFinalizer(sn, constants.Finalizer)).To(BeTrue())
 	})
 
+	It("should deny deletion of SubNamespace with child namespaces", func() {
+		nsR := &corev1.Namespace{}
+		nsR.GenerateName = "ns-"
+		nsR.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
+		Expect(k8sClient.Create(ctx, nsR)).To(Succeed())
+
+		snP := &accuratev2.SubNamespace{}
+		snP.Namespace = nsR.Name
+		snP.GenerateName = "ns-p-"
+		Expect(k8sClient.Create(ctx, snP)).To(Succeed())
+		// Create sub-namespace since no controllers present in this test setup
+		nsP := &corev1.Namespace{}
+		nsP.Name = snP.Name
+		nsP.Labels = map[string]string{constants.LabelParent: nsR.Name}
+		Expect(k8sClient.Create(ctx, nsP)).To(Succeed())
+
+		ns := &corev1.Namespace{}
+		ns.GenerateName = "ns-c-"
+		ns.Labels = map[string]string{constants.LabelParent: nsP.Name}
+		Expect(k8sClient.Create(ctx, ns)).To(Succeed())
+
+		err := k8sClient.Delete(ctx, snP)
+		Expect(err).To(HaveOccurred())
+		Expect(errors.ReasonForError(err)).Should(Equal(metav1.StatusReasonForbidden))
+	})
+
 	Context("Naming Policy", func() {
 		When("the root namespace name is matched some Root Naming Policies", func() {
 			When("the SubNamespace name is matched to the Root's Match Naming Policy", func() {
