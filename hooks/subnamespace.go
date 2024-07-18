@@ -53,7 +53,7 @@ func (m *subNamespaceMutator) Handle(ctx context.Context, req admission.Request)
 	return admission.PatchResponseFromRaw(req.Object.Raw, data)
 }
 
-//+kubebuilder:webhook:path=/validate-accurate-cybozu-com-v1-subnamespace,mutating=false,failurePolicy=fail,sideEffects=None,groups=accurate.cybozu.com,resources=subnamespaces,verbs=create;update,versions=v1,matchPolicy=Equivalent,name=vsubnamespace.kb.io,admissionReviewVersions={v1}
+//+kubebuilder:webhook:path=/validate-accurate-cybozu-com-v1-subnamespace,mutating=false,failurePolicy=fail,sideEffects=None,groups=accurate.cybozu.com,resources=subnamespaces,verbs=create;delete,versions=v1,matchPolicy=Equivalent,name=vsubnamespace.kb.io,admissionReviewVersions={v1}
 
 type subNamespaceValidator struct {
 	client.Client
@@ -64,17 +64,27 @@ type subNamespaceValidator struct {
 var _ admission.Handler = &subNamespaceValidator{}
 
 func (v *subNamespaceValidator) Handle(ctx context.Context, req admission.Request) admission.Response {
-	if req.Operation != admissionv1.Create {
+	switch req.Operation {
+	case admissionv1.Create:
+		sn := &accuratev1.SubNamespace{}
+		if err := v.dec.Decode(req, sn); err != nil {
+			return admission.Errored(http.StatusBadRequest, err)
+		}
+		return v.handleCreate(ctx, sn)
+	case admissionv1.Delete:
+		sn := &accuratev1.SubNamespace{}
+		if err := v.dec.DecodeRaw(req.OldObject, sn); err != nil {
+			return admission.Errored(http.StatusBadRequest, err)
+		}
+		return v.handleDelete(ctx, sn)
+	default:
 		return admission.Allowed("")
 	}
+}
 
-	sn := &accuratev1.SubNamespace{}
-	if err := v.dec.Decode(req, sn); err != nil {
-		return admission.Errored(http.StatusBadRequest, err)
-	}
-
+func (v *subNamespaceValidator) handleCreate(ctx context.Context, sn *accuratev1.SubNamespace) admission.Response {
 	ns := &corev1.Namespace{}
-	if err := v.Get(ctx, client.ObjectKey{Name: req.Namespace}, ns); err != nil {
+	if err := v.Get(ctx, client.ObjectKey{Name: sn.Namespace}, ns); err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
 
@@ -100,6 +110,30 @@ func (v *subNamespaceValidator) Handle(ctx context.Context, req admission.Reques
 	if !ok {
 		return admission.Denied(fmt.Sprintf("namespace %s is not match naming policies: %s", ns.Name, msg))
 	}
+	return admission.Allowed("")
+}
+
+func (v *subNamespaceValidator) handleDelete(ctx context.Context, sn *accuratev1.SubNamespace) admission.Response {
+	ns := &corev1.Namespace{}
+	if err := v.Get(ctx, client.ObjectKey{Name: sn.Name}, ns); err != nil {
+		if apierrors.IsNotFound(err) {
+			return admission.Allowed("")
+		}
+		return admission.Errored(http.StatusInternalServerError, err)
+	}
+
+	if ns.Labels[constants.LabelParent] != sn.Namespace {
+		return admission.Allowed("")
+	}
+
+	children := &corev1.NamespaceList{}
+	if err := v.List(ctx, children, client.MatchingFields{constants.NamespaceParentKey: ns.Name}); err != nil {
+		return admission.Errored(http.StatusInternalServerError, err)
+	}
+	if len(children.Items) > 0 {
+		return admission.Denied("child namespaces exist")
+	}
+
 	return admission.Allowed("")
 }
 
