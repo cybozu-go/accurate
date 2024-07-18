@@ -231,7 +231,7 @@ webhooks:
       service:
         name: '{{ template "accurate.fullname" . }}-webhook-service'
         namespace: '{{ .Release.Namespace }}'
-        path: /mutate-accurate-cybozu-com-v1-subnamespace
+        path: /mutate-accurate-cybozu-com-v2-subnamespace
     failurePolicy: Fail
     matchPolicy: Equivalent
     name: subnamespace.accurate.cybozu.io
@@ -239,7 +239,7 @@ webhooks:
       - apiGroups:
           - accurate.cybozu.com
         apiVersions:
-          - v1
+          - v2
         operations:
           - CREATE
           - UPDATE
@@ -286,7 +286,7 @@ webhooks:
       service:
         name: '{{ template "accurate.fullname" . }}-webhook-service'
         namespace: '{{ .Release.Namespace }}'
-        path: /validate-accurate-cybozu-com-v1-subnamespace
+        path: /validate-accurate-cybozu-com-v2-subnamespace
     failurePolicy: Fail
     matchPolicy: Equivalent
     name: vsubnamespace.kb.io
@@ -294,7 +294,7 @@ webhooks:
       - apiGroups:
           - accurate.cybozu.com
         apiVersions:
-          - v1
+          - v2
         operations:
           - CREATE
           - DELETE

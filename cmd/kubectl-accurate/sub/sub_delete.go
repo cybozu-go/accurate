@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
@@ -61,7 +61,7 @@ func (o *subDeleteOpts) Run(ctx context.Context) error {
 		return fmt.Errorf("namespace %s is not a sub-namespace", o.name)
 	}
 
-	sn := &accuratev1.SubNamespace{}
+	sn := &accuratev2.SubNamespace{}
 	sn.Namespace = parent
 	sn.Name = o.name
 	if err := o.client.Delete(ctx, sn); err != nil {

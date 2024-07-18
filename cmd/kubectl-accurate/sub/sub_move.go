@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
@@ -85,13 +85,13 @@ func (o *subMoveOpts) Run(ctx context.Context) error {
 
 	fmt.Fprintf(o.streams.Out, "the parent has changed to %s\n", o.parent)
 
-	oldSN := &accuratev1.SubNamespace{}
+	oldSN := &accuratev2.SubNamespace{}
 	if err := o.client.Get(ctx, client.ObjectKey{Name: o.name, Namespace: orig}, oldSN); err != nil {
 		return fmt.Errorf("failed to get original SubNamespace %s/%s: %w", orig, o.name, err)
 	}
 
 	if !o.orphan {
-		oldSN := &accuratev1.SubNamespace{}
+		oldSN := &accuratev2.SubNamespace{}
 		oldSN.Namespace = orig
 		oldSN.Name = o.name
 		err := o.client.Delete(ctx, oldSN)
@@ -104,7 +104,7 @@ func (o *subMoveOpts) Run(ctx context.Context) error {
 		}
 	}
 
-	sn := &accuratev1.SubNamespace{}
+	sn := &accuratev2.SubNamespace{}
 	sn.Namespace = o.parent
 	sn.Name = o.name
 	sn.Spec.Labels = oldSN.Spec.Labels

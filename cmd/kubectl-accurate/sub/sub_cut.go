@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
@@ -70,7 +70,7 @@ func (o *subCutOpts) Run(ctx context.Context) error {
 
 	fmt.Fprintf(o.streams.Out, "cut %s as a root namespace\n", o.name)
 
-	sn := &accuratev1.SubNamespace{}
+	sn := &accuratev2.SubNamespace{}
 	sn.Namespace = parent
 	sn.Name = o.name
 
