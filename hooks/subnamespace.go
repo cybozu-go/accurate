@@ -26,7 +26,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
-//+kubebuilder:webhook:path=/mutate-accurate-cybozu-com-v1-subnamespace,mutating=true,failurePolicy=fail,sideEffects=None,groups=accurate.cybozu.com,resources=subnamespaces,verbs=create;update,versions=v1,matchPolicy=Equivalent,name=subnamespace.accurate.cybozu.io,admissionReviewVersions={v1}
+//+kubebuilder:webhook:path=/mutate-accurate-cybozu-com-v2-subnamespace,mutating=true,failurePolicy=fail,sideEffects=None,groups=accurate.cybozu.com,resources=subnamespaces,verbs=create;update,versions=v2,matchPolicy=Equivalent,name=subnamespace.accurate.cybozu.io,admissionReviewVersions={v1}
 
 type subNamespaceMutator struct {
 	dec admission.Decoder
@@ -39,7 +39,7 @@ func (m *subNamespaceMutator) Handle(ctx context.Context, req admission.Request)
 		return admission.Allowed("")
 	}
 
-	sn := &accuratev1.SubNamespace{}
+	sn := &accuratev2.SubNamespace{}
 	if err := m.dec.Decode(req, sn); err != nil {
 		return admission.Errored(http.StatusBadRequest, err)
 	}
@@ -53,7 +53,7 @@ func (m *subNamespaceMutator) Handle(ctx context.Context, req admission.Request)
 	return admission.PatchResponseFromRaw(req.Object.Raw, data)
 }
 
-//+kubebuilder:webhook:path=/validate-accurate-cybozu-com-v1-subnamespace,mutating=false,failurePolicy=fail,sideEffects=None,groups=accurate.cybozu.com,resources=subnamespaces,verbs=create;delete,versions=v1,matchPolicy=Equivalent,name=vsubnamespace.kb.io,admissionReviewVersions={v1}
+//+kubebuilder:webhook:path=/validate-accurate-cybozu-com-v2-subnamespace,mutating=false,failurePolicy=fail,sideEffects=None,groups=accurate.cybozu.com,resources=subnamespaces,verbs=create;delete,versions=v2,matchPolicy=Equivalent,name=vsubnamespace.kb.io,admissionReviewVersions={v1}
 
 type subNamespaceValidator struct {
 	client.Client
@@ -66,13 +66,13 @@ var _ admission.Handler = &subNamespaceValidator{}
 func (v *subNamespaceValidator) Handle(ctx context.Context, req admission.Request) admission.Response {
 	switch req.Operation {
 	case admissionv1.Create:
-		sn := &accuratev1.SubNamespace{}
+		sn := &accuratev2.SubNamespace{}
 		if err := v.dec.Decode(req, sn); err != nil {
 			return admission.Errored(http.StatusBadRequest, err)
 		}
 		return v.handleCreate(ctx, sn)
 	case admissionv1.Delete:
-		sn := &accuratev1.SubNamespace{}
+		sn := &accuratev2.SubNamespace{}
 		if err := v.dec.DecodeRaw(req.OldObject, sn); err != nil {
 			return admission.Errored(http.StatusBadRequest, err)
 		}
@@ -82,7 +82,7 @@ func (v *subNamespaceValidator) Handle(ctx context.Context, req admission.Reques
 	}
 }
 
-func (v *subNamespaceValidator) handleCreate(ctx context.Context, sn *accuratev1.SubNamespace) admission.Response {
+func (v *subNamespaceValidator) handleCreate(ctx context.Context, sn *accuratev2.SubNamespace) admission.Response {
 	ns := &corev1.Namespace{}
 	if err := v.Get(ctx, client.ObjectKey{Name: sn.Namespace}, ns); err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)
@@ -113,7 +113,7 @@ func (v *subNamespaceValidator) handleCreate(ctx context.Context, sn *accuratev1
 	return admission.Allowed("")
 }
 
-func (v *subNamespaceValidator) handleDelete(ctx context.Context, sn *accuratev1.SubNamespace) admission.Response {
+func (v *subNamespaceValidator) handleDelete(ctx context.Context, sn *accuratev2.SubNamespace) admission.Response {
 	ns := &corev1.Namespace{}
 	if err := v.Get(ctx, client.ObjectKey{Name: sn.Name}, ns); err != nil {
 		if apierrors.IsNotFound(err) {
@@ -189,13 +189,13 @@ func SetupSubNamespaceWebhook(mgr manager.Manager, dec admission.Decoder, naming
 	m := &subNamespaceMutator{
 		dec: dec,
 	}
-	serv.Register("/mutate-accurate-cybozu-com-v1-subnamespace", &webhook.Admission{Handler: m})
+	serv.Register("/mutate-accurate-cybozu-com-v2-subnamespace", &webhook.Admission{Handler: m})
 
 	v := &subNamespaceValidator{
 		Client:         mgr.GetClient(),
 		dec:            dec,
 		namingPolicies: namingPolicyRegexps,
 	}
-	serv.Register("/validate-accurate-cybozu-com-v1-subnamespace", &webhook.Admission{Handler: v})
+	serv.Register("/validate-accurate-cybozu-com-v2-subnamespace", &webhook.Admission{Handler: v})
 	return nil
 }

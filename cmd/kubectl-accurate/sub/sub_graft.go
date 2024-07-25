@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
@@ -78,7 +78,7 @@ func (o *subGraftOpts) Run(ctx context.Context) error {
 		return fmt.Errorf("failed to update namespace %s: %w", o.name, err)
 	}
 
-	sn := &accuratev1.SubNamespace{}
+	sn := &accuratev2.SubNamespace{}
 	sn.Namespace = o.parent
 	sn.Name = o.name
 	if err := o.client.Create(ctx, sn); err != nil {
