@@ -224,7 +224,7 @@ subjects:
 <pre><code class="language-console">$ kubectl accurate sub create &lt;name&gt; &lt;parent&gt;
 </code></pre>
 <p>Applying YAML manifests:</p>
-<pre><code class="language-console">apiVersion: accurate.cybozu.com/v1
+<pre><code class="language-console">apiVersion: accurate.cybozu.com/v2
 kind: SubNamespace
 metadata:
   namespace: &lt;parent&gt;
@@ -235,7 +235,7 @@ metadata:
 <pre><code class="language-console">$ kubectl accurate sub create &lt;name&gt; &lt;parent&gt; --labels=foo=bar --annotations=baz=zot
 </code></pre>
 <p>Applying YAML manifests:</p>
-<pre><code class="language-console">apiVersion: accurate.cybozu.com/v1
+<pre><code class="language-console">apiVersion: accurate.cybozu.com/v2
 kind: SubNamespace
 metadata:
   namespace: &lt;parent&gt;
