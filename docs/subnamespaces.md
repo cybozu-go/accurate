@@ -80,7 +80,7 @@ $ kubectl accurate sub create <name> <parent>
 Applying YAML manifests:
 
 ```console
-apiVersion: accurate.cybozu.com/v1
+apiVersion: accurate.cybozu.com/v2
 kind: SubNamespace
 metadata:
   namespace: <parent>
@@ -98,7 +98,7 @@ $ kubectl accurate sub create <name> <parent> --labels=foo=bar --annotations=baz
 Applying YAML manifests:
 
 ```console
-apiVersion: accurate.cybozu.com/v1
+apiVersion: accurate.cybozu.com/v2
 kind: SubNamespace
 metadata:
   namespace: <parent>
