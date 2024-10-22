@@ -133,6 +133,9 @@ func subMain(ns, addr string, port int) error {
 	hooks.SetupNamespaceWebhook(mgr, dec)
 
 	// SubNamespace reconciler & webhook
+	if err := indexing.SetupIndexForSubNamespace(ctx, mgr); err != nil {
+		return fmt.Errorf("failed to setup indexer for subnamespaces: %w", err)
+	}
 	if err = (&controllers.SubNamespaceReconciler{
 		Client: mgr.GetClient(),
 	}).SetupWithManager(mgr); err != nil {

@@ -23,6 +23,9 @@ var resourceQuota []byte
 //go:embed testdata/serviceaccountWithDummySecrets.yaml
 var serviceAccountWithDummySecretsYAML []byte
 
+//go:embed testdata/conflicting-subnamespace.yaml
+var conflictingSubnamespaceYAML []byte
+
 var (
 	sealedJSON      []byte
 	k8sMinorVersion int
@@ -290,6 +293,51 @@ var _ = Describe("kubectl accurate", func() {
 
 		_, err = kubectl(nil, "get", "-n", "subroot2", "subnamespaces", "sn2")
 		Expect(err).To(HaveOccurred())
+	})
+
+	It("should (re)create sub-namespace when conflicting namespace deleted", func() {
+		By("preparing namespaces")
+		kubectlSafe(nil, "create", "ns", "conflict-root1")
+		kubectlSafe(nil, "accurate", "ns", "set-type", "conflict-root1", "root")
+		kubectlSafe(nil, "create", "ns", "conflict-sub1")
+
+		By("creating conflicting subnamespace")
+		// Cannot use "kubectl accurate" here, since conflict is validated client-side.
+		kubectlSafe(conflictingSubnamespaceYAML, "apply", "-f", "-")
+		var conditions []metav1.Condition
+		Eventually(func() ([]metav1.Condition, error) {
+			out, err := kubectl(nil, "get", "-n", "conflict-root1", "subnamespaces", "conflict-sub1", "-o", "json")
+			if err != nil {
+				return nil, err
+			}
+			sn := &accuratev2.SubNamespace{}
+			if err := json.Unmarshal(out, sn); err != nil {
+				return nil, err
+			}
+			conditions = sn.Status.Conditions
+			return conditions, nil
+		}).Should(HaveLen(1))
+		Expect(conditions[0].Reason).To(Equal("Conflict"))
+
+		By("deleting conflicting namespace")
+		kubectlSafe(nil, "delete", "ns", "conflict-sub1")
+		Eventually(func() ([]metav1.Condition, error) {
+			out, err := kubectl(nil, "get", "-n", "conflict-root1", "subnamespaces", "conflict-sub1", "-o", "json")
+			if err != nil {
+				return nil, err
+			}
+			sn := &accuratev2.SubNamespace{}
+			if err := json.Unmarshal(out, sn); err != nil {
+				return nil, err
+			}
+			return sn.Status.Conditions, nil
+		}).Should(BeEmpty())
+		out, err := kubectl(nil, "get", "ns", "conflict-sub1", "-o", "json")
+		Expect(err).NotTo(HaveOccurred())
+		sn := &corev1.Namespace{}
+		err = json.Unmarshal(out, sn)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(sn.Labels).To(HaveKeyWithValue(constants.LabelParent, "conflict-root1"))
 	})
 
 	It("should propagate ServiceAccount w/o secrets field", func() {

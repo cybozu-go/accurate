@@ -6,6 +6,7 @@ import (
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/cybozu-go/accurate/pkg/constants"
+	"github.com/cybozu-go/accurate/pkg/indexing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -34,6 +35,9 @@ var _ = Describe("SubNamespace controller", func() {
 		err = snr.SetupWithManager(mgr)
 		Expect(err).ToNot(HaveOccurred())
 
+		err = indexing.SetupIndexForSubNamespace(ctx, mgr)
+		Expect(err).NotTo(HaveOccurred())
+
 		ctx, cancel := context.WithCancel(ctx)
 		stopFunc = cancel
 		go func() {
@@ -50,7 +54,7 @@ var _ = Describe("SubNamespace controller", func() {
 		time.Sleep(100 * time.Millisecond)
 	})
 
-	It("should create and delete sub namespaces", func() {
+	It("should create and delete sub-namespaces", func() {
 		ns := &corev1.Namespace{}
 		ns.Name = "test1"
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed())
@@ -92,9 +96,14 @@ var _ = Describe("SubNamespace controller", func() {
 		Eventually(komega.Object(sn)).Should(HaveField("Status.ObservedGeneration", BeNumerically(">", 0)))
 		Expect(sn.Status.Conditions).To(HaveLen(1))
 		Expect(sn.Status.Conditions[0].Reason).To(Equal(accuratev2.SubNamespaceConflict))
+
+		// It's tempting to test if a conflict can be resolved by deleting the conflicting namespace,
+		// but this is currently not possible because EnvTest does not support namespace deletion.
+		// See https://github.com/kubernetes-sigs/controller-runtime/issues/880 for details.
+		// This feature should be tested in e2e-tests.
 	})
 
-	It("should not delete a conflicting sub namespace", func() {
+	It("should not delete a conflicting sub-namespace", func() {
 		ns := &corev1.Namespace{}
 		ns.Name = "test3"
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed())
@@ -121,7 +130,7 @@ var _ = Describe("SubNamespace controller", func() {
 		Consistently(komega.Object(sub1)).Should(HaveField("DeletionTimestamp", BeNil()))
 	})
 
-	It("should re-create a subnamespace if it is deleted", func() {
+	It("should re-create a sub-namespace if it is deleted", func() {
 		ns := &corev1.Namespace{}
 		ns.Name = "test4"
 		Expect(k8sClient.Create(ctx, ns)).To(Succeed())
