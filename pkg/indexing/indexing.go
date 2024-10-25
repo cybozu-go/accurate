@@ -3,6 +3,7 @@ package indexing
 import (
 	"context"
 
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -23,7 +24,7 @@ func SetupIndexForResource(ctx context.Context, mgr manager.Manager, res client.
 // SetupIndexForNamespace sets up indexers for namespaces.
 func SetupIndexForNamespace(ctx context.Context, mgr manager.Manager) error {
 	ns := &corev1.Namespace{}
-	err := mgr.GetFieldIndexer().IndexField(context.Background(), ns, constants.NamespaceParentKey, func(rawObj client.Object) []string {
+	err := mgr.GetFieldIndexer().IndexField(ctx, ns, constants.NamespaceParentKey, func(rawObj client.Object) []string {
 		parent := rawObj.GetLabels()[constants.LabelParent]
 		if parent == "" {
 			return nil
@@ -40,5 +41,12 @@ func SetupIndexForNamespace(ctx context.Context, mgr manager.Manager) error {
 			return nil
 		}
 		return []string{tmpl}
+	})
+}
+
+// SetupIndexForSubNamespace sets up indexers for subnamespaces.
+func SetupIndexForSubNamespace(ctx context.Context, mgr manager.Manager) error {
+	return mgr.GetFieldIndexer().IndexField(ctx, &accuratev2.SubNamespace{}, constants.SubNamespaceNameKey, func(rawObj client.Object) []string {
+		return []string{rawObj.GetName()}
 	})
 }

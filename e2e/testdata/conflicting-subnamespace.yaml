@@ -1,0 +1,5 @@
+apiVersion: accurate.cybozu.com/v2
+kind: SubNamespace
+metadata:
+  name: conflict-sub1
+  namespace: conflict-root1

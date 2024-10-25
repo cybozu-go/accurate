@@ -16,14 +16,15 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	metav1ac "k8s.io/client-go/applyconfigurations/meta/v1"
 	"k8s.io/client-go/util/csaupgrade"
-	"k8s.io/client-go/util/workqueue"
 	kstatus "sigs.k8s.io/cli-utils/pkg/kstatus/status"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
@@ -154,30 +155,42 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *SubNamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	nsHandler := func(o client.Object, q workqueue.RateLimitingInterface) {
+	nsHandler := func(ctx context.Context, o client.Object) (requests []reconcile.Request) {
 		parent := o.GetLabels()[constants.LabelParent]
-		if parent == "" {
+		if parent != "" {
+			requests = append(requests, reconcile.Request{NamespacedName: types.NamespacedName{
+				Namespace: parent,
+				Name:      o.GetName(),
+			}})
 			return
 		}
-		q.Add(reconcile.Request{NamespacedName: types.NamespacedName{
-			Namespace: parent,
-			Name:      o.GetName(),
-		}})
+		if o.GetDeletionTimestamp() != nil {
+			// The namespace has no parent and is in terminating state.
+			// Let's find all (conflicting) subnamespaces that might want to recreate it.
+			snList := &accuratev2.SubNamespaceList{}
+			err := r.List(ctx, snList, client.MatchingFields{constants.SubNamespaceNameKey: o.GetName()})
+			if err != nil {
+				logger := log.FromContext(ctx)
+				logger.Error(err, "failed to list subnamespaces")
+				return
+			}
+			for _, sn := range snList.Items {
+				requests = append(requests, reconcile.Request{NamespacedName: types.NamespacedName{
+					Namespace: sn.Namespace,
+					Name:      sn.Name,
+				}})
+			}
+		}
+		return
 	}
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&accuratev2.SubNamespace{}).
-		Watches(&corev1.Namespace{}, handler.Funcs{
-			UpdateFunc: func(ctx context.Context, ev event.UpdateEvent, q workqueue.RateLimitingInterface) {
-				if ev.ObjectNew.GetDeletionTimestamp() != nil {
-					return
-				}
-				nsHandler(ev.ObjectOld, q)
+		Watches(&corev1.Namespace{}, handler.EnqueueRequestsFromMapFunc(nsHandler), builder.WithPredicates(predicate.Funcs{
+			CreateFunc: func(e event.TypedCreateEvent[client.Object]) bool {
+				return false
 			},
-			DeleteFunc: func(ctx context.Context, ev event.DeleteEvent, q workqueue.RateLimitingInterface) {
-				nsHandler(ev.Object, q)
-			},
-		}).
+		})).
 		Complete(r)
 }
 
