@@ -43,12 +43,14 @@ jobs:
           kubectl -n cert-manager wait --for=condition=available --timeout=180s --all deployments
       - name: Prepare values.yaml
         run: |
-          LATEST=$(curl -s "https://api.github.com/repos/cybozu-go/accurate/releases/latest" | jq -r .tag_name)
-          APP_VERSION=${LATEST#v}
+          docker build -t accurate:dev .
+          kind load docker-image accurate:dev --name=chart-testing
           mkdir -p charts/accurate/ci/
           cat > charts/accurate/ci/ci-values.yaml <<EOF
           image:
-             tag: $APP_VERSION
+            repository: accurate
+            tag: dev
+            pullPolicy: Never
           EOF
       - name: Run chart-testing (install)
         run: ct install --config ct.yaml

@@ -133,3 +133,12 @@ controller:
     # common namespace-scoped resources.
     clusterRoles:
     - admin
+
+webhook:
+  # webhook.allowCascadingDeletion -- Enable to allow cascading deletion of namespaces.
+  # Accurate webhooks will only allow deletion of a namespace with children if this option is enabled.
+  # Deleting namespaces is very dangerous, and deleting sub-namespaces can result in entire subtrees
+  # of namespaces being deleted as well. So enable this option with care!
+  # That said, enabling this option can be very useful to allow modern GitOps controllers like FluxCD
+  # to operate without errors based on desired state specified in Git.
+  allowCascadingDeletion: false
