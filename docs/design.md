@@ -46,7 +46,7 @@ Since these are fundamentally different requirements, we decided to develop our 
 - Opt-in root namespaces
     - Only namespaces labeled with `accurate.cybozu.com/type: root` can be the root of a namespace tree.
 - Tenant users can create and delete sub-namespaces by creating and deleting a custom resource in a root or a sub-namespace.
-    - If a namespace has one or more sub-namespaces, Accurate prevents the deletion of the namespace.
+    - If a namespace has one or more sub-namespaces, Accurate prevents the deletion of the namespace - unless allow cascading deletion of namespaces is enabled.
 - Template namespace
     - Namespaces that are not a sub-namespace can specify a template from which labels, annotations, and resources can be propagated.
 - Admins can change the parent namespace of a sub-namespace.

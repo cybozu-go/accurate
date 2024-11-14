@@ -57,8 +57,9 @@ func (m *subNamespaceMutator) Handle(ctx context.Context, req admission.Request)
 
 type subNamespaceValidator struct {
 	client.Client
-	dec            admission.Decoder
-	namingPolicies []config.NamingPolicyRegexp
+	dec                    admission.Decoder
+	namingPolicies         []config.NamingPolicyRegexp
+	allowCascadingDeletion bool
 }
 
 var _ admission.Handler = &subNamespaceValidator{}
@@ -114,6 +115,10 @@ func (v *subNamespaceValidator) handleCreate(ctx context.Context, sn *accuratev2
 }
 
 func (v *subNamespaceValidator) handleDelete(ctx context.Context, sn *accuratev2.SubNamespace) admission.Response {
+	if v.allowCascadingDeletion {
+		return admission.Allowed("")
+	}
+
 	ns := &corev1.Namespace{}
 	if err := v.Get(ctx, client.ObjectKey{Name: sn.Name}, ns); err != nil {
 		if apierrors.IsNotFound(err) {
@@ -174,7 +179,7 @@ func (v *subNamespaceValidator) notMatchingNamingPolicy(ctx context.Context, ns,
 }
 
 // SetupSubNamespaceWebhook registers the webhooks for SubNamespace
-func SetupSubNamespaceWebhook(mgr manager.Manager, dec admission.Decoder, namingPolicyRegexps []config.NamingPolicyRegexp) error {
+func SetupSubNamespaceWebhook(mgr manager.Manager, dec admission.Decoder, namingPolicyRegexps []config.NamingPolicyRegexp, allowCascadingDeletion bool) error {
 	for _, s := range []runtime.Object{&accuratev1.SubNamespace{}, &accuratev2alpha1.SubNamespace{}, &accuratev2.SubNamespace{}} {
 		err := ctrl.NewWebhookManagedBy(mgr).
 			For(s).
@@ -192,9 +197,10 @@ func SetupSubNamespaceWebhook(mgr manager.Manager, dec admission.Decoder, naming
 	serv.Register("/mutate-accurate-cybozu-com-v2-subnamespace", &webhook.Admission{Handler: m})
 
 	v := &subNamespaceValidator{
-		Client:         mgr.GetClient(),
-		dec:            dec,
-		namingPolicies: namingPolicyRegexps,
+		Client:                 mgr.GetClient(),
+		dec:                    dec,
+		namingPolicies:         namingPolicyRegexps,
+		allowCascadingDeletion: allowCascadingDeletion,
 	}
 	serv.Register("/validate-accurate-cybozu-com-v2-subnamespace", &webhook.Admission{Handler: v})
 	return nil

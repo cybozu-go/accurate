@@ -19,7 +19,8 @@ import (
 
 type namespaceValidator struct {
 	client.Client
-	dec admission.Decoder
+	dec                    admission.Decoder
+	allowCascadingDeletion bool
 }
 
 var _ admission.Handler = &namespaceValidator{}
@@ -178,10 +179,10 @@ func (v *namespaceValidator) handleUpdate(ctx context.Context, nsNew, nsOld *cor
 func (v *namespaceValidator) handleDelete(ctx context.Context, ns *corev1.Namespace) admission.Response {
 	key := constants.NamespaceParentKey
 	switch {
-	case ns.Labels[constants.LabelType] == constants.NSTypeRoot:
+	case ns.Labels[constants.LabelType] == constants.NSTypeRoot && !v.allowCascadingDeletion:
 	case ns.Labels[constants.LabelType] == constants.NSTypeTemplate:
 		key = constants.NamespaceTemplateKey
-	case ns.Labels[constants.LabelParent] != "":
+	case ns.Labels[constants.LabelParent] != "" && !v.allowCascadingDeletion:
 	default:
 		return admission.Allowed("")
 	}
@@ -198,10 +199,11 @@ func (v *namespaceValidator) handleDelete(ctx context.Context, ns *corev1.Namesp
 }
 
 // SetupNamespaceWebhook registers the webhook for Namespace
-func SetupNamespaceWebhook(mgr manager.Manager, dec admission.Decoder) {
+func SetupNamespaceWebhook(mgr manager.Manager, dec admission.Decoder, allowCascadingDeletion bool) {
 	v := &namespaceValidator{
-		Client: mgr.GetClient(),
-		dec:    dec,
+		Client:                 mgr.GetClient(),
+		dec:                    dec,
+		allowCascadingDeletion: allowCascadingDeletion,
 	}
 	serv := mgr.GetWebhookServer()
 	serv.Register("/validate-v1-namespace", &webhook.Admission{Handler: v})
