@@ -521,6 +521,7 @@ if installing the chart using non-standard values.</p>
 <tr><td>controller.replicas</td><td>int</td><td><code>2</code></td><td>Specify the number of replicas of the controller Pod.</td></tr>
 <tr><td>controller.resources</td><td>object</td><td><code>{&quot;requests&quot;:{&quot;cpu&quot;:&quot;100m&quot;,&quot;memory&quot;:&quot;20Mi&quot;}}</code></td><td>Specify resources.</td></tr>
 <tr><td>controller.terminationGracePeriodSeconds</td><td>int</td><td><code>10</code></td><td>Specify terminationGracePeriodSeconds.</td></tr>
+<tr><td>webhook.allowCascadingDeletion</td><td>bool</td><td><code>false</code></td><td>Enable to allow cascading deletion of namespaces. Accurate webhooks will only allow deletion of a namespace with children if this option is enabled.</td></tr>
 <tr><td>image.pullPolicy</td><td>string</td><td><code>nil</code></td><td>Accurate image pullPolicy.</td></tr>
 <tr><td>image.repository</td><td>string</td><td><code>&quot;ghcr.io/cybozu-go/accurate&quot;</code></td><td>Accurate image repository to use.</td></tr>
 <tr><td>image.tag</td><td>string</td><td><code>{{ .Chart.AppVersion }}</code></td><td>Accurate image tag to use.</td></tr>
@@ -1120,7 +1121,7 @@ Since we consider resource-propagation alone is highly useful, the feature is av
 </li>
 <li>Tenant users can create and delete sub-namespaces by creating and deleting a custom resource in a root or a sub-namespace.
 <ul>
-<li>If a namespace has one or more sub-namespaces, Accurate prevents the deletion of the namespace.</li>
+<li>If a namespace has one or more sub-namespaces, Accurate prevents the deletion of the namespace - unless allow cascading deletion of namespaces is enabled.</li>
 </ul>
 </li>
 <li>Template namespace
