@@ -3,6 +3,7 @@ package sub
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/cybozu-go/accurate/pkg/constants"
 	"github.com/spf13/cobra"
@@ -55,49 +56,78 @@ func (o *templateListOpts) Fill(streams genericiooptions.IOStreams, config *gene
 }
 
 func (o *templateListOpts) Run(ctx context.Context) error {
+	allNamespaces := &corev1.NamespaceList{}
+	if err := o.client.List(ctx, allNamespaces); err != nil {
+		return fmt.Errorf("failed to list all namespaces: %w", err)
+	}
+
+	sort.Slice(allNamespaces.Items, func(i, j int) bool {
+		return allNamespaces.Items[i].Name < allNamespaces.Items[j].Name
+	})
+
+	childMap := make(map[string][]*corev1.Namespace)
+	nsMap := make(map[string]*corev1.Namespace)
+
+	for i := range allNamespaces.Items {
+		ns := &allNamespaces.Items[i]
+		nsMap[ns.Name] = ns
+		if parent, ok := ns.Labels[constants.LabelTemplate]; ok {
+			childMap[parent] = append(childMap[parent], ns)
+		}
+	}
+
+	for _, children := range childMap {
+		sort.Slice(children, func(i, j int) bool {
+			return children[i].Name < children[j].Name
+		})
+	}
+
+	var roots []*corev1.Namespace
 	if o.template != "" {
-		return o.showNS(ctx, o.template, 0)
-	}
-
-	templates := &corev1.NamespaceList{}
-	if err := o.client.List(ctx, templates, client.MatchingLabels{constants.LabelType: constants.NSTypeTemplate}); err != nil {
-		return fmt.Errorf("failed to list the template namespaces: %w", err)
-	}
-
-	for _, ns := range templates.Items {
-		if _, ok := ns.Labels[constants.LabelTemplate]; ok {
-			continue
+		if rootNS, exists := nsMap[o.template]; exists {
+			roots = append(roots, rootNS)
+		} else {
+			return fmt.Errorf("namespace %s not found. ensure the namespace exists and is correctly labeled", o.template)
 		}
-
-		if err := o.showNS(ctx, ns.Name, 0); err != nil {
-			return err
+	} else {
+		for _, ns := range allNamespaces.Items {
+			if ns.Labels[constants.LabelType] == constants.NSTypeTemplate {
+				if _, hasParent := ns.Labels[constants.LabelTemplate]; !hasParent {
+					roots = append(roots, &ns)
+				}
+			}
 		}
 	}
+
+	sort.Slice(roots, func(i, j int) bool {
+		return roots[i].Name < roots[j].Name
+	})
+
+	for i, root := range roots {
+		o.showNSRecursive(root, childMap, "", i == len(roots)-1)
+	}
+
 	return nil
 }
 
-func (o *templateListOpts) showNS(ctx context.Context, name string, level int) error {
-	ns := &corev1.Namespace{}
-	if err := o.client.Get(ctx, client.ObjectKey{Name: name}, ns); err != nil {
-		return fmt.Errorf("failed to get namespace %s: %w", name, err)
+func (o *templateListOpts) showNSRecursive(ns *corev1.Namespace, childMap map[string][]*corev1.Namespace, prefix string, isLast bool) {
+	branch := "├── "
+	if isLast {
+		branch = "└── "
+	}
+	fmt.Fprintf(o.streams.Out, "%s%s%s\n", prefix, branch, ns.Name)
+
+	newPrefix := prefix
+	if isLast {
+		newPrefix += "    "
+	} else {
+		newPrefix += "│   "
 	}
 
-	subMark := " "
-	if _, ok := ns.Labels[constants.LabelTemplate]; ok {
-		subMark = "⮡"
-	}
-	fmt.Fprintf(o.streams.Out, "%*s%s%s\n", level, "", subMark, name)
+	children := childMap[ns.Name]
+	numChildren := len(children)
 
-	children := &corev1.NamespaceList{}
-	if err := o.client.List(ctx, children, client.MatchingLabels{constants.LabelTemplate: name}); err != nil {
-		return fmt.Errorf("failed to list the instances of %s: %w", name, err)
+	for i, child := range children {
+		o.showNSRecursive(child, childMap, newPrefix, i == numChildren-1)
 	}
-
-	level += indent
-	for _, child := range children.Items {
-		if err := o.showNS(ctx, child.Name, level); err != nil {
-			return err
-		}
-	}
-	return nil
 }
