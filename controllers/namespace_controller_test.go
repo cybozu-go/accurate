@@ -14,8 +14,10 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/config"
 	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
@@ -47,6 +49,9 @@ var _ = Describe("Namespace controller", func() {
 			Scheme:         scheme,
 			LeaderElection: false,
 			Metrics:        server.Options{BindAddress: "0"},
+			Controller: config.Controller{
+				SkipNameValidation: ptr.To(true),
+			},
 			Client: client.Options{
 				Cache: &client.CacheOptions{
 					Unstructured: true,
