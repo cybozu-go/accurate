@@ -1,5 +1,5 @@
 # Build the manager binary
-FROM ghcr.io/cybozu/golang:1.21-jammy as builder
+FROM ghcr.io/cybozu/golang:1.23-jammy as builder
 
 COPY ./ .
 RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o accurate-controller ./cmd/accurate-controller
