@@ -76,12 +76,6 @@ func (o *templateListOpts) Run(ctx context.Context) error {
 		}
 	}
 
-	for _, children := range childMap {
-		sort.Slice(children, func(i, j int) bool {
-			return children[i].Name < children[j].Name
-		})
-	}
-
 	var roots []*corev1.Namespace
 	if o.template != "" {
 		if rootNS, exists := nsMap[o.template]; exists {
