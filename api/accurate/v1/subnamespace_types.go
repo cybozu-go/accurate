@@ -28,7 +28,7 @@ type SubNamespaceSpec struct {
 }
 
 //+kubebuilder:object:root=true
-//+kubebuilder:deprecatedversion:warning="The v1 version of SubNamespace has been deprecated and will be removed in a future release of the API. Please upgrade."
+//+kubebuilder:unservedversion
 
 // SubNamespace is the Schema for the subnamespaces API
 // Deprecated: This type will be removed in one of the next releases.

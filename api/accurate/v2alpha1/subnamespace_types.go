@@ -32,7 +32,7 @@ type SubNamespaceSpec struct {
 }
 
 //+kubebuilder:object:root=true
-//+kubebuilder:deprecatedversion:warning="The v2alpha1 version of SubNamespace has been deprecated and will be removed in a future release of the API. Please upgrade."
+//+kubebuilder:unservedversion
 //+kubebuilder:subresource:status
 //+genclient
 
