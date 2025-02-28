@@ -1,6 +1,6 @@
 domain: cybozu.com
 layout:
-- go.kubebuilder.io/v3
+- go.kubebuilder.io/v4
 projectName: accurate
 repo: github.com/cybozu-go/accurate
 resources:

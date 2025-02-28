@@ -7,9 +7,9 @@ on:
 jobs:
   build:
     name: Build book
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: ./.github/actions/aqua
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -21,10 +21,10 @@ jobs:
         retention-days: 1
   publish:
     name: Publish book on GitHub Pages
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: build
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         ref: gh-pages
     # ignore helm chart index file and chart archive file.

@@ -116,7 +116,7 @@ build:
 
 .PHONY: release-build
 release-build: setup
-	goreleaser build --snapshot --rm-dist
+	goreleaser build --snapshot --clean
 
 ##@ Tools
 
