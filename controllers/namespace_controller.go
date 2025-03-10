@@ -395,7 +395,7 @@ func (r *NamespaceReconciler) reconcileTemplateNamespace(ctx context.Context, ns
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *NamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	subNSHandler := func(o client.Object, q workqueue.RateLimitingInterface) {
+	subNSHandler := func(o client.Object, q workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 		q.Add(reconcile.Request{NamespacedName: types.NamespacedName{
 			Name: o.GetName(),
 		}})
@@ -404,10 +404,10 @@ func (r *NamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&corev1.Namespace{}).
 		Watches(&accuratev2.SubNamespace{}, handler.Funcs{
-			CreateFunc: func(ctx context.Context, ev event.CreateEvent, q workqueue.RateLimitingInterface) {
+			CreateFunc: func(ctx context.Context, ev event.TypedCreateEvent[client.Object], q workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 				subNSHandler(ev.Object, q)
 			},
-			UpdateFunc: func(ctx context.Context, ev event.UpdateEvent, q workqueue.RateLimitingInterface) {
+			UpdateFunc: func(ctx context.Context, ev event.TypedUpdateEvent[client.Object], q workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 				if ev.ObjectNew.GetDeletionTimestamp() != nil {
 					return
 				}
