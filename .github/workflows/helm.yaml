@@ -18,6 +18,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: 3.13
+
+      - name: set up a buildkit builder
+        # --driver docker-container is required to get a builder that can build multi-arch.
+        # --driver-opt network=host is required to be able to push to the kind registry, which is sitting on the host at :5000.
+        run: |
+          docker buildx create --name=b --driver docker-container --driver-opt network=host
+          docker buildx use b
+
       - name: Set up chart-testing
         uses: helm/chart-testing-action@0d28d3144d3a25ea2cc349d6e59901c4ff469b3b # v2.7.0
 
@@ -33,22 +41,28 @@ jobs:
         run: ct lint --config ct.yaml
 
       - name: Create kind cluster
+        id: kind
         uses: helm/kind-action@a1b0e391336a6ee6713a0583f8c6240d70863de3 # v1.12.0
         if: steps.list-changed.outputs.changed == 'true'
         with:
           node_image: kindest/node:v1.31.4
+          registry: true
+          registry_name: kind-registry
+          registry_port: 5000
       - name: Apply cert-manager
         run: |
           kubectl apply -f https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
           kubectl -n cert-manager wait --for=condition=available --timeout=180s --all deployments
       - name: Prepare values.yaml
         run: |
-          docker build -t accurate:dev .
-          kind load docker-image accurate:dev --name=chart-testing
+          docker buildx build \
+            --platform arm64,amd64 \
+            --output type=registry,name=${{ steps.kind.outputs.LOCAL_REGISTRY }}/accurate:dev,push=true,registry.insecure=true,compression=zstd \
+            .
           mkdir -p charts/accurate/ci/
           cat > charts/accurate/ci/ci-values.yaml <<EOF
           image:
-            repository: accurate
+            repository: ${{ steps.kind.outputs.LOCAL_REGISTRY }}/accurate
             tag: dev
             pullPolicy: Never
           EOF

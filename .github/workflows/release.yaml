@@ -9,16 +9,19 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
+    - name: Setup
+      run: |
+        docker buildx create --name=b --driver docker-container
+        docker buildx use b
+        echo "TAG=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
     - name: Build images
       run: |
-        docker build -t accurate:dev .
+        docker buildx build --platform=arm64,amd64 -t ghcr.io/cybozu-go/accurate:$TAG .
     - name: Login to ghcr.io
       run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
     - name: Push images
       run: |
-        TAG=${GITHUB_REF#refs/tags/v}
-        docker tag accurate:dev ghcr.io/cybozu-go/accurate:$TAG
-        docker push ghcr.io/cybozu-go/accurate:$TAG
+        docker buildx build --platform=arm64,amd64 -t ghcr.io/cybozu-go/accurate:$TAG . --push
   release:
     name: Release on GitHub
     needs: image
