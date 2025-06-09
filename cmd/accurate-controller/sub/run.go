@@ -62,8 +62,6 @@ func subMain(ns, addr string, port int) error {
 	if err != nil {
 		return fmt.Errorf("failed to get REST config: %w", err)
 	}
-	restCfg.QPS = float32(options.qps)
-	restCfg.Burst = int(restCfg.QPS * 1.5)
 
 	mgr, err := ctrl.NewManager(restCfg, ctrl.Options{
 		Scheme: scheme,
