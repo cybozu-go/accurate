@@ -45,7 +45,7 @@ jobs:
         uses: helm/kind-action@a1b0e391336a6ee6713a0583f8c6240d70863de3 # v1.12.0
         if: steps.list-changed.outputs.changed == 'true'
         with:
-          node_image: kindest/node:v1.31.4
+          node_image: kindest/node:v1.32.0
           registry: true
           registry_name: kind-registry
           registry_port: 5000
