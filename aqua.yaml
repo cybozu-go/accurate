@@ -7,18 +7,18 @@ registries:
     type: local
     path: registry.yaml
 packages:
-  - name: kubernetes/kubectl@v1.31.6
-  - name: kubernetes-sigs/kubebuilder@v3.14.2
+  - name: kubernetes/kubectl@v1.32.0
+  - name: kubernetes-sigs/kubebuilder@v4.5.2
   - name: kubernetes-sigs/kustomize@kustomize/v5.6.0
   - name: kubernetes-sigs/kind@v0.26.0
-  - name: rust-lang/mdBook@v0.4.45
-  - name: mikefarah/yq@v4.35.1
+  - name: rust-lang/mdBook@v0.4.51
+  - name: mikefarah/yq@v4.45.2
   - name: clamoriniere/crd-to-markdown@v0.0.3
-  - name: kubernetes-sigs/controller-tools/controller-gen@v0.16.5
-  - name: helm/helm@v3.17.1
-  - name: bitnami-labs/sealed-secrets@v0.28.0
-  - name: goreleaser/goreleaser@v2.6.1
+  - name: kubernetes-sigs/controller-tools/controller-gen@v0.18.0
+  - name: helm/helm@v3.18.3
+  - name: bitnami-labs/sealed-secrets@v0.30.0
+  - name: goreleaser/goreleaser@v2.10.2
   - name: kubernetes/code-generator/applyconfiguration-gen@v0.30.0
     registry: local
-  - name: kubernetes/code-generator/conversion-gen@v0.30.0
+  - name: kubernetes/code-generator/conversion-gen@v0.32.0
     registry: local

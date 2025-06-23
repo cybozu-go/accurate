@@ -40,10 +40,10 @@ jobs:
         export TAG=$(curl -s "https://api.github.com/repos/cybozu-go/accurate/releases/latest" | jq -r .tag_name)
         echo "GORELEASER_PREVIOUS_TAG=${TAG}" >> $GITHUB_ENV
     - name: GoReleaser
-      uses: goreleaser/goreleaser-action@9ed2f89a662bf1735a48bc8557fd212fa902bebf # v6.1.0
+      uses: goreleaser/goreleaser-action@9c156ee8a17a598857849441385a2041ef570552 # v6.3.0
       with:
         distribution: goreleaser
-        version: v2.6.1
+        version: v2.10.2
         args: release --clean
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,7 +59,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install Helm
-        uses: azure/setup-helm@fe7b79cd5ee1e45176fcad797de68ecaf3ca4814 # v４.2.0
+        uses: azure/setup-helm@b9e51907a09c216f16ebe8536097933489208112 # v４.3.0
       - name: Set chart version
         run: |
           helm repo add accurate https://cybozu-go.github.io/accurate
@@ -93,7 +93,7 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@a917fd15b20e8b64b94d9158ad54cd6345335584 # v1.6.0
+        uses: helm/chart-releaser-action@cae68fefc6b5f367a0275617c9f83181ba54714f # v1.7.0
         with:
           config: cr.yaml
         env:
