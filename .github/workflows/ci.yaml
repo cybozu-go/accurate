@@ -36,9 +36,9 @@ jobs:
     strategy:
       matrix:
         k8s-version:
-        - v1.32.0 # renovate: kindest/node
-        - v1.31.4 # renovate: kindest/node
-        - v1.30.8 # renovate: kindest/node
+        - v1.32.0@sha256:c48c62eac5da28cdadcf560d1d8616cfa6783b58f0d94cf63ad1bf49600cb027 # renovate: kindest/node
+        - v1.31.4@sha256:2cb39f7295fe7eafee0842b1052a599a4fb0f8bcf3f83d96c7f4864c357c6c30 # renovate: kindest/node
+        - v1.30.8@sha256:17cd608b3971338d9180b00776cb766c50d0a0b6b904ab4ff52fd3fc5c6369bf # renovate: kindest/node
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
@@ -56,8 +56,14 @@ jobs:
     - run: make logs
       working-directory: e2e
       if: always()
+    - name: Sanitize version name
+      id: sanitize
+      run: |
+        # extract only version name because ':' is not allowed for artifact name
+        SANITIZED_K8S_VERSION="$(echo ${{ matrix.k8s-version}} | awk -F '@' '{print $1}')"
+        echo "SANITIZED_K8S_VERSION=$SANITIZED_K8S_VERSION" >> $GITHUB_OUTPUT
     - uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: logs-${{ matrix.k8s-version }}.tar.gz
+        name: logs-${{ steps.sanitize.outputs.SANITIZED_K8S_VERSION }}.tar.gz
         path: e2e/logs.tar.gz
