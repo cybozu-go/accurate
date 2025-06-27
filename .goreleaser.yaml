@@ -19,7 +19,7 @@ builds:
         goarch: arm64
 
 archives:
-  - builds:
+  - ids:
       - kubectl-accurate
     name_template: "kubectl-{{ .ProjectName }}_{{ .Tag }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
     wrap_in_directory: false
