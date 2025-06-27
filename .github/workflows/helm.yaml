@@ -64,7 +64,7 @@ jobs:
           image:
             repository: ${{ steps.kind.outputs.LOCAL_REGISTRY }}/accurate
             tag: dev
-            pullPolicy: Never
+            pullPolicy: Always
           EOF
       - name: Run chart-testing (install)
         run: ct install --config ct.yaml
