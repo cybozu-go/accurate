@@ -8,7 +8,7 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// SubNamespaceApplyConfiguration represents an declarative configuration of the SubNamespace type for use
+// SubNamespaceApplyConfiguration represents a declarative configuration of the SubNamespace type for use
 // with apply.
 type SubNamespaceApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
@@ -17,7 +17,7 @@ type SubNamespaceApplyConfiguration struct {
 	Status                           *SubNamespaceStatusApplyConfiguration `json:"status,omitempty"`
 }
 
-// SubNamespace constructs an declarative configuration of the SubNamespace type for use with
+// SubNamespace constructs a declarative configuration of the SubNamespace type for use with
 // apply.
 func SubNamespace(name, namespace string) *SubNamespaceApplyConfiguration {
 	b := &SubNamespaceApplyConfiguration{}
@@ -32,7 +32,7 @@ func SubNamespace(name, namespace string) *SubNamespaceApplyConfiguration {
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Kind field is set to the value of the last call.
 func (b *SubNamespaceApplyConfiguration) WithKind(value string) *SubNamespaceApplyConfiguration {
-	b.Kind = &value
+	b.TypeMetaApplyConfiguration.Kind = &value
 	return b
 }
 
@@ -40,7 +40,7 @@ func (b *SubNamespaceApplyConfiguration) WithKind(value string) *SubNamespaceApp
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the APIVersion field is set to the value of the last call.
 func (b *SubNamespaceApplyConfiguration) WithAPIVersion(value string) *SubNamespaceApplyConfiguration {
-	b.APIVersion = &value
+	b.TypeMetaApplyConfiguration.APIVersion = &value
 	return b
 }
 
@@ -49,7 +49,7 @@ func (b *SubNamespaceApplyConfiguration) WithAPIVersion(value string) *SubNamesp
 // If called multiple times, the Name field is set to the value of the last call.
 func (b *SubNamespaceApplyConfiguration) WithName(value string) *SubNamespaceApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Name = &value
+	b.ObjectMetaApplyConfiguration.Name = &value
 	return b
 }
 
@@ -58,7 +58,7 @@ func (b *SubNamespaceApplyConfiguration) WithName(value string) *SubNamespaceApp
 // If called multiple times, the GenerateName field is set to the value of the last call.
 func (b *SubNamespaceApplyConfiguration) WithGenerateName(value string) *SubNamespaceApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.GenerateName = &value
+	b.ObjectMetaApplyConfiguration.GenerateName = &value
 	return b
 }
 
@@ -67,7 +67,7 @@ func (b *SubNamespaceApplyConfiguration) WithGenerateName(value string) *SubName
 // If called multiple times, the Namespace field is set to the value of the last call.
 func (b *SubNamespaceApplyConfiguration) WithNamespace(value string) *SubNamespaceApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Namespace = &value
+	b.ObjectMetaApplyConfiguration.Namespace = &value
 	return b
 }
 
@@ -76,7 +76,7 @@ func (b *SubNamespaceApplyConfiguration) WithNamespace(value string) *SubNamespa
 // If called multiple times, the UID field is set to the value of the last call.
 func (b *SubNamespaceApplyConfiguration) WithUID(value types.UID) *SubNamespaceApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.UID = &value
+	b.ObjectMetaApplyConfiguration.UID = &value
 	return b
 }
 
@@ -85,7 +85,7 @@ func (b *SubNamespaceApplyConfiguration) WithUID(value types.UID) *SubNamespaceA
 // If called multiple times, the ResourceVersion field is set to the value of the last call.
 func (b *SubNamespaceApplyConfiguration) WithResourceVersion(value string) *SubNamespaceApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.ResourceVersion = &value
+	b.ObjectMetaApplyConfiguration.ResourceVersion = &value
 	return b
 }
 
@@ -94,7 +94,7 @@ func (b *SubNamespaceApplyConfiguration) WithResourceVersion(value string) *SubN
 // If called multiple times, the Generation field is set to the value of the last call.
 func (b *SubNamespaceApplyConfiguration) WithGeneration(value int64) *SubNamespaceApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.Generation = &value
+	b.ObjectMetaApplyConfiguration.Generation = &value
 	return b
 }
 
@@ -103,7 +103,7 @@ func (b *SubNamespaceApplyConfiguration) WithGeneration(value int64) *SubNamespa
 // If called multiple times, the CreationTimestamp field is set to the value of the last call.
 func (b *SubNamespaceApplyConfiguration) WithCreationTimestamp(value metav1.Time) *SubNamespaceApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.CreationTimestamp = &value
+	b.ObjectMetaApplyConfiguration.CreationTimestamp = &value
 	return b
 }
 
@@ -112,7 +112,7 @@ func (b *SubNamespaceApplyConfiguration) WithCreationTimestamp(value metav1.Time
 // If called multiple times, the DeletionTimestamp field is set to the value of the last call.
 func (b *SubNamespaceApplyConfiguration) WithDeletionTimestamp(value metav1.Time) *SubNamespaceApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionTimestamp = &value
+	b.ObjectMetaApplyConfiguration.DeletionTimestamp = &value
 	return b
 }
 
@@ -121,7 +121,7 @@ func (b *SubNamespaceApplyConfiguration) WithDeletionTimestamp(value metav1.Time
 // If called multiple times, the DeletionGracePeriodSeconds field is set to the value of the last call.
 func (b *SubNamespaceApplyConfiguration) WithDeletionGracePeriodSeconds(value int64) *SubNamespaceApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	b.DeletionGracePeriodSeconds = &value
+	b.ObjectMetaApplyConfiguration.DeletionGracePeriodSeconds = &value
 	return b
 }
 
@@ -131,11 +131,11 @@ func (b *SubNamespaceApplyConfiguration) WithDeletionGracePeriodSeconds(value in
 // overwriting an existing map entries in Labels field with the same key.
 func (b *SubNamespaceApplyConfiguration) WithLabels(entries map[string]string) *SubNamespaceApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Labels == nil && len(entries) > 0 {
-		b.Labels = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Labels == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Labels = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Labels[k] = v
+		b.ObjectMetaApplyConfiguration.Labels[k] = v
 	}
 	return b
 }
@@ -146,11 +146,11 @@ func (b *SubNamespaceApplyConfiguration) WithLabels(entries map[string]string) *
 // overwriting an existing map entries in Annotations field with the same key.
 func (b *SubNamespaceApplyConfiguration) WithAnnotations(entries map[string]string) *SubNamespaceApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
-	if b.Annotations == nil && len(entries) > 0 {
-		b.Annotations = make(map[string]string, len(entries))
+	if b.ObjectMetaApplyConfiguration.Annotations == nil && len(entries) > 0 {
+		b.ObjectMetaApplyConfiguration.Annotations = make(map[string]string, len(entries))
 	}
 	for k, v := range entries {
-		b.Annotations[k] = v
+		b.ObjectMetaApplyConfiguration.Annotations[k] = v
 	}
 	return b
 }
@@ -164,7 +164,7 @@ func (b *SubNamespaceApplyConfiguration) WithOwnerReferences(values ...*v1.Owner
 		if values[i] == nil {
 			panic("nil value passed to WithOwnerReferences")
 		}
-		b.OwnerReferences = append(b.OwnerReferences, *values[i])
+		b.ObjectMetaApplyConfiguration.OwnerReferences = append(b.ObjectMetaApplyConfiguration.OwnerReferences, *values[i])
 	}
 	return b
 }
@@ -175,7 +175,7 @@ func (b *SubNamespaceApplyConfiguration) WithOwnerReferences(values ...*v1.Owner
 func (b *SubNamespaceApplyConfiguration) WithFinalizers(values ...string) *SubNamespaceApplyConfiguration {
 	b.ensureObjectMetaApplyConfigurationExists()
 	for i := range values {
-		b.Finalizers = append(b.Finalizers, values[i])
+		b.ObjectMetaApplyConfiguration.Finalizers = append(b.ObjectMetaApplyConfiguration.Finalizers, values[i])
 	}
 	return b
 }
@@ -200,4 +200,10 @@ func (b *SubNamespaceApplyConfiguration) WithSpec(value *SubNamespaceSpecApplyCo
 func (b *SubNamespaceApplyConfiguration) WithStatus(value *SubNamespaceStatusApplyConfiguration) *SubNamespaceApplyConfiguration {
 	b.Status = value
 	return b
+}
+
+// GetName retrieves the value of the Name field in the declarative configuration.
+func (b *SubNamespaceApplyConfiguration) GetName() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.ObjectMetaApplyConfiguration.Name
 }

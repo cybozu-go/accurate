@@ -2,14 +2,14 @@
 
 package v2
 
-// SubNamespaceSpecApplyConfiguration represents an declarative configuration of the SubNamespaceSpec type for use
+// SubNamespaceSpecApplyConfiguration represents a declarative configuration of the SubNamespaceSpec type for use
 // with apply.
 type SubNamespaceSpecApplyConfiguration struct {
 	Labels      map[string]string `json:"labels,omitempty"`
 	Annotations map[string]string `json:"annotations,omitempty"`
 }
 
-// SubNamespaceSpecApplyConfiguration constructs an declarative configuration of the SubNamespaceSpec type for use with
+// SubNamespaceSpecApplyConfiguration constructs a declarative configuration of the SubNamespaceSpec type for use with
 // apply.
 func SubNamespaceSpec() *SubNamespaceSpecApplyConfiguration {
 	return &SubNamespaceSpecApplyConfiguration{}

@@ -6,14 +6,14 @@ import (
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 )
 
-// SubNamespaceStatusApplyConfiguration represents an declarative configuration of the SubNamespaceStatus type for use
+// SubNamespaceStatusApplyConfiguration represents a declarative configuration of the SubNamespaceStatus type for use
 // with apply.
 type SubNamespaceStatusApplyConfiguration struct {
 	ObservedGeneration *int64                           `json:"observedGeneration,omitempty"`
 	Conditions         []v1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 
-// SubNamespaceStatusApplyConfiguration constructs an declarative configuration of the SubNamespaceStatus type for use with
+// SubNamespaceStatusApplyConfiguration constructs a declarative configuration of the SubNamespaceStatus type for use with
 // apply.
 func SubNamespaceStatus() *SubNamespaceStatusApplyConfiguration {
 	return &SubNamespaceStatusApplyConfiguration{}
