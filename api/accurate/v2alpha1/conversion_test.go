@@ -25,5 +25,5 @@ func SubNamespaceStatusFuzzFunc(_ runtimeserializer.CodecFactory) []interface{} 
 }
 
 func SubNamespaceStatusFuzzer(in *SubNamespace, c randfill.Continue) {
-	c.Fill(in)
+	c.FillNoCustom(in)
 }

@@ -25,7 +25,7 @@ func SubNamespaceStatusFuzzFunc(_ runtimeserializer.CodecFactory) []interface{} 
 }
 
 func SubNamespaceStatusFuzzer(in *SubNamespace, c randfill.Continue) {
-	c.Fill(in)
+	c.FillNoCustom(in)
 
 	// The status is just a string in v1, and the controller is the sole actor updating status.
 	// As long as we make the controller reconcile v2, and also makes it the stored version,
