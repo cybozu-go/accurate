@@ -5,9 +5,9 @@ import (
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	utilconversion "github.com/cybozu-go/accurate/internal/util/conversion"
-	fuzz "github.com/google/gofuzz"
 	"k8s.io/apimachinery/pkg/api/apitesting/fuzzer"
 	runtimeserializer "k8s.io/apimachinery/pkg/runtime/serializer"
+	"sigs.k8s.io/randfill"
 )
 
 func TestFuzzyConversion(t *testing.T) {
@@ -24,8 +24,8 @@ func SubNamespaceStatusFuzzFunc(_ runtimeserializer.CodecFactory) []interface{} 
 	}
 }
 
-func SubNamespaceStatusFuzzer(in *SubNamespace, c fuzz.Continue) {
-	c.FuzzNoCustom(in)
+func SubNamespaceStatusFuzzer(in *SubNamespace, c randfill.Continue) {
+	c.FillNoCustom(in)
 
 	// The status is just a string in v1, and the controller is the sole actor updating status.
 	// As long as we make the controller reconcile v2, and also makes it the stored version,

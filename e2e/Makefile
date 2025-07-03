@@ -1,4 +1,4 @@
-KUBERNETES_VERSION = v1.31.4 # renovate: kindest/node
+KUBERNETES_VERSION = v1.33.1@sha256:050072256b9a903bd914c0b2866828150cb229cea0efe5892e2b644d5dd3b34f # renovate: kindest/node
 
 KUBECTL_ACCURATE := $(dir $(shell pwd))/bin/kubectl-accurate
 KUBECONFIG := $(shell pwd)/.kubeconfig
