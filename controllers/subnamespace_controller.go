@@ -7,13 +7,13 @@ import (
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	accuratev2ac "github.com/cybozu-go/accurate/internal/applyconfigurations/accurate/v2"
-	utilerrors "github.com/cybozu-go/accurate/internal/util/errors"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/json"
 	metav1ac "k8s.io/client-go/applyconfigurations/meta/v1"
 	"k8s.io/client-go/util/csaupgrade"
 	kstatus "sigs.k8s.io/cli-utils/pkg/kstatus/status"
@@ -64,10 +64,6 @@ func (r *SubNamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request
 }
 
 func (r *SubNamespaceReconciler) finalize(ctx context.Context, sn *accuratev2.SubNamespace) error {
-	if !controllerutil.ContainsFinalizer(sn, constants.Finalizer) {
-		return nil
-	}
-
 	logger := log.FromContext(ctx)
 
 	ns := &corev1.Namespace{}
@@ -75,28 +71,49 @@ func (r *SubNamespaceReconciler) finalize(ctx context.Context, sn *accuratev2.Su
 		if !apierrors.IsNotFound(err) {
 			return err
 		}
-		goto DELETE
+		return r.removeFinalizer(ctx, sn)
 	}
 
 	if ns.DeletionTimestamp != nil {
-		goto DELETE
+		return r.removeFinalizer(ctx, sn)
 	}
 
 	if parent := ns.Labels[constants.LabelParent]; parent != sn.Namespace {
 		logger.Info("finalization: ignored non-child namespace", "parent", parent)
-		goto DELETE
+		return r.removeFinalizer(ctx, sn)
 	}
 
 	if err := r.Delete(ctx, ns); err != nil {
-		return fmt.Errorf("failed to delete namespace %s: %w", sn.Name, err)
+		if !apierrors.IsNotFound(err) {
+			return fmt.Errorf("failed to delete namespace %s: %w", ns.Name, err)
+		}
+	} else {
+		logger.Info("deleted namespace", "name", ns.Name)
 	}
 
-	logger.Info("deleted namespace", "name", sn.Name)
+	return r.removeFinalizer(context.Background(), sn)
+}
 
-DELETE:
-	orig := sn.DeepCopy()
+func (r *SubNamespaceReconciler) removeFinalizer(ctx context.Context, sn *accuratev2.SubNamespace) error {
+	if !controllerutil.ContainsFinalizer(sn, constants.Finalizer) {
+		return nil
+	}
+
+	sn = sn.DeepCopy()
 	controllerutil.RemoveFinalizer(sn, constants.Finalizer)
-	return r.Patch(ctx, sn, client.MergeFrom(orig))
+
+	// We'll use a JSON Merge Patch here to avoid removal of finalizers added by other controllers
+	patch := map[string]interface{}{
+		"metadata": map[string]interface{}{
+			"finalizers": sn.GetFinalizers(),
+		},
+	}
+	patchBytes, err := json.Marshal(patch)
+	if err != nil {
+		return err
+	}
+
+	return client.IgnoreNotFound(r.Patch(ctx, sn, client.RawPatch(types.MergePatchType, patchBytes)))
 }
 
 func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2.SubNamespace) error {
@@ -115,7 +132,7 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2
 			constants.LabelParent:    sn.Namespace,
 		}
 		if err := r.Create(ctx, ns); err != nil {
-			return utilerrors.Ignore(err, utilerrors.IsNamespaceTerminating)
+			return fmt.Errorf("failed to create namespace %s: %w", ns.Name, err)
 		}
 		logger.Info("created a sub namespace", "name", sn.Name)
 	}
@@ -162,11 +179,10 @@ func (r *SubNamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				Namespace: parent,
 				Name:      o.GetName(),
 			}})
-			return
 		}
 		if o.GetDeletionTimestamp() != nil {
-			// The namespace has no parent and is in terminating state.
-			// Let's find all (conflicting) subnamespaces that might want to recreate it.
+			// The namespace is in terminating state.
+			// Let's find all subnamespaces that might want to recreate it.
 			snList := &accuratev2.SubNamespaceList{}
 			err := r.List(ctx, snList, client.MatchingFields{constants.SubNamespaceNameKey: o.GetName()})
 			if err != nil {
