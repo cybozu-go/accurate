@@ -93,11 +93,11 @@ check-generate:
 .PHONY: envtest
 envtest: setup-envtest
 	source <($(SETUP_ENVTEST) use -p env); \
-		TEST_CONFIG=1 go test -v -count 1 -race ./pkg/config -ginkgo.progress -ginkgo.v -ginkgo.fail-fast
+		TEST_CONFIG=1 go test -v -count 1 -race ./pkg/config -ginkgo.show-node-events -ginkgo.v -ginkgo.fail-fast
 	source <($(SETUP_ENVTEST) use -p env); \
-		go test -v -count 1 -race ./controllers -ginkgo.progress -ginkgo.v -ginkgo.fail-fast
+		go test -v -count 1 -race ./controllers -ginkgo.show-node-events -ginkgo.v -ginkgo.fail-fast
 	source <($(SETUP_ENVTEST) use -p env); \
-		go test -v -count 1 -race ./hooks/... -ginkgo.progress -ginkgo.v
+		go test -v -count 1 -race ./hooks/... -ginkgo.show-node-events -ginkgo.v
 
 .PHONY: test
 test: test-tools

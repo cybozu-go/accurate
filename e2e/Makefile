@@ -38,7 +38,7 @@ start: setup $(KUBECTL_ACCURATE)
 .PHONY: test
 test:
 	env PATH=$$(pwd)/../bin:$$PATH RUN_E2E=1 \
-		go test -v -race . -ginkgo.progress -ginkgo.v -ginkgo.fail-fast
+		go test -v -race . -ginkgo.show-node-events -ginkgo.v -ginkgo.fail-fast
 
 .PHONY: logs
 logs:
