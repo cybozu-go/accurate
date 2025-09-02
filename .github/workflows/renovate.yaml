@@ -2,14 +2,23 @@ name: Renovate
 on:
   schedule:
     - cron: '0 10 * * 1'
+  workflow_dispatch:
 jobs:
   renovate:
     runs-on: ubuntu-latest
     steps:
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.RENOVATE_APP_ID }}
+          private-key: ${{ secrets.RENOVATE_PRIVATE_KEY }}
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
       - name: Self-hosted Renovate
-        uses: renovatebot/github-action@13da59cf7cfbd3bfea72ce26752ed22edf747ce9 # renovate v43.0.2
+        uses: renovatebot/github-action@7876d7a812254599d262d62b6b2c2706018258a2 # renovate v43.0.10
         with:
           configurationFile: renovate.json
-          token: ${{ secrets.RENOVATE_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
