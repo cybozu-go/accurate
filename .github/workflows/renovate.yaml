@@ -12,7 +12,7 @@ jobs:
         uses: actions/create-github-app-token@v2
         with:
           app-id: ${{ secrets.RENOVATE_APP_ID }}
-          private-key: ${{ secrets.RENOVATE_PRIVATE_KEY }}
+          private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }}
       - name: Checkout
         uses: actions/checkout@v4
         with:
