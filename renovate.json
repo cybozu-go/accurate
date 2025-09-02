@@ -8,7 +8,6 @@
     "cybozu-go/accurate"
   ],
   "extends": [
-    "config:base",
     "config:best-practices",
     "github>aquaproj/aqua-renovate-config#1.6.0",
     ":semanticCommitTypeAll(chore)",
