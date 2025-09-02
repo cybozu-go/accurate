@@ -13,7 +13,9 @@
     ":semanticCommitTypeAll(chore)",
     ":timezone(Asia/Tokyo)"
   ],
-  "ignorePresets": [":prHourlyLimit2"],
+  "ignorePresets": [
+    ":prHourlyLimit2"
+  ],
   "labels": [
     "dependencies"
   ],
@@ -23,10 +25,10 @@
       "matchDatasources": [
         "go"
       ],
-      "matchPackagePatterns": [
-        "^k8s\\.io\\/.*"
-      ],
-      "separateMinorPatch": true
+      "separateMinorPatch": true,
+      "matchPackageNames": [
+        "/^k8s\\.io\\/.*/"
+      ]
     },
     {
       "description": "Disable major updates for k8s.io/client-go",
@@ -81,22 +83,24 @@
   "postUpdateOptions": [
     "gomodTidy"
   ],
-  "regexManagers": [
+  "customManagers": [
     {
+      "customType": "regex",
       "datasourceTemplate": "docker",
       "depNameTemplate": "kindest/node",
-      "fileMatch": [
-        "^\\.github\\/workflows\\/.+\\.ya?ml$"
+      "managerFilePatterns": [
+        "/^\\.github\\/workflows\\/.+\\.ya?ml$/"
       ],
       "matchStrings": [
         "- (?<currentValue>.+?) # renovate: kindest\\/node"
       ]
     },
     {
+      "customType": "regex",
       "datasourceTemplate": "docker",
       "depNameTemplate": "kindest/node",
-      "fileMatch": [
-        "^e2e\\/Makefile$"
+      "managerFilePatterns": [
+        "/^e2e\\/Makefile$/"
       ],
       "matchStrings": [
         "KUBERNETES_VERSION := (?<currentValue>.*?) # renovate: kindest\\/node"
