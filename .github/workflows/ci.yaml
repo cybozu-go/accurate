@@ -9,8 +9,8 @@ jobs:
     name: Build binaries
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-go@v5
+    - uses: actions/checkout@v5.0.0
+    - uses: actions/setup-go@v5.5.0
       with:
         go-version-file: go.mod
     - uses: ./.github/actions/aqua
@@ -21,8 +21,8 @@ jobs:
     name: Small tests
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-go@v5
+    - uses: actions/checkout@v5.0.0
+    - uses: actions/setup-go@v5.5.0
       with:
         go-version-file: go.mod
     - uses: ./.github/actions/aqua
@@ -41,8 +41,8 @@ jobs:
         - v1.31.9@sha256:b94a3a6c06198d17f59cca8c6f486236fa05e2fb359cbd75dabbfc348a10b211 # renovate: kindest/node
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-go@v5
+    - uses: actions/checkout@v5.0.0
+    - uses: actions/setup-go@v5.5.0
       with:
         go-version-file: go.mod
         cache: true
@@ -62,7 +62,7 @@ jobs:
         # extract only version name because ':' is not allowed for artifact name
         SANITIZED_K8S_VERSION="$(echo ${{ matrix.k8s-version}} | awk -F '@' '{print $1}')"
         echo "SANITIZED_K8S_VERSION=$SANITIZED_K8S_VERSION" >> $GITHUB_OUTPUT
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v4.6.2
       if: always()
       with:
         name: logs-${{ steps.sanitize.outputs.SANITIZED_K8S_VERSION }}.tar.gz

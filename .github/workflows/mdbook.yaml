@@ -9,12 +9,12 @@ jobs:
     name: Build book
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5.0.0
     - uses: ./.github/actions/aqua
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
     - run: make book
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v4.6.2
       with:
         name: book
         path: docs/book
@@ -24,12 +24,12 @@ jobs:
     runs-on: ubuntu-24.04
     needs: build
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5.0.0
       with:
         ref: gh-pages
     # ignore helm chart index file and chart archive file.
     - run: ls | grep -v -E 'index.yaml|accurate-.*\.tgz' | xargs rm -rf
-    - uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@v4.3.0
       with:
         name: book
     - run: git add .
