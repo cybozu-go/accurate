@@ -13,7 +13,9 @@
     ":semanticCommitTypeAll(chore)",
     ":timezone(Asia/Tokyo)"
   ],
-  "ignorePresets": [":prHourlyLimit2"],
+  "ignorePresets": [
+    ":prHourlyLimit2"
+  ],
   "labels": [
     "dependencies"
   ],
@@ -44,11 +46,10 @@
       "matchDatasources": [
         "go"
       ],
-      "matchPackagePatterns": [
-        "^k8s\\.io\\/.*",
-        "^sigs\\.k8s\\.io\\/.*"
-      ],
-      "separateMinorPatch": true
+      "separateMinorPatch": true,
+      "matchPackageNames": [
+        "/^k8s\\.io\\/.*/"
+      ]
     },
     {
       "dependencyDashboardApproval": true,
@@ -173,7 +174,7 @@
       "datasourceTemplate": "docker",
       "depNameTemplate": "kindest/node",
       "managerFilePatterns": [
-        "^\\.github\\/workflows\\/.+\\.ya?ml$"
+        "/^\\.github\\/workflows\\/.+\\.ya?ml$/"
       ],
       "matchStrings": [
         "- (?<currentValue>.+?) # renovate: kindest\\/node"
@@ -184,7 +185,7 @@
       "datasourceTemplate": "docker",
       "depNameTemplate": "kindest/node",
       "managerFilePatterns": [
-        "^e2e\\/Makefile$"
+        "/^e2e\\/Makefile$/"
       ],
       "matchStrings": [
         "KUBERNETES_VERSION := (?<currentValue>.*?) # renovate: kindest\\/node"
