@@ -32,10 +32,15 @@
         "^sigs\\.k8s\\.io\\/.*"
       ],
       "excludePackageNames": [
-        "kubernetes/kubectl",
-        "kindest/node",
         "aquaproj/aqua-installer",
+        "azure/setup-helm",
+        "goreleaser/goreleaser-action",
         "helm/chart-releaser-action",
+        "helm/chart-testing-action",
+        "helm/kind-action",
+        "kindest/node",
+        "kubernetes/kubectl",
+        "rajatjindal/krew-release-bot",
         "renovatebot/github-action"
       ],
       "groupName": "all minor and patch updates",
