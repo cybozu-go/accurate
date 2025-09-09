@@ -165,7 +165,12 @@
       ],
       "matchPackageNames": [
         "aquaproj/aqua-installer",
+        "azure/setup-helm",
+        "goreleaser/goreleaser-action",
         "helm/chart-releaser-action",
+        "helm/chart-testing-action",
+        "helm/kind-action",
+        "rajatjindal/krew-release-bot",
         "renovatebot/github-action"
       ]
     }
