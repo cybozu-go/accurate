@@ -1,0 +1,205 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "username": "renovate[bot]",
+  "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
+  "platform": "github",
+  "onboarding": false,
+  "repositories": [
+    "cybozu-go/accurate"
+  ],
+  "extends": [
+    "config:best-practices",
+    "github>aquaproj/aqua-renovate-config#2.8.2",
+    ":semanticCommitTypeAll(chore)",
+    ":timezone(Asia/Tokyo)"
+  ],
+  "ignorePresets": [
+    ":prHourlyLimit2"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "minimumReleaseAge": "14 days",
+  "packageRules": [
+    {
+      "description": "Group all minor and patch updates except Kubernetes packages",
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "excludePackagePatterns": [
+        "^k8s\\.io\\/.*",
+        "^sigs\\.k8s\\.io\\/.*"
+      ],
+      "excludePackageNames": [
+        "aquaproj/aqua-installer",
+        "azure/setup-helm",
+        "goreleaser/goreleaser-action",
+        "helm/chart-releaser-action",
+        "helm/chart-testing-action",
+        "helm/kind-action",
+        "kindest/node",
+        "kubernetes/kubectl",
+        "rajatjindal/krew-release-bot",
+        "renovatebot/github-action"
+      ],
+      "groupName": "all minor and patch updates",
+      "groupSlug": "all-minor-patch"
+    },
+    {
+      "description": "Separate minor and patch updates for Kubernetes packages",
+      "matchDatasources": [
+        "go"
+      ],
+      "separateMinorPatch": true,
+      "matchPackageNames": [
+        "/^k8s\\.io\\/.*/"
+      ]
+    },
+    {
+      "dependencyDashboardApproval": true,
+      "description": "Require approval for Kubernetes packages major and minor updates",
+      "matchDatasources": [
+        "go"
+      ],
+      "matchPackagePatterns": [
+        "^k8s\\.io\\/.*",
+        "^sigs\\.k8s\\.io\\/.*"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ]
+    },
+    {
+      "description": "Group patch updates for Kubernetes packages",
+      "matchDatasources": [
+        "go"
+      ],
+      "matchPackagePatterns": [
+        "^k8s\\.io\\/.*",
+        "^sigs\\.k8s\\.io\\/.*"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "groupName": "all minor and patch updates",
+      "groupSlug": "all-minor-patch"
+    },
+    {
+      "description": "Disable major updates for k8s.io/client-go",
+      "enabled": false,
+      "matchDatasources": [
+        "go"
+      ],
+      "matchPackageNames": [
+        "k8s.io/client-go"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ]
+    },
+    {
+      "description": "Separate minor and patch updates for kubectl",
+      "matchPackageNames": [
+        "kubernetes/kubectl"
+      ],
+      "separateMinorPatch": true
+    },
+    {
+      "description": "Disable major and minor update for kubectl",
+      "enabled": false,
+      "matchPackageNames": [
+        "kubernetes/kubectl"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ]
+    },
+    {
+      "description": "Group patch updates for kubectl",
+      "matchPackageNames": [
+        "kubernetes/kubectl"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "groupName": "all minor and patch updates",
+      "groupSlug": "all-minor-patch"
+    },
+    {
+      "description": "Separate minor and patch update for Kubernetes",
+      "matchPackageNames": [
+        "kindest/node"
+      ],
+      "separateMinorPatch": true
+    },
+    {
+      "description": "Group patch updates for kindest/node",
+      "matchPackageNames": [
+        "kindest/node"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "groupName": "all minor and patch updates",
+      "groupSlug": "all-minor-patch"
+    },
+    {
+      "description": "Disable major and minor update for Kubernetes",
+      "enabled": false,
+      "matchPackageNames": [
+        "kindest/node"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ]
+    },
+    {
+      "dependencyDashboardApproval": true,
+      "description": "Require approval for GitHub Action updates",
+      "matchDatasources": [
+        "github-tags"
+      ],
+      "matchPackageNames": [
+        "aquaproj/aqua-installer",
+        "azure/setup-helm",
+        "goreleaser/goreleaser-action",
+        "helm/chart-releaser-action",
+        "helm/chart-testing-action",
+        "helm/kind-action",
+        "rajatjindal/krew-release-bot",
+        "renovatebot/github-action"
+      ]
+    }
+  ],
+  "postUpdateOptions": [
+    "gomodTidy"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "kindest/node",
+      "managerFilePatterns": [
+        "/^\\.github\\/workflows\\/.+\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "- (?<currentValue>.+?) # renovate: kindest\\/node"
+      ]
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "kindest/node",
+      "managerFilePatterns": [
+        "/^e2e\\/Makefile$/"
+      ],
+      "matchStrings": [
+        "KUBERNETES_VERSION := (?<currentValue>.*?) # renovate: kindest\\/node"
+      ]
+    }
+  ]
+}
