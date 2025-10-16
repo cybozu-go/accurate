@@ -186,8 +186,6 @@ The following table is a summary of the feature gates that you can set.
 - The "Until" column, if not empty, contains the last Accurate release in which
   you can still use a feature gate.
 
-{{< table caption="Feature gates for features in Alpha or Beta states" sortable="true" >}}
-
 | Feature | Default | Stage | Since | Until |
 |---------|---------|-------|-------|-------|
 | `DisablePropagateGenerated` | `false` | Alpha | 1.2.0 | 1.3.0 |

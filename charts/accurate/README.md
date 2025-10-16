@@ -4,7 +4,7 @@
 
 You need to add this repository to your Helm repositories:
 
-```console
+```bash
 helm repo add accurate https://cybozu-go.github.io/accurate/
 helm repo update
 ```
@@ -13,8 +13,8 @@ helm repo update
 
 ### Installing cert-manager
 
-```console
-$ curl -fsL https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml | kubectl apply -f -
+```bash
+curl -fsL https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml | kubectl apply -f -
 ```
 
 ### Installing CustomResourceDefinitions (optional)
@@ -28,12 +28,11 @@ add annotations preventing Helm from uninstalling the CRD when the Helm release 
 
 The recommended approach is to let helm manage CRDs, but if you want to manage CRDs yourself, now is the time.
 
-```console
-$  kubectl apply -k https://github.com/cybozu-go/accurate//config/crd-only/
+```bash
+kubectl apply -k https://github.com/cybozu-go/accurate//config/crd-only/
 ```
 
-> NOTE:
->
+> [!NOTE]
 > Since the CRDs contain configuration of conversion webhooks, you may have to tweak the webhook settings
 > if installing the chart using non-standard values.
 
@@ -41,22 +40,21 @@ If you decided to manage CRDs outside of Helm, make sure you set the `crds.enabl
 
 ### Installing the Chart
 
-> NOTE:
->
+> [!NOTE]
 > This installation method requires cert-manager to be installed beforehand.
 
 To install the chart with the release name `accurate` using a dedicated namespace(recommended):
 
-```console
-$ helm install --create-namespace --namespace accurate accurate accurate/accurate
+```bash
+helm install --create-namespace --namespace accurate accurate accurate/accurate
 ```
 
 Specify parameters using `--set key=value[,key=value]` argument to `helm install`.
 
 Alternatively a YAML file that specifies the values for the parameters can be provided like this:
 
-```console
-$ helm install --create-namespace --namespace accurate accurate -f values.yaml accurate/accurate
+```bash
+helm install --create-namespace --namespace accurate accurate -f values.yaml accurate/accurate
 ```
 
 ## Values
@@ -86,6 +84,6 @@ $ helm install --create-namespace --namespace accurate accurate -f values.yaml a
 
 You can use the `helm template` command to render manifests.
 
-```console
-$ helm template --namespace accurate accurate accurate/accurate
+```bash
+helm template --namespace accurate accurate accurate/accurate
 ```

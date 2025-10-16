@@ -12,13 +12,13 @@ Likewise, `<template>` represents a template Namespace name.
 
 Using `kubectl accurate`:
 
-```console
-$ kubectl accurate ns set-type <name> template
+```bash
+kubectl accurate ns set-type <name> template
 ```
 
 Applying YAML manifests:
 
-```console
+```yaml
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -31,8 +31,8 @@ metadata:
 
 Using `kubectl accurate`:
 
-```console
-$ kubectl accurate ns set-type <name> none
+```bash
+kubectl accurate ns set-type <name> none
 ```
 
 Applying YAML manifests:
@@ -43,13 +43,13 @@ Remove `accurate.cybozu.com/type` label.
 
 Using `kubectl accurate`:
 
-```console
-$ kubectl accurate template set <name> <template>
+```bash
+kubectl accurate template set <name> <template>
 ```
 
 Applying YAML manifests:
 
-```console
+```yaml
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -62,9 +62,10 @@ metadata:
 
 Using `kubectl accurate`:
 
-```console
-$ kubectl accurate template unset <name>
+```bash
+kubectl accurate template unset <name>
 ```
+
 Applying YAML manifests:
 
 Remove `accurate.cybozu.com/template` label.

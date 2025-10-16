@@ -10,9 +10,9 @@ It is strongly recommended to install `kubectl-accurate` though Accurate can be 
 
 See the [documentation](https://krew.sigs.k8s.io/docs/user-guide/setup/install/) for how to install Krew.
 
-```console
-$ kubectl krew update
-$ kubectl krew install accurate
+```bash
+kubectl krew update
+kubectl krew install accurate
 ```
 
 ## Installing manually
@@ -23,8 +23,8 @@ $ kubectl krew install accurate
 
     If Go is available, `OS` can be set automatically as follows:
 
-    ```console
-    $ OS=$(go env GOOS)
+    ```bash
+    OS=$(go env GOOS)
     ```
 
 2. Set `ARCH` to the operating system name
@@ -33,24 +33,24 @@ $ kubectl krew install accurate
 
     If Go is available, `ARCH` can be set automatically as follows:
 
-    ```console
-    $ ARCH=$(go env GOARCH)
+    ```bash
+    ARCH=$(go env GOARCH)
     ```
 
 3. Set `VERSION` to the accurate version
 
-   See the Accurate release page: https://github.com/cybozu-go/accurate/releases
+   See the Accurate release page: <https://github.com/cybozu-go/accurate/releases>
 
-   ```console
-   $ VERSION=< The version you want to install >
+   ```bash
+   VERSION=< The version you want to install >
    ```
 
 4. Download the binary and put it in a directory of your `PATH`.
 
     The following is an example to install the plugin in `/usr/local/bin`.
 
-    ```console
-    $ curl -L -sS https://github.com/cybozu-go/accurate/releases/download/$(VERSION)/kubectl-accurate_$(VERSION)_$(OS)_$(ARCH).tar.gz \
+    ```bash
+    curl -L -sS https://github.com/cybozu-go/accurate/releases/download/$(VERSION)/kubectl-accurate_$(VERSION)_$(OS)_$(ARCH).tar.gz \
       | tar xz -C /usr/local/bin kubectl-accurate
     ```
 
