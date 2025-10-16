@@ -6,13 +6,13 @@ Use `kubectl accurate list`:
 
 ```console
 $ kubectl accurate list
- root1
- root2
-    ⮡sub1
- root3
- subroot1
-    ⮡sn1
- subroot2
+├── root1
+├── root2
+│   └── sub1
+├── root3
+├── subroot1
+│   └── sn1
+└── subroot2
 ```
 
 ## Show all template Namespaces
@@ -21,11 +21,11 @@ Use `kubectl accurate template list`:
 
 ```console
 $ kubectl accurate template list
- template1
- template2
-    ⮡reference1
-    ⮡reference2
- template3
+├── template1
+├── template2
+│   ├── reference1
+│   └── reference2
+└── template3
 ```
 
 ## Show the properties of a Namespace
