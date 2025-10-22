@@ -26,7 +26,7 @@
 
 `kubectl-accurate` takes the same generic options as `kubectl` including:
 
-```
+```txt
 Flags:
       --as string                      Username to impersonate for the operation
       --as-group stringArray           Group to impersonate for the operation, this flag can be repeated to specify multiple groups.

@@ -27,9 +27,10 @@ Mode is one of the following:
 
 ## Propagating generated resources (DEPRECATED)
 
-> [!WARNING]  
-> Propagating generated resources is a deprecated feature and is subject for
-> removal soon.
+<div class="warning">
+Propagating generated resources is a deprecated feature and is subject for
+removal soon.
+</div>
 
 If a resource annotated with `accurate.cybozu.com/propagate-generated=<mode>` creates a resource and set an owner reference in the created resource, Accurate automatically adds `accurate.cybozu.com/propagate=<mode>` to the created resource.
 

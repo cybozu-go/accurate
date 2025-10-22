@@ -13,9 +13,9 @@ Suppose that Accurate is configured to propagate `team` label.
 
 Using `kubectl accurate`:
 
-```console
-$ kubectl accurate ns set-type <name> root
-$ kubectl label ns <name> team=foo
+```bash
+kubectl accurate ns set-type <name> root
+kubectl label ns <name> team=foo
 ```
 
 Applying YAML manifests:
@@ -37,7 +37,7 @@ Accurate only propagates labels/annotations that have been configured in that re
 In almost all cases, a root Namespace should have RoleBinding for a group of tenant users.
 The RoleBinding should be annotated with `accurate.cybozu.com/propagate=update`.
 
-```console
+```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -61,8 +61,8 @@ You may want to prepare more objects such as ResourceQuotas.
 
 Using `kubectl accurate`:
 
-```console
-$ kubectl accurate ns set-type <name> none
+```bash
+kubectl accurate ns set-type <name> none
 ```
 
 Applying YAML manifests:
@@ -73,8 +73,8 @@ Remove `accurate.cybozu.com/type` label.
 
 Using `kubectl accurate`:
 
-```console
-$ kubectl accurate sub create <name> <parent>
+```bash
+kubectl accurate sub create <name> <parent>
 ```
 
 Applying YAML manifests:
@@ -91,13 +91,13 @@ metadata:
 
 Using `kubectl accurate`:
 
-```console
-$ kubectl accurate sub create <name> <parent> --labels=foo=bar --annotations=baz=zot
+```bash
+kubectl accurate sub create <name> <parent> --labels=foo=bar --annotations=baz=zot
 ```
 
 Applying YAML manifests:
 
-```console
+```yaml
 apiVersion: accurate.cybozu.com/v2
 kind: SubNamespace
 metadata:
@@ -112,8 +112,8 @@ spec:
 
 You can edit these `spec.labels/spec.annotations` with `kubectl edit`:
 
-```console
-$ kubectl edit SubNamespace -n=<parent> <name>
+```bash
+kubectl edit SubNamespace -n=<parent> <name>
 ```
 
 The `spec.labels/spec.annotations` that can be propagated to sub-namespaces can be set with the `subNamespaceLabelKeys/subNamespaceAnnotationKeys` parameters in config.yaml.
@@ -122,8 +122,8 @@ The `spec.labels/spec.annotations` that can be propagated to sub-namespaces can 
 
 Using `kubectl accurate`:
 
-```console
-$ kubectl accurate sub delete <name>
+```bash
+kubectl accurate sub delete <name>
 ```
 
 Applying YAML manifests:
@@ -136,13 +136,13 @@ Only cluster admins can do this.
 
 Using `kubectl accurate`:
 
-```console
-$ kubectl accurate sub move <name> <new-parent>
+```bash
+kubectl accurate sub move <name> <new-parent>
 ```
 
 Applying YAML manifests:
 
-```console
+```yaml
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -157,13 +157,13 @@ Only cluster admins can do this.
 
 Using `kubectl accurate`:
 
-```console
-$ kubectl accurate sub graft <name> <parent>
+```bash
+kubectl accurate sub graft <name> <parent>
 ```
 
 Applying YAML manifests:
 
-```console
+```yaml
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -178,13 +178,13 @@ Only cluster admins can do this.
 
 Using `kubectl accurate`:
 
-```console
-$ kubectl accurate sub cut <name>
+```bash
+kubectl accurate sub cut <name>
 ```
 
 Applying YAML manifests:
 
-```console
+```yaml
 apiVersion: v1
 kind: Namespace
 metadata:

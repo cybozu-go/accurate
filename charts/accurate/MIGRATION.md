@@ -121,8 +121,8 @@ controller:
 
 The values file can be specified with the `-f` option when you install Helm chart.
 
-```console
-$ helm install --create-namespace --namespace accurate accurate accurate/accurate -f values.yaml
+```bash
+helm install --create-namespace --namespace accurate accurate accurate/accurate -f values.yaml
 ```
 
 There are several other configurable items besides the Accurate config file. See [README.md](./README.md) for details.
