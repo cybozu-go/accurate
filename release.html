@@ -184,17 +184,18 @@ Please refer to <code>.github/release.yml</code> for the kind of labels.</p>
 <ol>
 <li>
 <p>Determine a new version number. Then set <code>VERSION</code> variable.</p>
-<pre><code class="language-console"># Set VERSION and confirm it. It should not have "v" prefix.
-$ VERSION=x.y.z
-$ echo $VERSION
+<pre><code class="language-bash"># Set VERSION and confirm it. It should not have "v" prefix.
+VERSION=x.y.z
+echo $VERSION
 </code></pre>
 </li>
 <li>
 <p>Add a git tag to the main HEAD, then push it.</p>
-<pre><code class="language-console">$ git checkout main
-$ git tag -a -m "Release v$VERSION" "v$VERSION"
-$ git tag -ln | grep $VERSION
-$ git push origin v$VERSION
+<pre><code class="language-bash">git checkout main
+git pull
+git tag -a -m "Release v$VERSION" "v$VERSION"
+git tag -ln | grep $VERSION
+git push origin v$VERSION
 </code></pre>
 </li>
 </ol>

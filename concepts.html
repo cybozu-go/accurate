@@ -192,11 +192,10 @@
 <li><code>update</code>: the resource will be created in referencing Namespaces if missing, or will be updated if not identical, or will be deleted when the resource in the referenced Namespace is deleted.</li>
 </ul>
 <h2 id="propagating-generated-resources-deprecated"><a class="header" href="#propagating-generated-resources-deprecated">Propagating generated resources (DEPRECATED)</a></h2>
-<blockquote>
-<p>[!WARNING]<br />
+<div class="warning">
 Propagating generated resources is a deprecated feature and is subject for
-removal soon.</p>
-</blockquote>
+removal soon.
+</div>
 <p>If a resource annotated with <code>accurate.cybozu.com/propagate-generated=&lt;mode&gt;</code> creates a resource and set an owner reference in the created resource, Accurate automatically adds <code>accurate.cybozu.com/propagate=&lt;mode&gt;</code> to the created resource.</p>
 <p>This can be used, for example, to propagate Secret created from <a href="https://github.com/bitnami-labs/sealed-secrets">SealedSecret</a>.</p>
 

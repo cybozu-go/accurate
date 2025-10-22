@@ -175,12 +175,12 @@
                         <h1 id="accurate-helm-chart"><a class="header" href="#accurate-helm-chart">Accurate Helm Chart</a></h1>
 <h2 id="how-to-use-accurate-helm-repository"><a class="header" href="#how-to-use-accurate-helm-repository">How to use Accurate Helm repository</a></h2>
 <p>You need to add this repository to your Helm repositories:</p>
-<pre><code class="language-console">helm repo add accurate https://cybozu-go.github.io/accurate/
+<pre><code class="language-bash">helm repo add accurate https://cybozu-go.github.io/accurate/
 helm repo update
 </code></pre>
 <h2 id="quick-start"><a class="header" href="#quick-start">Quick start</a></h2>
 <h3 id="installing-cert-manager"><a class="header" href="#installing-cert-manager">Installing cert-manager</a></h3>
-<pre><code class="language-console">$ curl -fsL https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml | kubectl apply -f -
+<pre><code class="language-bash">curl -fsL https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml | kubectl apply -f -
 </code></pre>
 <h3 id="installing-customresourcedefinitions-optional"><a class="header" href="#installing-customresourcedefinitions-optional">Installing CustomResourceDefinitions (optional)</a></h3>
 <p>Accurate does not use the <a href="https://helm.sh/docs/chart_best_practices/custom_resource_definitions/">official helm method</a> of installing CRD resources.
@@ -189,25 +189,25 @@ The helm team explain the limitations of their approach <a href="https://helm.sh
 <p>The Accurate Helm chart default is to install and manage CRDs with Helm and
 add annotations preventing Helm from uninstalling the CRD when the Helm release is uninstalled.</p>
 <p>The recommended approach is to let helm manage CRDs, but if you want to manage CRDs yourself, now is the time.</p>
-<pre><code class="language-console">$  kubectl apply -k https://github.com/cybozu-go/accurate//config/crd-only/
+<pre><code class="language-bash">kubectl apply -k https://github.com/cybozu-go/accurate//config/crd-only/
 </code></pre>
 <blockquote>
-<p>NOTE:</p>
-<p>Since the CRDs contain configuration of conversion webhooks, you may have to tweak the webhook settings
+<p>[!NOTE]
+Since the CRDs contain configuration of conversion webhooks, you may have to tweak the webhook settings
 if installing the chart using non-standard values.</p>
 </blockquote>
 <p>If you decided to manage CRDs outside of Helm, make sure you set the <code>crds.enabled</code> Helm value to <code>false</code>.</p>
 <h3 id="installing-the-chart"><a class="header" href="#installing-the-chart">Installing the Chart</a></h3>
 <blockquote>
-<p>NOTE:</p>
-<p>This installation method requires cert-manager to be installed beforehand.</p>
+<p>[!NOTE]
+This installation method requires cert-manager to be installed beforehand.</p>
 </blockquote>
 <p>To install the chart with the release name <code>accurate</code> using a dedicated namespace(recommended):</p>
-<pre><code class="language-console">$ helm install --create-namespace --namespace accurate accurate accurate/accurate
+<pre><code class="language-bash">helm install --create-namespace --namespace accurate accurate accurate/accurate
 </code></pre>
 <p>Specify parameters using <code>--set key=value[,key=value]</code> argument to <code>helm install</code>.</p>
 <p>Alternatively a YAML file that specifies the values for the parameters can be provided like this:</p>
-<pre><code class="language-console">$ helm install --create-namespace --namespace accurate accurate -f values.yaml accurate/accurate
+<pre><code class="language-bash">helm install --create-namespace --namespace accurate accurate -f values.yaml accurate/accurate
 </code></pre>
 <h2 id="values"><a class="header" href="#values">Values</a></h2>
 <div class="table-wrapper"><table><thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody>
@@ -233,7 +233,7 @@ if installing the chart using non-standard values.</p>
 </div>
 <h2 id="generate-manifests"><a class="header" href="#generate-manifests">Generate Manifests</a></h2>
 <p>You can use the <code>helm template</code> command to render manifests.</p>
-<pre><code class="language-console">$ helm template --namespace accurate accurate accurate/accurate
+<pre><code class="language-bash">helm template --namespace accurate accurate accurate/accurate
 </code></pre>
 
                     </main>

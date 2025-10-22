@@ -178,14 +178,14 @@
 <p>(Optional) Prepare cert-manager</p>
 <p>Accurate depends on <a href="https://cert-manager.io/">cert-manager</a> to issue TLS certificate for admission webhooks.
 If cert-manager is not installed on your cluster, install it as follows:</p>
-<pre><code class="language-console">$ curl -fsLO https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
-$ kubectl apply -f cert-manager.yaml
+<pre><code class="language-bash">curl -fsLO https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
+kubectl apply -f cert-manager.yaml
 </code></pre>
 </li>
 <li>
 <p>Setup Accurate Helm repository</p>
-<pre><code class="language-console">$ helm repo add accurate https://cybozu-go.github.io/accurate/
-$ helm repo update
+<pre><code class="language-bash">helm repo add accurate https://cybozu-go.github.io/accurate/
+helm repo update
 </code></pre>
 </li>
 <li>
@@ -194,7 +194,7 @@ $ helm repo update
 </li>
 <li>
 <p>Install the Accurate Helm chart</p>
-<pre><code class="language-console">$ helm install --create-namespace --namespace accurate accurate accurate/accurate -f values.yaml
+<pre><code class="language-bash">helm install --create-namespace --namespace accurate accurate accurate/accurate -f values.yaml
 </code></pre>
 </li>
 </ol>

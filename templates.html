@@ -180,10 +180,10 @@ So, a template Namespace can reference another template Namespace.</p>
 Likewise, <code>&lt;template&gt;</code> represents a template Namespace name.</p>
 <h2 id="setting-a-namespace-as-a-template"><a class="header" href="#setting-a-namespace-as-a-template">Setting a Namespace as a template</a></h2>
 <p>Using <code>kubectl accurate</code>:</p>
-<pre><code class="language-console">$ kubectl accurate ns set-type &lt;name&gt; template
+<pre><code class="language-bash">kubectl accurate ns set-type &lt;name&gt; template
 </code></pre>
 <p>Applying YAML manifests:</p>
-<pre><code class="language-console">apiVersion: v1
+<pre><code class="language-yaml">apiVersion: v1
 kind: Namespace
 metadata:
   name: &lt;name&gt;
@@ -192,16 +192,16 @@ metadata:
 </code></pre>
 <h2 id="reverting-a-template-namespace-to-a-normal-one"><a class="header" href="#reverting-a-template-namespace-to-a-normal-one">Reverting a template Namespace to a normal one</a></h2>
 <p>Using <code>kubectl accurate</code>:</p>
-<pre><code class="language-console">$ kubectl accurate ns set-type &lt;name&gt; none
+<pre><code class="language-bash">kubectl accurate ns set-type &lt;name&gt; none
 </code></pre>
 <p>Applying YAML manifests:</p>
 <p>Remove <code>accurate.cybozu.com/type</code> label.</p>
 <h2 id="setting-a-reference-to-a-template-namespace"><a class="header" href="#setting-a-reference-to-a-template-namespace">Setting a reference to a template Namespace</a></h2>
 <p>Using <code>kubectl accurate</code>:</p>
-<pre><code class="language-console">$ kubectl accurate template set &lt;name&gt; &lt;template&gt;
+<pre><code class="language-bash">kubectl accurate template set &lt;name&gt; &lt;template&gt;
 </code></pre>
 <p>Applying YAML manifests:</p>
-<pre><code class="language-console">apiVersion: v1
+<pre><code class="language-yaml">apiVersion: v1
 kind: Namespace
 metadata:
   name: &lt;name&gt;
@@ -210,7 +210,7 @@ metadata:
 </code></pre>
 <h2 id="unsetting-a-reference-to-a-template-namespace"><a class="header" href="#unsetting-a-reference-to-a-template-namespace">Unsetting a reference to a template Namespace</a></h2>
 <p>Using <code>kubectl accurate</code>:</p>
-<pre><code class="language-console">$ kubectl accurate template unset &lt;name&gt;
+<pre><code class="language-bash">kubectl accurate template unset &lt;name&gt;
 </code></pre>
 <p>Applying YAML manifests:</p>
 <p>Remove <code>accurate.cybozu.com/template</code> label.</p>

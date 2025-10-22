@@ -173,7 +173,7 @@
                         <h1 id="accurate-documentation"><a class="header" href="#accurate-documentation">Accurate documentation</a></h1>
 <p>Accurate is a Kubernetes controller for soft multi-tenancy environments.
 It is currently developed and maintained by <a href="https://cybozu-global.com/">Cybozu</a>.</p>
-<p>The repository is at https://github.com/cybozu-go/accurate .</p>
+<p>The repository is at <a href="https://github.com/cybozu-go/accurate">https://github.com/cybozu-go/accurate</a> .</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="overview"><a class="header" href="#overview">Overview</a></h1>
 <p>Accurate is a Kubernetes controller to help operations in large soft multi-tenancy environments.</p>
 <h2 id="soft-multi-tenancy-in-kubernetes"><a class="header" href="#soft-multi-tenancy-in-kubernetes">Soft multi-tenancy in Kubernetes</a></h2>
@@ -217,7 +217,7 @@ Without propagating Role/RoleBinding, the tenant user would be able to do nothin
 <li>
 <p>Inheriting labels and annotations creation/update from parent namespaces</p>
 <p>Namespace labels often play important roles.
-For example, <a href="https://github.com/kubernetes/website/blob/dev-1.22/content/en/docs/concepts/security/pod-security-admission.md#pod-security-admission-labels-for-namespaces">Pod Security Admission</a>, a new feature planned for Kubernetes 1.22, uses Namespace labels to control security policies.</p>
+For example, <a href="https://kubernetes.io/docs/concepts/security/pod-security-admission/">Pod Security Admission</a> uses Namespace labels to control security policies.</p>
 </li>
 <li>
 <p>SubNamespace custom resource for tenant users</p>
@@ -256,11 +256,10 @@ Labels, annotations, and resources can be propagated from a template Namespace t
 <li><code>update</code>: the resource will be created in referencing Namespaces if missing, or will be updated if not identical, or will be deleted when the resource in the referenced Namespace is deleted.</li>
 </ul>
 <h2 id="propagating-generated-resources-deprecated"><a class="header" href="#propagating-generated-resources-deprecated">Propagating generated resources (DEPRECATED)</a></h2>
-<blockquote>
-<p>[!WARNING]<br />
+<div class="warning">
 Propagating generated resources is a deprecated feature and is subject for
-removal soon.</p>
-</blockquote>
+removal soon.
+</div>
 <p>If a resource annotated with <code>accurate.cybozu.com/propagate-generated=&lt;mode&gt;</code> creates a resource and set an owner reference in the created resource, Accurate automatically adds <code>accurate.cybozu.com/propagate=&lt;mode&gt;</code> to the created resource.</p>
 <p>This can be used, for example, to propagate Secret created from <a href="https://github.com/bitnami-labs/sealed-secrets">SealedSecret</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started"><a class="header" href="#getting-started">Getting started</a></h1>
@@ -434,7 +433,6 @@ or its release stage is changed.</li>
 <li>The "Until" column, if not empty, contains the last Accurate release in which
 you can still use a feature gate.</li>
 </ul>
-<p>{{&lt; table caption="Feature gates for features in Alpha or Beta states" sortable="true" &gt;}}</p>
 <div class="table-wrapper"><table><thead><tr><th>Feature</th><th>Default</th><th>Stage</th><th>Since</th><th>Until</th></tr></thead><tbody>
 <tr><td><code>DisablePropagateGenerated</code></td><td><code>false</code></td><td>Alpha</td><td>1.2.0</td><td>1.3.0</td></tr>
 <tr><td><code>DisablePropagateGenerated</code></td><td><code>true</code></td><td>Beta</td><td>1.3.0</td><td></td></tr>
@@ -451,14 +449,14 @@ which is a feature subject for removal soon.</li>
 <p>(Optional) Prepare cert-manager</p>
 <p>Accurate depends on <a href="https://cert-manager.io/">cert-manager</a> to issue TLS certificate for admission webhooks.
 If cert-manager is not installed on your cluster, install it as follows:</p>
-<pre><code class="language-console">$ curl -fsLO https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
-$ kubectl apply -f cert-manager.yaml
+<pre><code class="language-bash">curl -fsLO https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
+kubectl apply -f cert-manager.yaml
 </code></pre>
 </li>
 <li>
 <p>Setup Accurate Helm repository</p>
-<pre><code class="language-console">$ helm repo add accurate https://cybozu-go.github.io/accurate/
-$ helm repo update
+<pre><code class="language-bash">helm repo add accurate https://cybozu-go.github.io/accurate/
+helm repo update
 </code></pre>
 </li>
 <li>
@@ -467,19 +465,19 @@ $ helm repo update
 </li>
 <li>
 <p>Install the Accurate Helm chart</p>
-<pre><code class="language-console">$ helm install --create-namespace --namespace accurate accurate accurate/accurate -f values.yaml
+<pre><code class="language-bash">helm install --create-namespace --namespace accurate accurate accurate/accurate -f values.yaml
 </code></pre>
 </li>
 </ol>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="accurate-helm-chart"><a class="header" href="#accurate-helm-chart">Accurate Helm Chart</a></h1>
 <h2 id="how-to-use-accurate-helm-repository"><a class="header" href="#how-to-use-accurate-helm-repository">How to use Accurate Helm repository</a></h2>
 <p>You need to add this repository to your Helm repositories:</p>
-<pre><code class="language-console">helm repo add accurate https://cybozu-go.github.io/accurate/
+<pre><code class="language-bash">helm repo add accurate https://cybozu-go.github.io/accurate/
 helm repo update
 </code></pre>
 <h2 id="quick-start"><a class="header" href="#quick-start">Quick start</a></h2>
 <h3 id="installing-cert-manager"><a class="header" href="#installing-cert-manager">Installing cert-manager</a></h3>
-<pre><code class="language-console">$ curl -fsL https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml | kubectl apply -f -
+<pre><code class="language-bash">curl -fsL https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml | kubectl apply -f -
 </code></pre>
 <h3 id="installing-customresourcedefinitions-optional"><a class="header" href="#installing-customresourcedefinitions-optional">Installing CustomResourceDefinitions (optional)</a></h3>
 <p>Accurate does not use the <a href="https://helm.sh/docs/chart_best_practices/custom_resource_definitions/">official helm method</a> of installing CRD resources.
@@ -488,25 +486,25 @@ The helm team explain the limitations of their approach <a href="https://helm.sh
 <p>The Accurate Helm chart default is to install and manage CRDs with Helm and
 add annotations preventing Helm from uninstalling the CRD when the Helm release is uninstalled.</p>
 <p>The recommended approach is to let helm manage CRDs, but if you want to manage CRDs yourself, now is the time.</p>
-<pre><code class="language-console">$  kubectl apply -k https://github.com/cybozu-go/accurate//config/crd-only/
+<pre><code class="language-bash">kubectl apply -k https://github.com/cybozu-go/accurate//config/crd-only/
 </code></pre>
 <blockquote>
-<p>NOTE:</p>
-<p>Since the CRDs contain configuration of conversion webhooks, you may have to tweak the webhook settings
+<p>[!NOTE]
+Since the CRDs contain configuration of conversion webhooks, you may have to tweak the webhook settings
 if installing the chart using non-standard values.</p>
 </blockquote>
 <p>If you decided to manage CRDs outside of Helm, make sure you set the <code>crds.enabled</code> Helm value to <code>false</code>.</p>
 <h3 id="installing-the-chart"><a class="header" href="#installing-the-chart">Installing the Chart</a></h3>
 <blockquote>
-<p>NOTE:</p>
-<p>This installation method requires cert-manager to be installed beforehand.</p>
+<p>[!NOTE]
+This installation method requires cert-manager to be installed beforehand.</p>
 </blockquote>
 <p>To install the chart with the release name <code>accurate</code> using a dedicated namespace(recommended):</p>
-<pre><code class="language-console">$ helm install --create-namespace --namespace accurate accurate accurate/accurate
+<pre><code class="language-bash">helm install --create-namespace --namespace accurate accurate accurate/accurate
 </code></pre>
 <p>Specify parameters using <code>--set key=value[,key=value]</code> argument to <code>helm install</code>.</p>
 <p>Alternatively a YAML file that specifies the values for the parameters can be provided like this:</p>
-<pre><code class="language-console">$ helm install --create-namespace --namespace accurate accurate -f values.yaml accurate/accurate
+<pre><code class="language-bash">helm install --create-namespace --namespace accurate accurate -f values.yaml accurate/accurate
 </code></pre>
 <h2 id="values"><a class="header" href="#values">Values</a></h2>
 <div class="table-wrapper"><table><thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody>
@@ -532,7 +530,7 @@ if installing the chart using non-standard values.</p>
 </div>
 <h2 id="generate-manifests"><a class="header" href="#generate-manifests">Generate Manifests</a></h2>
 <p>You can use the <code>helm template</code> command to render manifests.</p>
-<pre><code class="language-console">$ helm template --namespace accurate accurate accurate/accurate
+<pre><code class="language-bash">helm template --namespace accurate accurate accurate/accurate
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="installing-kubectl-plugin"><a class="header" href="#installing-kubectl-plugin">Installing kubectl plugin</a></h1>
 <p><code>kubectl-accurate</code> is a plugin for <code>kubectl</code> to make operations of Accurate easy.</p>
@@ -540,8 +538,8 @@ if installing the chart using non-standard values.</p>
 <h2 id="installing-using-krew"><a class="header" href="#installing-using-krew">Installing using Krew</a></h2>
 <p><a href="https://krew.sigs.k8s.io/">Krew</a> is the plugin manager for kubectl command-line tool.</p>
 <p>See the <a href="https://krew.sigs.k8s.io/docs/user-guide/setup/install/">documentation</a> for how to install Krew.</p>
-<pre><code class="language-console">$ kubectl krew update
-$ kubectl krew install accurate
+<pre><code class="language-bash">kubectl krew update
+kubectl krew install accurate
 </code></pre>
 <h2 id="installing-manually"><a class="header" href="#installing-manually">Installing manually</a></h2>
 <ol>
@@ -549,26 +547,26 @@ $ kubectl krew install accurate
 <p>Set <code>OS</code> to the operating system name</p>
 <p>OS is one of <code>linux</code>, <code>windows</code>, or <code>darwin</code> (MacOS).</p>
 <p>If Go is available, <code>OS</code> can be set automatically as follows:</p>
-<pre><code class="language-console">$ OS=$(go env GOOS)
+<pre><code class="language-bash">OS=$(go env GOOS)
 </code></pre>
 </li>
 <li>
 <p>Set <code>ARCH</code> to the operating system name</p>
 <p>ARCH is one of <code>amd64</code> or <code>arm64</code>.</p>
 <p>If Go is available, <code>ARCH</code> can be set automatically as follows:</p>
-<pre><code class="language-console">$ ARCH=$(go env GOARCH)
+<pre><code class="language-bash">ARCH=$(go env GOARCH)
 </code></pre>
 </li>
 <li>
 <p>Set <code>VERSION</code> to the accurate version</p>
-<p>See the Accurate release page: https://github.com/cybozu-go/accurate/releases</p>
-<pre><code class="language-console">$ VERSION=&lt; The version you want to install &gt;
+<p>See the Accurate release page: <a href="https://github.com/cybozu-go/accurate/releases">https://github.com/cybozu-go/accurate/releases</a></p>
+<pre><code class="language-bash">VERSION=&lt; The version you want to install &gt;
 </code></pre>
 </li>
 <li>
 <p>Download the binary and put it in a directory of your <code>PATH</code>.</p>
 <p>The following is an example to install the plugin in <code>/usr/local/bin</code>.</p>
-<pre><code class="language-console">$ curl -L -sS https://github.com/cybozu-go/accurate/releases/download/$(VERSION)/kubectl-accurate_$(VERSION)_$(OS)_$(ARCH).tar.gz \
+<pre><code class="language-bash">curl -L -sS https://github.com/cybozu-go/accurate/releases/download/$(VERSION)/kubectl-accurate_$(VERSION)_$(OS)_$(ARCH).tar.gz \
   | tar xz -C /usr/local/bin kubectl-accurate
 </code></pre>
 </li>
@@ -599,22 +597,22 @@ Available Commands:
 <h2 id="show-the-hierarchical-list-of-sub-namespaces"><a class="header" href="#show-the-hierarchical-list-of-sub-namespaces">Show the hierarchical list of sub-namespaces</a></h2>
 <p>Use <code>kubectl accurate list</code>:</p>
 <pre><code class="language-console">$ kubectl accurate list
- root1
- root2
-    ⮡sub1
- root3
- subroot1
-    ⮡sn1
- subroot2
+├── root1
+├── root2
+│   └── sub1
+├── root3
+├── subroot1
+│   └── sn1
+└── subroot2
 </code></pre>
 <h2 id="show-all-template-namespaces"><a class="header" href="#show-all-template-namespaces">Show all template Namespaces</a></h2>
 <p>Use <code>kubectl accurate template list</code>:</p>
 <pre><code class="language-console">$ kubectl accurate template list
- template1
- template2
-    ⮡reference1
-    ⮡reference2
- template3
+├── template1
+├── template2
+│   ├── reference1
+│   └── reference2
+└── template3
 </code></pre>
 <h2 id="show-the-properties-of-a-namespace"><a class="header" href="#show-the-properties-of-a-namespace">Show the properties of a Namespace</a></h2>
 <p>Use <code>kubectl accurate ns describe</code>:</p>
@@ -637,10 +635,10 @@ So, a template Namespace can reference another template Namespace.</p>
 Likewise, <code>&lt;template&gt;</code> represents a template Namespace name.</p>
 <h2 id="setting-a-namespace-as-a-template"><a class="header" href="#setting-a-namespace-as-a-template">Setting a Namespace as a template</a></h2>
 <p>Using <code>kubectl accurate</code>:</p>
-<pre><code class="language-console">$ kubectl accurate ns set-type &lt;name&gt; template
+<pre><code class="language-bash">kubectl accurate ns set-type &lt;name&gt; template
 </code></pre>
 <p>Applying YAML manifests:</p>
-<pre><code class="language-console">apiVersion: v1
+<pre><code class="language-yaml">apiVersion: v1
 kind: Namespace
 metadata:
   name: &lt;name&gt;
@@ -649,16 +647,16 @@ metadata:
 </code></pre>
 <h2 id="reverting-a-template-namespace-to-a-normal-one"><a class="header" href="#reverting-a-template-namespace-to-a-normal-one">Reverting a template Namespace to a normal one</a></h2>
 <p>Using <code>kubectl accurate</code>:</p>
-<pre><code class="language-console">$ kubectl accurate ns set-type &lt;name&gt; none
+<pre><code class="language-bash">kubectl accurate ns set-type &lt;name&gt; none
 </code></pre>
 <p>Applying YAML manifests:</p>
 <p>Remove <code>accurate.cybozu.com/type</code> label.</p>
 <h2 id="setting-a-reference-to-a-template-namespace"><a class="header" href="#setting-a-reference-to-a-template-namespace">Setting a reference to a template Namespace</a></h2>
 <p>Using <code>kubectl accurate</code>:</p>
-<pre><code class="language-console">$ kubectl accurate template set &lt;name&gt; &lt;template&gt;
+<pre><code class="language-bash">kubectl accurate template set &lt;name&gt; &lt;template&gt;
 </code></pre>
 <p>Applying YAML manifests:</p>
-<pre><code class="language-console">apiVersion: v1
+<pre><code class="language-yaml">apiVersion: v1
 kind: Namespace
 metadata:
   name: &lt;name&gt;
@@ -667,7 +665,7 @@ metadata:
 </code></pre>
 <h2 id="unsetting-a-reference-to-a-template-namespace"><a class="header" href="#unsetting-a-reference-to-a-template-namespace">Unsetting a reference to a template Namespace</a></h2>
 <p>Using <code>kubectl accurate</code>:</p>
-<pre><code class="language-console">$ kubectl accurate template unset &lt;name&gt;
+<pre><code class="language-bash">kubectl accurate template unset &lt;name&gt;
 </code></pre>
 <p>Applying YAML manifests:</p>
 <p>Remove <code>accurate.cybozu.com/template</code> label.</p>
@@ -679,7 +677,7 @@ Read <a href="concepts.html">Concepts</a> about the propagation modes.</p>
 <h2 id="annotating-a-resource-for-propagation"><a class="header" href="#annotating-a-resource-for-propagation">Annotating a resource for propagation</a></h2>
 <p>The following is an example to propagate Secrets.</p>
 <p>Using <code>kubectl</code>:</p>
-<pre><code class="language-console">$ kubectl annotate secrets &lt;name&gt; accurate.cybozu.com/propagate=&lt;mode&gt;
+<pre><code class="language-bash">kubectl annotate secrets &lt;name&gt; accurate.cybozu.com/propagate=&lt;mode&gt;
 </code></pre>
 <p>Applying YAML manifests:</p>
 <pre><code class="language-console">apiVersion: v1
@@ -691,15 +689,14 @@ metadata:
     accurate.cybozu.com/propagate: &lt;mode&gt;
 </code></pre>
 <h2 id="annotating-a-resource-to-propagate-resources-created-from-it-deprecated"><a class="header" href="#annotating-a-resource-to-propagate-resources-created-from-it-deprecated">Annotating a resource to propagate resources created from it (DEPRECATED)</a></h2>
-<blockquote>
-<p>[!WARNING]<br />
+<div class="warning">
 Propagating generated resources is a deprecated feature and is subject for
 removal soon. Commonly used tools like cert-manager and sealed-secrets now
 provide features for adding annotations/labels to resources created from
 user-facing custom resources. These features can be used for migration to
-ensure the standard <code>accurate.cybozu.com/propagate</code> annotation is added to
-generated resources.</p>
-</blockquote>
+ensure the standard `accurate.cybozu.com/propagate` annotation is added to
+generated resources.
+</div>
 <p>For example, a Secret created from cert-manager's Certificate can automatically be propagated.</p>
 <p>To do this, Certificate should be annotated with <code>accurate.cybozu.com/propagate-generated=&lt;mode&gt;</code> at the time of creation.</p>
 <pre><code class="language-yaml">apiVersion: cert-manager.io/v1
@@ -721,8 +718,8 @@ Likewise, <code>&lt;parent&gt;</code> represents a root or another sub-namespace
 <h2 id="setting-a-namespace-as-a-root-namespace"><a class="header" href="#setting-a-namespace-as-a-root-namespace">Setting a Namespace as a root Namespace</a></h2>
 <p>Suppose that Accurate is configured to propagate <code>team</code> label.</p>
 <p>Using <code>kubectl accurate</code>:</p>
-<pre><code class="language-console">$ kubectl accurate ns set-type &lt;name&gt; root
-$ kubectl label ns &lt;name&gt; team=foo
+<pre><code class="language-bash">kubectl accurate ns set-type &lt;name&gt; root
+kubectl label ns &lt;name&gt; team=foo
 </code></pre>
 <p>Applying YAML manifests:</p>
 <pre><code class="language-console">apiVersion: v1
@@ -737,7 +734,7 @@ metadata:
 <h3 id="preparing-resources-for-tenant-users"><a class="header" href="#preparing-resources-for-tenant-users">Preparing resources for tenant users</a></h3>
 <p>In almost all cases, a root Namespace should have RoleBinding for a group of tenant users.
 The RoleBinding should be annotated with <code>accurate.cybozu.com/propagate=update</code>.</p>
-<pre><code class="language-console">apiVersion: rbac.authorization.k8s.io/v1
+<pre><code class="language-yaml">apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   namespace: &lt;name&gt;
@@ -756,13 +753,13 @@ subjects:
 <p>You may want to prepare more objects such as ResourceQuotas.</p>
 <h2 id="reverting-a-root-namespace-to-a-normal-one"><a class="header" href="#reverting-a-root-namespace-to-a-normal-one">Reverting a root Namespace to a normal one</a></h2>
 <p>Using <code>kubectl accurate</code>:</p>
-<pre><code class="language-console">$ kubectl accurate ns set-type &lt;name&gt; none
+<pre><code class="language-bash">kubectl accurate ns set-type &lt;name&gt; none
 </code></pre>
 <p>Applying YAML manifests:</p>
 <p>Remove <code>accurate.cybozu.com/type</code> label.</p>
 <h2 id="creating-a-sub-namespace"><a class="header" href="#creating-a-sub-namespace">Creating a sub-namespace</a></h2>
 <p>Using <code>kubectl accurate</code>:</p>
-<pre><code class="language-console">$ kubectl accurate sub create &lt;name&gt; &lt;parent&gt;
+<pre><code class="language-bash">kubectl accurate sub create &lt;name&gt; &lt;parent&gt;
 </code></pre>
 <p>Applying YAML manifests:</p>
 <pre><code class="language-console">apiVersion: accurate.cybozu.com/v2
@@ -773,10 +770,10 @@ metadata:
 </code></pre>
 <h3 id="creating-a-sub-namespace-with-additional-labelsannotations"><a class="header" href="#creating-a-sub-namespace-with-additional-labelsannotations">Creating a sub-namespace with additional labels/annotations</a></h3>
 <p>Using <code>kubectl accurate</code>:</p>
-<pre><code class="language-console">$ kubectl accurate sub create &lt;name&gt; &lt;parent&gt; --labels=foo=bar --annotations=baz=zot
+<pre><code class="language-bash">kubectl accurate sub create &lt;name&gt; &lt;parent&gt; --labels=foo=bar --annotations=baz=zot
 </code></pre>
 <p>Applying YAML manifests:</p>
-<pre><code class="language-console">apiVersion: accurate.cybozu.com/v2
+<pre><code class="language-yaml">apiVersion: accurate.cybozu.com/v2
 kind: SubNamespace
 metadata:
   namespace: &lt;parent&gt;
@@ -788,22 +785,22 @@ spec:
     baz: zot
 </code></pre>
 <p>You can edit these <code>spec.labels/spec.annotations</code> with <code>kubectl edit</code>:</p>
-<pre><code class="language-console">$ kubectl edit SubNamespace -n=&lt;parent&gt; &lt;name&gt;
+<pre><code class="language-bash">kubectl edit SubNamespace -n=&lt;parent&gt; &lt;name&gt;
 </code></pre>
 <p>The <code>spec.labels/spec.annotations</code> that can be propagated to sub-namespaces can be set with the <code>subNamespaceLabelKeys/subNamespaceAnnotationKeys</code> parameters in config.yaml.</p>
 <h2 id="deleting-a-created-sub-namespace"><a class="header" href="#deleting-a-created-sub-namespace">Deleting a created sub-namespace</a></h2>
 <p>Using <code>kubectl accurate</code>:</p>
-<pre><code class="language-console">$ kubectl accurate sub delete &lt;name&gt;
+<pre><code class="language-bash">kubectl accurate sub delete &lt;name&gt;
 </code></pre>
 <p>Applying YAML manifests:</p>
 <p>Delete the created SubNamespace object.</p>
 <h2 id="changing-the-parent-of-a-sub-namespace"><a class="header" href="#changing-the-parent-of-a-sub-namespace">Changing the parent of a sub-namespace</a></h2>
 <p>Only cluster admins can do this.</p>
 <p>Using <code>kubectl accurate</code>:</p>
-<pre><code class="language-console">$ kubectl accurate sub move &lt;name&gt; &lt;new-parent&gt;
+<pre><code class="language-bash">kubectl accurate sub move &lt;name&gt; &lt;new-parent&gt;
 </code></pre>
 <p>Applying YAML manifests:</p>
-<pre><code class="language-console">apiVersion: v1
+<pre><code class="language-yaml">apiVersion: v1
 kind: Namespace
 metadata:
   name: &lt;name&gt;
@@ -813,10 +810,10 @@ metadata:
 <h2 id="converting-a-normal-namespace-to-a-sub-namespace"><a class="header" href="#converting-a-normal-namespace-to-a-sub-namespace">Converting a normal Namespace to a sub-namespace</a></h2>
 <p>Only cluster admins can do this.</p>
 <p>Using <code>kubectl accurate</code>:</p>
-<pre><code class="language-console">$ kubectl accurate sub graft &lt;name&gt; &lt;parent&gt;
+<pre><code class="language-bash">kubectl accurate sub graft &lt;name&gt; &lt;parent&gt;
 </code></pre>
 <p>Applying YAML manifests:</p>
-<pre><code class="language-console">apiVersion: v1
+<pre><code class="language-yaml">apiVersion: v1
 kind: Namespace
 metadata:
   name: &lt;name&gt;
@@ -826,10 +823,10 @@ metadata:
 <h2 id="converting-a-sub-namespace-to-a-root-namespace"><a class="header" href="#converting-a-sub-namespace-to-a-root-namespace">Converting a sub-namespace to a root Namespace</a></h2>
 <p>Only cluster admins can do this.</p>
 <p>Using <code>kubectl accurate</code>:</p>
-<pre><code class="language-console">$ kubectl accurate sub cut &lt;name&gt;
+<pre><code class="language-bash">kubectl accurate sub cut &lt;name&gt;
 </code></pre>
 <p>Applying YAML manifests:</p>
-<pre><code class="language-console">apiVersion: v1
+<pre><code class="language-yaml">apiVersion: v1
 kind: Namespace
 metadata:
   name: &lt;name&gt;
@@ -905,7 +902,7 @@ metadata:
 </ul>
 <h2 id="generic-options"><a class="header" href="#generic-options">Generic options</a></h2>
 <p><code>kubectl-accurate</code> takes the same generic options as <code>kubectl</code> including:</p>
-<pre><code>Flags:
+<pre><code class="language-txt">Flags:
       --as string                      Username to impersonate for the operation
       --as-group stringArray           Group to impersonate for the operation, this flag can be repeated to specify multiple groups.
       --cache-dir string               Default cache directory (default "$HOME/.kube/cache")
@@ -1007,7 +1004,7 @@ watches:
 </tbody></table>
 </div>
 <h2 id="command-line-flags"><a class="header" href="#command-line-flags">Command-line flags</a></h2>
-<pre><code>Flags:
+<pre><code class="language-txt">Flags:
       --add_dir_header                   If true, adds the file directory to the header
       --alsologtostderr                  log to standard error as well as files
       --apiserver-qps-throttle int       The maximum QPS to the API server. (default 50)
@@ -1244,17 +1241,18 @@ Please refer to <code>.github/release.yml</code> for the kind of labels.</p>
 <ol>
 <li>
 <p>Determine a new version number. Then set <code>VERSION</code> variable.</p>
-<pre><code class="language-console"># Set VERSION and confirm it. It should not have "v" prefix.
-$ VERSION=x.y.z
-$ echo $VERSION
+<pre><code class="language-bash"># Set VERSION and confirm it. It should not have "v" prefix.
+VERSION=x.y.z
+echo $VERSION
 </code></pre>
 </li>
 <li>
 <p>Add a git tag to the main HEAD, then push it.</p>
-<pre><code class="language-console">$ git checkout main
-$ git tag -a -m "Release v$VERSION" "v$VERSION"
-$ git tag -ln | grep $VERSION
-$ git push origin v$VERSION
+<pre><code class="language-bash">git checkout main
+git pull
+git tag -a -m "Release v$VERSION" "v$VERSION"
+git tag -ln | grep $VERSION
+git push origin v$VERSION
 </code></pre>
 </li>
 </ol>

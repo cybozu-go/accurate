@@ -176,22 +176,22 @@
 <h2 id="show-the-hierarchical-list-of-sub-namespaces"><a class="header" href="#show-the-hierarchical-list-of-sub-namespaces">Show the hierarchical list of sub-namespaces</a></h2>
 <p>Use <code>kubectl accurate list</code>:</p>
 <pre><code class="language-console">$ kubectl accurate list
- root1
- root2
-    ⮡sub1
- root3
- subroot1
-    ⮡sn1
- subroot2
+├── root1
+├── root2
+│   └── sub1
+├── root3
+├── subroot1
+│   └── sn1
+└── subroot2
 </code></pre>
 <h2 id="show-all-template-namespaces"><a class="header" href="#show-all-template-namespaces">Show all template Namespaces</a></h2>
 <p>Use <code>kubectl accurate template list</code>:</p>
 <pre><code class="language-console">$ kubectl accurate template list
- template1
- template2
-    ⮡reference1
-    ⮡reference2
- template3
+├── template1
+├── template2
+│   ├── reference1
+│   └── reference2
+└── template3
 </code></pre>
 <h2 id="show-the-properties-of-a-namespace"><a class="header" href="#show-the-properties-of-a-namespace">Show the properties of a Namespace</a></h2>
 <p>Use <code>kubectl accurate ns describe</code>:</p>
