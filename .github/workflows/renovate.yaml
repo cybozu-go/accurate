@@ -18,7 +18,7 @@ jobs:
         with:
           token: ${{ steps.app-token.outputs.token }}
       - name: Self-hosted Renovate
-        uses: renovatebot/github-action@7876d7a812254599d262d62b6b2c2706018258a2 # renovate v43.0.10
+        uses: renovatebot/github-action@f7fad228a053c69a98e24f8e4f6cf40db8f61e08 # renovate v44.2.1
         with:
           configurationFile: renovate.json
           token: ${{ steps.app-token.outputs.token }}
