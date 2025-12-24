@@ -1,7 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "username": "renovate[bot]",
-  "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
+  "gitAuthor": "cybozu-neco <neco@cybozu.com>",
   "platform": "github",
   "onboarding": false,
   "repositories": [
@@ -21,6 +20,15 @@
   ],
   "minimumReleaseAge": "14 days",
   "packageRules": [
+    {
+      "description": "Group all minor and patch updates",
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "all minor and patch updates",
+      "groupSlug": "all-minor-patch"
+    },
     {
       "description": "Group all minor and patch updates except Kubernetes packages",
       "matchUpdateTypes": [
