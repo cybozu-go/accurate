@@ -58,8 +58,9 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
-      - name: Install Helm
-        uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # v4.3.1
+      - uses: ./.github/actions/aqua
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Set chart version
         run: |
           helm repo add accurate https://cybozu-go.github.io/accurate
