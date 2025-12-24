@@ -40,11 +40,7 @@ jobs:
         export TAG=$(curl -s "https://api.github.com/repos/cybozu-go/accurate/releases/latest" | jq -r .tag_name)
         echo "GORELEASER_PREVIOUS_TAG=${TAG}" >> $GITHUB_ENV
     - name: GoReleaser
-      uses: goreleaser/goreleaser-action@9c156ee8a17a598857849441385a2041ef570552 # v6.3.0
-      with:
-        distribution: goreleaser
-        version: v2.10.2
-        args: release --clean
+      run: goreleaser release --clean
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Update new version in krew-index
