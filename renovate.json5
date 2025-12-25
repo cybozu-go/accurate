@@ -1,12 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "username": "renovate[bot]",
-  "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
-  "platform": "github",
-  "onboarding": false,
-  "repositories": [
-    "cybozu-go/accurate"
-  ],
+  "gitAuthor": "cybozu-neco <neco@cybozu.com>",
   "extends": [
     "config:best-practices",
     "github>aquaproj/aqua-renovate-config#2.8.2",
