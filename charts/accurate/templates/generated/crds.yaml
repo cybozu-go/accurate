@@ -5,7 +5,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     cert-manager.io/inject-ca-from: '{{ .Release.Namespace }}/{{ template "accurate.fullname" . }}-serving-cert'
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: '{{ .Values.crds.keep | ternary "keep" "delete" }}'
   labels:
     app.kubernetes.io/managed-by: '{{ .Release.Service }}'
