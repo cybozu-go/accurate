@@ -17,7 +17,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
         with:
-          python-version: 3.13
+          python-version: 3.14
 
       - name: set up a buildkit builder
         # --driver docker-container is required to get a builder that can build multi-arch.

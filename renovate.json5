@@ -3,7 +3,7 @@
   gitAuthor: 'cybozu-neco <neco@cybozu.com>',
   extends: [
     'config:best-practices',
-    'github>aquaproj/aqua-renovate-config#2.8.2',
+    'github>aquaproj/aqua-renovate-config#2.9.0',
     ':semanticCommitTypeAll(chore)',
     ':timezone(Asia/Tokyo)',
   ],
