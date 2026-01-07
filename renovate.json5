@@ -34,6 +34,7 @@
         '!helm/kind-action',
         '!kindest/node',
         '!kubernetes/kubectl',
+        '!kubernetes-sigs/controller-tools/controller-gen',
         '!rajatjindal/krew-release-bot',
         '!renovatebot/github-action',
       ],
@@ -46,6 +47,14 @@
       separateMinorPatch: true,
       matchPackageNames: [
         '/^k8s\\.io\\/.*/',
+      ],
+    },
+    {
+      // For controller-tools/controller-gen managed by aqua.yaml
+      description: 'Separate minor and patch updates for controller-tools/controller-gen',
+      separateMinorPatch: true,
+      matchPackageNames: [
+        'kubernetes-sigs/controller-tools/controller-gen',
       ],
     },
     {
@@ -64,6 +73,18 @@
       ],
     },
     {
+      // For controller-tools/controller-gen managed by aqua.yaml
+      dependencyDashboardApproval: true,
+      description: 'Require approval for controller-tools/controller-gen major and minor updates',
+      matchUpdateTypes: [
+        'major',
+        'minor',
+      ],
+      matchPackageNames: [
+        'kubernetes-sigs/controller-tools/controller-gen',
+      ],
+    },
+    {
       description: 'Group patch updates for Kubernetes packages',
       matchDatasources: [
         'go',
@@ -76,6 +97,18 @@
       matchPackageNames: [
         '/^k8s\\.io\\/.*/',
         '/^sigs\\.k8s\\.io\\/.*/',
+      ],
+    },
+    {
+      // For controller-tools/controller-gen managed by aqua.yaml
+      description: 'Group patch updates for controller-gen',
+      matchUpdateTypes: [
+        'patch',
+      ],
+      groupName: 'all minor and patch updates',
+      groupSlug: 'all-minor-patch',
+      matchPackageNames: [
+        'kubernetes-sigs/controller-tools/controller-gen',
       ],
     },
     {
