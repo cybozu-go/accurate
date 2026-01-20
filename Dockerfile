@@ -1,5 +1,5 @@
 # Build the manager binary. This always executes in the native architecture of the building machine.
-FROM --platform=$BUILDPLATFORM ghcr.io/cybozu/golang:1.24-jammy@sha256:76d2d319588995376d895eff708ad689562b1cc54e462c695e2f754290e36b22 AS builder
+FROM --platform=$BUILDPLATFORM ghcr.io/cybozu/golang:1.24-jammy@sha256:049bd8cc3c3bce0ca2981e679a7f28bb7db698353bbbed6a0413be89a6f18e6a AS builder
 
 COPY ./ .
 
