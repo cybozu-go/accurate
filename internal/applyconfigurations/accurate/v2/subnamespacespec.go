@@ -4,8 +4,12 @@ package v2
 
 // SubNamespaceSpecApplyConfiguration represents a declarative configuration of the SubNamespaceSpec type for use
 // with apply.
+//
+// SubNamespaceSpec defines the desired state of SubNamespace
 type SubNamespaceSpecApplyConfiguration struct {
-	Labels      map[string]string `json:"labels,omitempty"`
+	// Labels are the labels to be propagated to the sub-namespace
+	Labels map[string]string `json:"labels,omitempty"`
+	// Annotations are the annotations to be propagated to the sub-namespace.
 	Annotations map[string]string `json:"annotations,omitempty"`
 }
 

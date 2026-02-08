@@ -10,11 +10,16 @@ import (
 
 // SubNamespaceApplyConfiguration represents a declarative configuration of the SubNamespace type for use
 // with apply.
+//
+// SubNamespace is the Schema for the subnamespaces API
+// Deprecated: This type will be removed in one of the next releases.
 type SubNamespaceApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                             *SubNamespaceSpecApplyConfiguration   `json:"spec,omitempty"`
-	Status                           *SubNamespaceStatusApplyConfiguration `json:"status,omitempty"`
+	// Spec is the spec of SubNamespace.
+	Spec *SubNamespaceSpecApplyConfiguration `json:"spec,omitempty"`
+	// Status is the status of SubNamespace.
+	Status *SubNamespaceStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // SubNamespace constructs a declarative configuration of the SubNamespace type for use with
@@ -27,6 +32,7 @@ func SubNamespace(name, namespace string) *SubNamespaceApplyConfiguration {
 	b.WithAPIVersion("accurate.cybozu.com/v2alpha1")
 	return b
 }
+
 func (b SubNamespaceApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value
