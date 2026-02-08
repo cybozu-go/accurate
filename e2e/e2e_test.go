@@ -340,6 +340,59 @@ var _ = Describe("kubectl accurate", func() {
 		Expect(sn.Labels).To(HaveKeyWithValue(constants.LabelParent, "conflict-root1"))
 	})
 
+	It("should (re)create sub-namespace when conflicting sub-namespace deleted", func() {
+		By("preparing namespaces")
+		kubectlSafe(nil, "create", "ns", "sub-conflict-root1")
+		kubectlSafe(nil, "accurate", "ns", "set-type", "sub-conflict-root1", "root")
+		kubectlSafe(nil, "create", "ns", "sub-conflict-root2")
+		kubectlSafe(nil, "accurate", "ns", "set-type", "sub-conflict-root2", "root")
+
+		By("creating subnamespace")
+		kubectlSafe(nil, "accurate", "sub", "create", "sub-conflict-sn1", "sub-conflict-root1")
+		subNsLabelsFn := func() (map[string]string, error) {
+			out, err := kubectl(nil, "get", "ns", "sub-conflict-sn1", "-o", "json")
+			if err != nil {
+				return nil, err
+			}
+			ns := &corev1.Namespace{}
+			if err := json.Unmarshal(out, ns); err != nil {
+				return nil, err
+			}
+			return ns.Labels, nil
+		}
+		Eventually(subNsLabelsFn).Should(HaveKeyWithValue(constants.LabelParent, "sub-conflict-root1"))
+
+		By("creating conflicting subnamespace")
+		// Cannot use "kubectl accurate" here, since conflict is validated client-side.
+		kubectlSafe([]byte(`
+apiVersion: accurate.cybozu.com/v2
+kind: SubNamespace
+metadata:
+  name: sub-conflict-sn1
+  namespace: sub-conflict-root2
+`), "apply", "-f", "-")
+		var conditions []metav1.Condition
+		sn1ConditionsFn := func() ([]metav1.Condition, error) {
+			out, err := kubectl(nil, "get", "-n", "sub-conflict-root2", "subnamespaces", "sub-conflict-sn1", "-o", "json")
+			if err != nil {
+				return nil, err
+			}
+			sn := &accuratev2.SubNamespace{}
+			if err := json.Unmarshal(out, sn); err != nil {
+				return nil, err
+			}
+			conditions = sn.Status.Conditions
+			return conditions, nil
+		}
+		Eventually(sn1ConditionsFn).Should(HaveLen(1))
+		Expect(conditions[0].Reason).To(Equal("Conflict"))
+
+		By("deleting subnamespace")
+		kubectlSafe(nil, "accurate", "sub", "delete", "sub-conflict-sn1")
+		Eventually(sn1ConditionsFn).Should(BeEmpty())
+		Eventually(subNsLabelsFn).Should(HaveKeyWithValue(constants.LabelParent, "sub-conflict-root2"))
+	})
+
 	It("should propagate ServiceAccount w/o secrets field", func() {
 		// From Kubernetes 1.24, the auto-generation of secret-based service account tokens has been disabled by default.
 		// So the secrets field in the ServiceAccount is not updated. But when upgrading Kubernetes from 1.23 or lower,
