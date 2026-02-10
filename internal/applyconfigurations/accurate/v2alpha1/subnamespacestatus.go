@@ -8,9 +8,15 @@ import (
 
 // SubNamespaceStatusApplyConfiguration represents a declarative configuration of the SubNamespaceStatus type for use
 // with apply.
+//
+// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
+// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+// SubNamespaceStatus defines the observed state of SubNamespace
 type SubNamespaceStatusApplyConfiguration struct {
-	ObservedGeneration *int64                           `json:"observedGeneration,omitempty"`
-	Conditions         []v1.ConditionApplyConfiguration `json:"conditions,omitempty"`
+	// The generation observed by the object controller.
+	ObservedGeneration *int64 `json:"observedGeneration,omitempty"`
+	// Conditions represent the latest available observations of an object's state
+	Conditions []v1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 
 // SubNamespaceStatusApplyConfiguration constructs a declarative configuration of the SubNamespaceStatus type for use with

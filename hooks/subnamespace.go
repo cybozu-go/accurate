@@ -181,8 +181,7 @@ func (v *subNamespaceValidator) notMatchingNamingPolicy(ctx context.Context, ns,
 // SetupSubNamespaceWebhook registers the webhooks for SubNamespace
 func SetupSubNamespaceWebhook(mgr manager.Manager, dec admission.Decoder, namingPolicyRegexps []config.NamingPolicyRegexp, allowCascadingDeletion bool) error {
 	for _, s := range []runtime.Object{&accuratev1.SubNamespace{}, &accuratev2alpha1.SubNamespace{}, &accuratev2.SubNamespace{}} {
-		err := ctrl.NewWebhookManagedBy(mgr).
-			For(s).
+		err := ctrl.NewWebhookManagedBy(mgr, s).
 			Complete()
 		if err != nil {
 			return err
