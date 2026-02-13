@@ -163,11 +163,7 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2
 		return err
 	}
 
-	sn, p, err := newSubNamespacePatch(ac)
-	if err != nil {
-		return err
-	}
-	return r.Status().Patch(ctx, sn, p, fieldOwner, client.ForceOwnership)
+	return r.Status().Apply(ctx, ac, fieldOwner, client.ForceOwnership)
 }
 
 // SetupWithManager sets up the controller with the Manager.

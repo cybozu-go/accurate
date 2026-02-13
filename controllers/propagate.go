@@ -290,7 +290,8 @@ func (r *PropagateController) propagateUpdate(ctx context.Context, obj, parent *
 		}
 
 		if !equality.Semantic.DeepDerivative(clone, obj) {
-			if err := r.Patch(ctx, clone, applyPatch{clone}, fieldOwner, client.ForceOwnership); err != nil {
+			ac := client.ApplyConfigurationFromUnstructured(clone)
+			if err := r.Apply(ctx, ac, fieldOwner, client.ForceOwnership); err != nil {
 				return fmt.Errorf("failed to apply %s/%s: %w", clone.GetNamespace(), clone.GetName(), err)
 			}
 			logger.Info("applied", "from", parent.GetNamespace())
@@ -336,7 +337,8 @@ func (r *PropagateController) propagateUpdate(ctx context.Context, obj, parent *
 			continue
 		}
 
-		if err := r.Patch(ctx, clone, applyPatch{clone}, fieldOwner, client.ForceOwnership); err != nil {
+		ac := client.ApplyConfigurationFromUnstructured(clone)
+		if err := r.Apply(ctx, ac, fieldOwner, client.ForceOwnership); err != nil {
 			return fmt.Errorf("failed to apply %s/%s: %w", clone.GetNamespace(), clone.GetName(), err)
 		}
 		logger.Info("applied a child resource", "subnamespace", child.Name)

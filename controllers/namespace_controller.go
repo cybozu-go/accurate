@@ -134,11 +134,7 @@ func (r *NamespaceReconciler) propagateMeta(ctx context.Context, ns, parent *cor
 	ac := corev1ac.Namespace(ns.Name).
 		WithLabels(labels).
 		WithAnnotations(annotations)
-	ns, p, err := newNamespacePatch(ac)
-	if err != nil {
-		return err
-	}
-	if err := r.Patch(ctx, ns, p, fieldOwner, client.ForceOwnership); err != nil {
+	if err := r.Apply(ctx, ac, fieldOwner, client.ForceOwnership); err != nil {
 		return fmt.Errorf("failed to propagate labels/annotations for namespace %s: %w", ns.Name, err)
 	}
 	return nil
@@ -269,7 +265,8 @@ func (r *NamespaceReconciler) propagateUpdate(ctx context.Context, res *unstruct
 		return nil
 	}
 
-	if err := r.Patch(ctx, c2, applyPatch{c2}, fieldOwner, client.ForceOwnership); err != nil {
+	ac := client.ApplyConfigurationFromUnstructured(c2)
+	if err := r.Apply(ctx, ac, fieldOwner, client.ForceOwnership); err != nil {
 		return fmt.Errorf("failed to apply %s/%s: %w", c2.GetNamespace(), c2.GetName(), err)
 	}
 
