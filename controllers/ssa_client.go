@@ -2,14 +2,9 @@ package controllers
 
 import (
 	"context"
-	"encoding/json"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
-	accuratev2ac "github.com/cybozu-go/accurate/internal/applyconfigurations/accurate/v2"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
-	corev1ac "k8s.io/client-go/applyconfigurations/core/v1"
 	"k8s.io/client-go/util/csaupgrade"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -33,32 +28,4 @@ func upgradeManagedFields(ctx context.Context, c client.Client, obj client.Objec
 	}
 	// No work to be done - already upgraded
 	return nil
-}
-
-func newSubNamespacePatch(ac *accuratev2ac.SubNamespaceApplyConfiguration) (*accuratev2.SubNamespace, client.Patch, error) {
-	sn := &accuratev2.SubNamespace{}
-	sn.Name = *ac.Name
-	sn.Namespace = *ac.Namespace
-
-	return sn, applyPatch{ac}, nil
-}
-
-func newNamespacePatch(ac *corev1ac.NamespaceApplyConfiguration) (*corev1.Namespace, client.Patch, error) {
-	ns := &corev1.Namespace{}
-	ns.Name = *ac.Name
-
-	return ns, applyPatch{ac}, nil
-}
-
-type applyPatch struct {
-	// must use any type until apply configurations implements a common interface
-	patch any
-}
-
-func (p applyPatch) Type() types.PatchType {
-	return types.ApplyPatchType
-}
-
-func (p applyPatch) Data(_ client.Object) ([]byte, error) {
-	return json.Marshal(p.patch)
 }
