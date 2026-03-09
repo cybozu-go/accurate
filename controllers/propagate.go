@@ -144,7 +144,6 @@ func (r *PropagateController) Reconcile(ctx context.Context, req ctrl.Request) (
 		}
 	case "":
 		//nolint:staticcheck
-		//lint:ignore SA1019 subject for removal
 		if !config.DefaultFeatureGate.Enabled(feature.DisablePropagateGenerated) && ann[constants.AnnGenerated] != notGenerated {
 			if err := r.checkController(ctx, obj); err != nil {
 				logger.Error(err, "failed to check the controller reference")
@@ -399,7 +398,6 @@ func (r *PropagateController) SetupWithManager(mgr ctrl.Manager) error {
 			return true
 		}
 		//nolint:staticcheck
-		//lint:ignore SA1019 subject for removal
 		if config.DefaultFeatureGate.Enabled(feature.DisablePropagateGenerated) || ann[constants.AnnGenerated] == notGenerated {
 			return false
 		}

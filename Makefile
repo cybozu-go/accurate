@@ -3,7 +3,6 @@ CTRL_RUNTIME_VERSION := $(shell awk '/sigs.k8s.io\/controller-runtime/ {print su
 
 # Test tools
 BIN_DIR := $(shell pwd)/bin
-STATICCHECK := $(BIN_DIR)/staticcheck
 GOLANGCI_LINT := $(BIN_DIR)/golangci-lint
 SUDO = sudo
 
@@ -103,7 +102,6 @@ envtest: setup-envtest
 .PHONY: lint
 lint: tools
 	$(GOLANGCI_LINT) run ./... -v
-	$(STATICCHECK) ./...
 
 .PHONY: test
 test: 
@@ -147,11 +145,7 @@ GOBIN=$(PROJECT_DIR)/bin go install $(2) ;\
 endef
 
 .PHONY: tools
-tools: $(STATICCHECK) $(GOLANGCI_LINT)
-
-$(STATICCHECK):
-	mkdir -p $(BIN_DIR)
-	GOBIN=$(BIN_DIR) go install honnef.co/go/tools/cmd/staticcheck@latest
+tools: $(GOLANGCI_LINT)
 
 $(GOLANGCI_LINT):
 	mkdir -p $(BIN_DIR)
