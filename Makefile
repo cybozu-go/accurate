@@ -4,6 +4,7 @@ CTRL_RUNTIME_VERSION := $(shell awk '/sigs.k8s.io\/controller-runtime/ {print su
 # Test tools
 BIN_DIR := $(shell pwd)/bin
 STATICCHECK := $(BIN_DIR)/staticcheck
+GOLANGCI_LINT := $(BIN_DIR)/golangci-lint
 SUDO = sudo
 
 # Set the shell used to bash for better error handling.
@@ -99,13 +100,17 @@ envtest: setup-envtest
 	source <($(SETUP_ENVTEST) use -p env); \
 		go test -v -count 1 -race ./hooks/... -ginkgo.show-node-events -ginkgo.v
 
+.PHONY: lint
+lint: tools
+	$(GOLANGCI_LINT) run ./... -v
+	$(STATICCHECK) ./...
+
 .PHONY: test
-test: test-tools
+test: 
 	go test -v -count 1 -race ./api/... ./internal/... ./pkg/...
 	go install ./...
 	go vet ./...
 	test -z $$(gofmt -s -l . | tee /dev/stderr)
-	$(STATICCHECK) ./...
 
 ##@ Build
 
@@ -141,9 +146,13 @@ GOBIN=$(PROJECT_DIR)/bin go install $(2) ;\
 }
 endef
 
-.PHONY: test-tools
-test-tools: $(STATICCHECK)
+.PHONY: tools
+tools: $(STATICCHECK) $(GOLANGCI_LINT)
 
 $(STATICCHECK):
 	mkdir -p $(BIN_DIR)
 	GOBIN=$(BIN_DIR) go install honnef.co/go/tools/cmd/staticcheck@latest
+
+$(GOLANGCI_LINT):
+	mkdir -p $(BIN_DIR)
+	GOBIN=$(BIN_DIR) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest

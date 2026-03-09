@@ -28,6 +28,7 @@ jobs:
     - uses: ./.github/actions/aqua
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+    - run: make lint
     - run: make test
     - run: make check-generate
     - run: make envtest

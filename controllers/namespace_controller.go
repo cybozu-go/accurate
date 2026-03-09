@@ -261,7 +261,7 @@ func (r *NamespaceReconciler) propagateUpdate(ctx context.Context, res *unstruct
 		return err
 	}
 
-	if equality.Semantic.Equalities.DeepDerivative(c2, c) {
+	if equality.Semantic.DeepDerivative(c2, c) {
 		return nil
 	}
 
