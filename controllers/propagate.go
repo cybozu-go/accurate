@@ -143,7 +143,7 @@ func (r *PropagateController) Reconcile(ctx context.Context, req ctrl.Request) (
 			return ctrl.Result{}, err
 		}
 	case "":
-		//nolint:staticcheck
+		//nolint:staticcheck // SA1019: subject for removal
 		if !config.DefaultFeatureGate.Enabled(feature.DisablePropagateGenerated) && ann[constants.AnnGenerated] != notGenerated {
 			if err := r.checkController(ctx, obj); err != nil {
 				logger.Error(err, "failed to check the controller reference")
@@ -397,7 +397,7 @@ func (r *PropagateController) SetupWithManager(mgr ctrl.Manager) error {
 		if _, ok := ann[constants.AnnPropagate]; ok {
 			return true
 		}
-		//nolint:staticcheck
+		//nolint:staticcheck // SA1019: subject for removal
 		if config.DefaultFeatureGate.Enabled(feature.DisablePropagateGenerated) || ann[constants.AnnGenerated] == notGenerated {
 			return false
 		}

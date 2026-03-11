@@ -337,7 +337,7 @@ var _ = Describe("SubNamespace controller", func() {
 		cm1 := &corev1.ConfigMap{}
 		cm1.Namespace = rootNS
 		cm1.Name = "cm-generate"
-		//nolint:staticcheck
+		//nolint:staticcheck // SA1019: subject for removal
 		cm1.Annotations = map[string]string{constants.AnnPropagateGenerated: constants.PropagateUpdate}
 		cm1.Data = map[string]string{"foo": "bar"}
 		Expect(k8sClient.Create(ctx, cm1)).To(Succeed())
@@ -357,7 +357,7 @@ var _ = Describe("SubNamespace controller", func() {
 		Expect(k8sClient.Create(ctx, svc1)).To(Succeed())
 
 		Eventually(komega.Object(svc1)).Should(HaveField("Annotations", HaveKeyWithValue(constants.AnnPropagate, constants.PropagateUpdate)))
-		//nolint:staticcheck
+		//nolint:staticcheck // SA1019: subject for removal
 		Expect(svc1.Annotations).NotTo(HaveKey(constants.AnnGenerated))
 
 		svc2 := &corev1.Service{}
@@ -368,7 +368,7 @@ var _ = Describe("SubNamespace controller", func() {
 		svc2.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt32(3333)}}
 		Expect(k8sClient.Create(ctx, svc2)).To(Succeed())
 
-		//nolint:staticcheck
+		//nolint:staticcheck // SA1019: subject for removal
 		Eventually(komega.Object(svc2)).Should(HaveField("Annotations", HaveKeyWithValue(constants.AnnGenerated, notGenerated)))
 	})
 })

@@ -103,6 +103,10 @@ envtest: setup-envtest
 lint: tools
 	$(GOLANGCI_LINT) run ./... -v
 
+.PHONY: lint-fix
+lint-fix: tools
+	$(GOLANGCI_LINT) run ./... -v --fix
+
 .PHONY: test
 test: 
 	go test -v -count 1 -race ./api/... ./internal/... ./pkg/...
@@ -149,4 +153,4 @@ tools: $(GOLANGCI_LINT)
 
 $(GOLANGCI_LINT):
 	mkdir -p $(BIN_DIR)
-	GOBIN=$(BIN_DIR) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
+	GOBIN=$(BIN_DIR) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.3
