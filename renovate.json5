@@ -199,6 +199,15 @@
         'renovatebot/github-action',
       ],
     },
+    {
+      "description": "Enable golangci-lint in aqua.yaml",
+      "enabled": true,
+      "matchDatasources": ["github-tags"],
+      "matchDepNames": ["golangci/golangci-lint"],
+      "matchFileNames": [
+        "aqua.yaml",
+      ],
+    },
   ],
   postUpdateOptions: [
     'gomodTidy',

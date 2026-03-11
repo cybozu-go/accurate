@@ -3,7 +3,6 @@ CTRL_RUNTIME_VERSION := $(shell awk '/sigs.k8s.io\/controller-runtime/ {print su
 
 # Test tools
 BIN_DIR := $(shell pwd)/bin
-GOLANGCI_LINT := $(BIN_DIR)/golangci-lint
 SUDO = sudo
 
 # Set the shell used to bash for better error handling.
@@ -100,12 +99,12 @@ envtest: setup-envtest
 		go test -v -count 1 -race ./hooks/... -ginkgo.show-node-events -ginkgo.v
 
 .PHONY: lint
-lint: tools
-	$(GOLANGCI_LINT) run ./... -v
+lint: setup
+	golangci-lint run ./... -v
 
 .PHONY: lint-fix
-lint-fix: tools
-	$(GOLANGCI_LINT) run ./... -v --fix
+lint-fix: setup
+	golangci-lint run ./... -v --fix
 
 .PHONY: test
 test: 
@@ -148,9 +147,3 @@ GOBIN=$(PROJECT_DIR)/bin go install $(2) ;\
 }
 endef
 
-.PHONY: tools
-tools: $(GOLANGCI_LINT)
-
-$(GOLANGCI_LINT):
-	mkdir -p $(BIN_DIR)
-	GOBIN=$(BIN_DIR) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.3
