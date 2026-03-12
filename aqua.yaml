@@ -22,3 +22,4 @@ packages:
     registry: local
   - name: kubernetes/code-generator/conversion-gen@v0.35.0
     registry: local
+  - name: golangci/golangci-lint@v2.11.3

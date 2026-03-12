@@ -227,7 +227,7 @@ func TestValidate(t *testing.T) {
 
 func newFakeRESTMapper() meta.RESTMapper {
 	cs := &fakeclientset.Clientset{}
-	cs.Fake.Resources = append(cs.Fake.Resources, &metav1.APIResourceList{
+	cs.Resources = append(cs.Resources, &metav1.APIResourceList{
 		GroupVersion: "v1",
 		APIResources: []metav1.APIResource{
 			{Name: "secrets", Namespaced: true, Kind: "Secret"},

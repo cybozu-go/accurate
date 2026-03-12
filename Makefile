@@ -3,7 +3,6 @@ CTRL_RUNTIME_VERSION := $(shell awk '/sigs.k8s.io\/controller-runtime/ {print su
 
 # Test tools
 BIN_DIR := $(shell pwd)/bin
-STATICCHECK := $(BIN_DIR)/staticcheck
 SUDO = sudo
 
 # Set the shell used to bash for better error handling.
@@ -99,13 +98,20 @@ envtest: setup-envtest
 	source <($(SETUP_ENVTEST) use -p env); \
 		go test -v -count 1 -race ./hooks/... -ginkgo.show-node-events -ginkgo.v
 
+.PHONY: lint
+lint: setup
+	golangci-lint run ./... -v
+
+.PHONY: lint-fix
+lint-fix: setup
+	golangci-lint run ./... -v --fix
+
 .PHONY: test
-test: test-tools
+test: 
 	go test -v -count 1 -race ./api/... ./internal/... ./pkg/...
 	go install ./...
 	go vet ./...
 	test -z $$(gofmt -s -l . | tee /dev/stderr)
-	$(STATICCHECK) ./...
 
 ##@ Build
 
@@ -141,9 +147,3 @@ GOBIN=$(PROJECT_DIR)/bin go install $(2) ;\
 }
 endef
 
-.PHONY: test-tools
-test-tools: $(STATICCHECK)
-
-$(STATICCHECK):
-	mkdir -p $(BIN_DIR)
-	GOBIN=$(BIN_DIR) go install honnef.co/go/tools/cmd/staticcheck@latest
