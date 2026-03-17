@@ -63,7 +63,7 @@ jobs:
         # extract only version name because ':' is not allowed for artifact name
         SANITIZED_K8S_VERSION="$(echo ${{ matrix.k8s-version}} | awk -F '@' '{print $1}')"
         echo "SANITIZED_K8S_VERSION=$SANITIZED_K8S_VERSION" >> $GITHUB_OUTPUT
-    - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+    - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
       if: always()
       with:
         name: logs-${{ steps.sanitize.outputs.SANITIZED_K8S_VERSION }}.tar.gz
