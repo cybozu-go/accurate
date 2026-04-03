@@ -43,11 +43,11 @@ var rootCmd = &cobra.Command{
 		cmd.SilenceUsage = true
 		h, p, err := net.SplitHostPort(options.webhookAddr)
 		if err != nil {
-			return fmt.Errorf("invalid webhook address: %s, %v", options.webhookAddr, err)
+			return fmt.Errorf("invalid webhook address: %s, %w", options.webhookAddr, err)
 		}
 		numPort, err := strconv.Atoi(p)
 		if err != nil {
-			return fmt.Errorf("invalid webhook address: %s, %v", options.webhookAddr, err)
+			return fmt.Errorf("invalid webhook address: %s, %w", options.webhookAddr, err)
 		}
 		ns := os.Getenv("POD_NAMESPACE")
 		if ns == "" {

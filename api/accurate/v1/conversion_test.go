@@ -18,8 +18,8 @@ func TestFuzzyConversion(t *testing.T) {
 	}))
 }
 
-func SubNamespaceStatusFuzzFunc(_ runtimeserializer.CodecFactory) []interface{} {
-	return []interface{}{
+func SubNamespaceStatusFuzzFunc(_ runtimeserializer.CodecFactory) []any {
+	return []any{
 		SubNamespaceStatusFuzzer,
 	}
 }

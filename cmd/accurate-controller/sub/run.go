@@ -165,7 +165,7 @@ func subMain(ns, addr string, port int) error {
 
 	logger.Info("starting manager")
 	if err := mgr.Start(ctx); err != nil {
-		return fmt.Errorf("problem running manager: %s", err)
+		return fmt.Errorf("problem running manager: %w", err)
 	}
 	return nil
 }

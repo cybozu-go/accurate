@@ -113,11 +113,11 @@ var _ = Describe("Namespace controller", func() {
 		role1 := roleRes.DeepCopy()
 		role1.SetNamespace("tmpl")
 		role1.SetName("role1")
-		role1.Object["rules"] = []interface{}{
-			map[string]interface{}{
-				"apiGroups": []interface{}{""},
-				"resources": []interface{}{"pods"},
-				"verbs":     []interface{}{"get", "watch", "list"},
+		role1.Object["rules"] = []any{
+			map[string]any{
+				"apiGroups": []any{""},
+				"resources": []any{"pods"},
+				"verbs":     []any{"get", "watch", "list"},
 			},
 		}
 		Expect(k8sClient.Create(ctx, role1)).To(Succeed())
@@ -126,11 +126,11 @@ var _ = Describe("Namespace controller", func() {
 		role2.SetNamespace("tmpl")
 		role2.SetName("role2")
 		role2.SetAnnotations(map[string]string{constants.AnnPropagate: constants.PropagateCreate})
-		role2.Object["rules"] = []interface{}{
-			map[string]interface{}{
-				"apiGroups": []interface{}{""},
-				"resources": []interface{}{"pods"},
-				"verbs":     []interface{}{"get", "watch", "list"},
+		role2.Object["rules"] = []any{
+			map[string]any{
+				"apiGroups": []any{""},
+				"resources": []any{"pods"},
+				"verbs":     []any{"get", "watch", "list"},
 			},
 		}
 		Expect(k8sClient.Create(ctx, role2)).To(Succeed())
@@ -138,7 +138,7 @@ var _ = Describe("Namespace controller", func() {
 		secret := secretRes.DeepCopy()
 		secret.SetNamespace("tmpl")
 		secret.SetName("foo")
-		secret.Object["data"] = map[string]interface{}{
+		secret.Object["data"] = map[string]any{
 			"foo": "MjAyMC0wOS0xM1QwNDozOToxMFo=",
 		}
 		secret.SetAnnotations(map[string]string{constants.AnnPropagate: constants.PropagateUpdate})
@@ -151,7 +151,7 @@ var _ = Describe("Namespace controller", func() {
 		secret2 := secretRes.DeepCopy()
 		secret2.SetNamespace("ns1")
 		secret2.SetName("bar")
-		secret2.Object["data"] = map[string]interface{}{
+		secret2.Object["data"] = map[string]any{
 			"bar": "MjAyMC0wOS0xM1QwNDozOToxMFo=",
 		}
 		secret2.SetAnnotations(map[string]string{constants.AnnPropagate: constants.PropagateUpdate})

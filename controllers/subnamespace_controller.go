@@ -91,7 +91,7 @@ func (r *SubNamespaceReconciler) finalize(ctx context.Context, sn *accuratev2.Su
 		logger.Info("deleted namespace", "name", ns.Name)
 	}
 
-	return r.removeFinalizer(context.Background(), sn)
+	return r.removeFinalizer(ctx, sn)
 }
 
 func (r *SubNamespaceReconciler) removeFinalizer(ctx context.Context, sn *accuratev2.SubNamespace) error {
@@ -103,8 +103,8 @@ func (r *SubNamespaceReconciler) removeFinalizer(ctx context.Context, sn *accura
 	controllerutil.RemoveFinalizer(sn, constants.Finalizer)
 
 	// We'll use a JSON Merge Patch here to avoid removal of finalizers added by other controllers
-	patch := map[string]interface{}{
-		"metadata": map[string]interface{}{
+	patch := map[string]any{
+		"metadata": map[string]any{
 			"finalizers": sn.GetFinalizers(),
 		},
 	}

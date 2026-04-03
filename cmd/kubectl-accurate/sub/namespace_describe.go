@@ -57,7 +57,7 @@ func (o *nsDescribeOpts) Fill(streams genericiooptions.IOStreams, config *generi
 	return nil
 }
 
-func (o *nsDescribeOpts) printf(s string, args ...interface{}) {
+func (o *nsDescribeOpts) printf(s string, args ...any) {
 	fmt.Fprintf(o.streams.Out, s, args...)
 }
 
@@ -159,8 +159,7 @@ func (o *nsDescribeOpts) Run(ctx context.Context) error {
 	for _, gvk := range cfg.Watches {
 		o.printResource(ctx, w, gvk)
 	}
-	w.Flush()
-	return nil
+	return w.Flush()
 }
 
 func (o *nsDescribeOpts) printResource(ctx context.Context, w io.Writer, gvk metav1.GroupVersionKind) {
