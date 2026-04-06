@@ -90,12 +90,12 @@ check-generate:
 	git diff --exit-code --name-only
 
 .PHONY: envtest
-envtest: setup-envtest
-	source <($(SETUP_ENVTEST) use -p env); \
+envtest: 
+	source <(setup-envtest use -p env); \
 		TEST_CONFIG=1 go test -v -count 1 -race ./pkg/config -ginkgo.show-node-events -ginkgo.v -ginkgo.fail-fast
-	source <($(SETUP_ENVTEST) use -p env); \
+	source <(setup-envtest use -p env); \
 		go test -v -count 1 -race ./controllers -ginkgo.show-node-events -ginkgo.v -ginkgo.fail-fast
-	source <($(SETUP_ENVTEST) use -p env); \
+	source <(setup-envtest use -p env); \
 		go test -v -count 1 -race ./hooks/... -ginkgo.show-node-events -ginkgo.v
 
 .PHONY: lint
@@ -129,21 +129,3 @@ release-build: setup
 setup:
 	aqua policy allow ./aqua-policy.yaml
 	aqua i -l
-
-SETUP_ENVTEST := $(shell pwd)/bin/setup-envtest
-.PHONY: setup-envtest
-setup-envtest: $(SETUP_ENVTEST) ## Download setup-envtest locally if necessary
-$(SETUP_ENVTEST):
-	# see https://github.com/kubernetes-sigs/controller-runtime/tree/master/tools/setup-envtest
-	GOBIN=$(shell pwd)/bin go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
-
-# go-get-tool will 'go get' any package $2 and install it to $1.
-PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
-define go-get-tool
-@[ -f $(1) ] || { \
-set -e ;\
-echo "Downloading $(2)" ;\
-GOBIN=$(PROJECT_DIR)/bin go install $(2) ;\
-}
-endef
-
