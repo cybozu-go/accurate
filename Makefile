@@ -90,7 +90,7 @@ check-generate:
 	git diff --exit-code --name-only
 
 .PHONY: envtest
-envtest: 
+envtest: setup
 	source <(setup-envtest use -p env); \
 		TEST_CONFIG=1 go test -v -count 1 -race ./pkg/config -ginkgo.show-node-events -ginkgo.v -ginkgo.fail-fast
 	source <(setup-envtest use -p env); \
