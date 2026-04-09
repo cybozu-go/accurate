@@ -21,6 +21,26 @@
       "algorithm": "sha256"
     },
     {
+      "id": "github_release/github.com/bitnami-labs/sealed-secrets/v0.36.1/kubeseal-0.36.1-darwin-amd64.tar.gz",
+      "checksum": "FCAA3789FE67D18540EDE711F76FD800F143DC0C1AA8137081C05E5D6B5FF932",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/bitnami-labs/sealed-secrets/v0.36.1/kubeseal-0.36.1-darwin-arm64.tar.gz",
+      "checksum": "297B3E99084EEA1DF078FE060DD90B539A3785E88FB41E96AB5FF87ED784B789",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/bitnami-labs/sealed-secrets/v0.36.1/kubeseal-0.36.1-linux-amd64.tar.gz",
+      "checksum": "1C47A0042BE8D79E13261073D58C717611EFD999D6AF71D07A07010580DC40C6",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/bitnami-labs/sealed-secrets/v0.36.1/kubeseal-0.36.1-linux-arm64.tar.gz",
+      "checksum": "568094081B77B14DB9990C681E7FD78ED51EECF0D16274A6BF6C2FB3F76F64E9",
+      "algorithm": "sha256"
+    },
+    {
       "id": "github_release/github.com/clamoriniere/crd-to-markdown/v0.0.3/crd-to-markdown_Darwin_x86_64",
       "checksum": "90FBC1E0625C1A7F765EC658849F07A78DFF5A3CA469A1734F6DD23B313F7ECD",
       "algorithm": "sha256"
@@ -56,6 +76,26 @@
       "algorithm": "sha256"
     },
     {
+      "id": "github_release/github.com/golangci/golangci-lint/v2.11.4/golangci-lint-2.11.4-darwin-amd64.tar.gz",
+      "checksum": "C900D4048DB75D1EDFD550FD11CF6A9B3008E7CAA8E119FCDDBC700412D63E60",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/golangci/golangci-lint/v2.11.4/golangci-lint-2.11.4-darwin-arm64.tar.gz",
+      "checksum": "02DB2A2DAE8B26812E53B0688A6F617E3EF1F489790E829EA22862CF76945675",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/golangci/golangci-lint/v2.11.4/golangci-lint-2.11.4-linux-amd64.tar.gz",
+      "checksum": "200C5B7503F67B59A6743CCF32133026C174E272B930EE79AA2AA6F37ACA7EF1",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/golangci/golangci-lint/v2.11.4/golangci-lint-2.11.4-linux-arm64.tar.gz",
+      "checksum": "3BCFA2E6F3D32B2BF5CD75EAA876447507025E0303698633F722A05331988DB4",
+      "algorithm": "sha256"
+    },
+    {
       "id": "github_release/github.com/goreleaser/goreleaser/v2.13.1/goreleaser_Darwin_all.tar.gz",
       "checksum": "C7B5C26953E59B7E4B50913738C7FF2C371C95B5145BD0A2F93CFA5571D3BE97",
       "algorithm": "sha256"
@@ -68,6 +108,21 @@
     {
       "id": "github_release/github.com/goreleaser/goreleaser/v2.13.1/goreleaser_Linux_x86_64.tar.gz",
       "checksum": "04764528D7344BC5EFAE80EF62467480578A37DB0BB98EA2CEE185E04AEB1A7D",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/goreleaser/goreleaser/v2.14.3/goreleaser_Darwin_all.tar.gz",
+      "checksum": "3507798489E107A78AFF36B169DE48148A335AC26EB3161608D905F3F3A957BD",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/goreleaser/goreleaser/v2.14.3/goreleaser_Linux_arm64.tar.gz",
+      "checksum": "581A10E53C1176B3E81EE45CF531E02DBF899DB0BC7B795669347DF4276CE948",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/goreleaser/goreleaser/v2.14.3/goreleaser_Linux_x86_64.tar.gz",
+      "checksum": "DC7FAEEEB6DA8BDFDA788626263A4AE725892A8C7504B975C3234127D4A44579",
       "algorithm": "sha256"
     },
     {
@@ -171,6 +226,26 @@
       "algorithm": "sha256"
     },
     {
+      "id": "github_release/github.com/mikefarah/yq/v4.52.5/yq_darwin_amd64",
+      "checksum": "6E399D1EB466860C3202D231727197FDCE055888C5C7BEC6964156983DD1559D",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/mikefarah/yq/v4.52.5/yq_darwin_arm64",
+      "checksum": "45A12E64D4BD8A31C72EE1B889E81F1B1110E801BAAD3D6F030C111DB0068DE0",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/mikefarah/yq/v4.52.5/yq_linux_amd64",
+      "checksum": "75D893A0D5940D1019CB7CDC60001D9E876623852C31CFC6267047BC31149FA9",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/mikefarah/yq/v4.52.5/yq_linux_arm64",
+      "checksum": "90FA510C50EE8CA75544DBFFFED10C88ED59B36834DF35916520CDDC623D9AAA",
+      "algorithm": "sha256"
+    },
+    {
       "id": "github_release/github.com/rust-lang/mdBook/v0.5.2/mdbook-v0.5.2-x86_64-apple-darwin.tar.gz",
       "checksum": "17CC64478EC279A73881420E850BD8F9D460552E56B50159FF465BC97EB90D6C",
       "algorithm": "sha256"
@@ -238,6 +313,26 @@
     {
       "id": "http/get.helm.sh/helm-v4.0.4-linux-arm64.tar.gz",
       "checksum": "16B88ACC6503D646B7537A298E7389BEF469C5CC9EBADF727547ABE9F6A35903",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "http/get.helm.sh/helm-v4.1.3-darwin-amd64.tar.gz",
+      "checksum": "742132E11CC08A81C97F70180CD714AE8376F8C896247A7B14AE1F51838B5A0B",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "http/get.helm.sh/helm-v4.1.3-darwin-arm64.tar.gz",
+      "checksum": "21C02FE2F7E27D08E24A6BF93103F9D2B25AAB6F13F91814B2CFABC99B108A5E",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "http/get.helm.sh/helm-v4.1.3-linux-amd64.tar.gz",
+      "checksum": "02CE9722D541238F81459938B84CF47DF2FDF1187493B4BFB2346754D82A4700",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "http/get.helm.sh/helm-v4.1.3-linux-arm64.tar.gz",
+      "checksum": "5DB45E027CC8DE4677EC869E5D803FC7631B0BAB1C1EB62AC603A62D22359A43",
       "algorithm": "sha256"
     },
     {
