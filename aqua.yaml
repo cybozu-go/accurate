@@ -1,5 +1,11 @@
 # aqua - Declarative CLI Version Manager
 # https://aquaproj.github.io/
+checksum:
+  enabled: true
+  require_checksum: true
+  supported_envs:
+  - darwin
+  - linux
 registries:
   - type: standard
     ref: v4.446.0 # renovate: depName=aquaproj/aqua-registry
@@ -8,6 +14,7 @@ registries:
     path: registry.yaml
 packages:
   - name: kubernetes/kubectl@v1.35.2
+  - name: kubernetes-sigs/controller-runtime/setup-envtest@v0.23.3
   - name: kubernetes-sigs/kubebuilder@v4.11.1
   - name: kubernetes-sigs/kustomize@kustomize/v5.8.0
   - name: kubernetes-sigs/kind@v0.31.0
