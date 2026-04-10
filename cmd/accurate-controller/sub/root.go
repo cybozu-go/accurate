@@ -17,7 +17,6 @@ import (
 
 const (
 	defaultConfigPath = "/etc/accurate/config.yaml"
-	defaultQPS        = 50
 )
 
 var options struct {
@@ -74,7 +73,7 @@ func init() {
 	fs.StringVar(&options.leaderElectionID, "leader-election-id", "accurate", "ID for leader election by controller-runtime")
 	fs.StringVar(&options.webhookAddr, "webhook-addr", ":9443", "Listen address for the webhook endpoint")
 	fs.StringVar(&options.certDir, "cert-dir", "", "webhook certificate directory")
-	fs.IntVar(&options.qps, "apiserver-qps-throttle", defaultQPS, "The maximum QPS to the API server.")
+	fs.IntVar(&options.qps, "apiserver-qps-throttle", 0, "Maximum client-side QPS to the API server. Values greater than 0 enable throttling.")
 
 	fs.BoolVar(&options.webhookAllowCascadingDeletion, "webhook-allow-cascading-deletion", false, "Set to true to allow cascading deletion of namespaces (namespaces with children)")
 
