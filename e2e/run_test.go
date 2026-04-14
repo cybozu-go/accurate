@@ -11,7 +11,7 @@ import (
 func kubectl(input []byte, args ...string) ([]byte, error) {
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
-	cmd := exec.Command("kubectl", args...)
+	cmd := exec.Command("kubectl", args...) // #nosec G204 -- args are static/test-controlled
 	cmd.Stdout = stdout
 	cmd.Stderr = stderr
 	if input != nil {
@@ -21,7 +21,7 @@ func kubectl(input []byte, args ...string) ([]byte, error) {
 	if err == nil {
 		return stdout.Bytes(), nil
 	}
-	return nil, fmt.Errorf("kubectl failed with %s: stderr=%s", err, stderr)
+	return nil, fmt.Errorf("kubectl failed with %w: stderr=%s", err, stderr.String())
 }
 
 func kubectlSafe(input []byte, args ...string) []byte {

@@ -35,7 +35,7 @@ func SetupIndexForNamespace(ctx context.Context, mgr manager.Manager) error {
 		return err
 	}
 
-	return mgr.GetFieldIndexer().IndexField(context.Background(), ns, constants.NamespaceTemplateKey, func(rawObj client.Object) []string {
+	return mgr.GetFieldIndexer().IndexField(ctx, ns, constants.NamespaceTemplateKey, func(rawObj client.Object) []string {
 		tmpl := rawObj.GetLabels()[constants.LabelTemplate]
 		if tmpl == "" {
 			return nil

@@ -21,8 +21,8 @@ import (
 func GetFuzzer(scheme *runtime.Scheme, funcs ...fuzzer.FuzzerFuncs) *randfill.Filler {
 	funcs = append([]fuzzer.FuzzerFuncs{
 		metafuzzer.Funcs,
-		func(_ runtimeserializer.CodecFactory) []interface{} {
-			return []interface{}{
+		func(_ runtimeserializer.CodecFactory) []any {
+			return []any{
 				// Custom fuzzer for metav1.Time pointers which weren't
 				// fuzzed and always resulted in `nil` values.
 				// This implementation is somewhat similar to the one provided
@@ -73,7 +73,7 @@ func FuzzTestFunc(input FuzzTestFuncInput) func(*testing.T) {
 			g := gomega.NewWithT(t)
 			fzr := GetFuzzer(input.Scheme, input.FuzzerFuncs...)
 
-			for i := 0; i < 10000; i++ {
+			for range 10000 {
 				// Create the spoke and fuzz it
 				spokeBefore := input.Spoke.DeepCopyObject().(conversion.Convertible)
 				fzr.Fill(spokeBefore)
@@ -97,7 +97,7 @@ func FuzzTestFunc(input FuzzTestFuncInput) func(*testing.T) {
 			g := gomega.NewWithT(t)
 			fzr := GetFuzzer(input.Scheme, input.FuzzerFuncs...)
 
-			for i := 0; i < 10000; i++ {
+			for range 10000 {
 				// Create the hub and fuzz it
 				hubBefore := input.Hub.DeepCopyObject().(conversion.Hub)
 				fzr.Fill(hubBefore)
