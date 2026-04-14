@@ -15,7 +15,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/json"
 	metav1ac "k8s.io/client-go/applyconfigurations/meta/v1"
-	"k8s.io/client-go/util/csaupgrade"
 	kstatus "sigs.k8s.io/cli-utils/pkg/kstatus/status"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -155,12 +154,6 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2
 					WithMessage("Conflicting namespace already exists"),
 			),
 		)
-	}
-
-	// Ensure that status managed fields are upgraded to SSA before the following SSA.
-	// TODO(migration): This code could be removed after a couple of releases.
-	if err := upgradeManagedFields(ctx, r.Client, sn, csaupgrade.Subresource("status")); err != nil {
-		return err
 	}
 
 	return r.Status().Apply(ctx, ac, fieldOwner, client.ForceOwnership)
