@@ -13,5 +13,5 @@ If Kubernetes or controller-runtime API has changed, please fix the relevant sou
 
 ## How to update dependencies
 
-Renovate will create PRs that update dependencies once a week.
+Renovate will create PRs that update dependencies when you [trigger the workflow with `workflow_dispatch`](https://github.com/cybozu-go/accurate/actions/workflows/renovate.yaml).
 However, Kubernetes is only updated with patched versions.
