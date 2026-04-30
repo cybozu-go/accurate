@@ -1,6 +1,8 @@
 name: Renovate
 on:
   workflow_dispatch:
+# No permissions are required for this workflow because the GitHub App has its own permissions.
+permissions: {}
 jobs:
   renovate:
     runs-on: ubuntu-latest
