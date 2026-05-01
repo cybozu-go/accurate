@@ -54,7 +54,3 @@ type SubNamespaceList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []SubNamespace `json:"items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&SubNamespace{}, &SubNamespaceList{})
-}
