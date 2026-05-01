@@ -50,7 +50,7 @@ Run and try Accurate on a [kind (Kubernetes-In-Docker)][kind] cluster as follows
 3. Install [aqua][].
 
     ```bash
-    go install github.com/aquaproj/aqua/v2/cmd/aqua@latest
+    go install github.com/aquaproj/aqua/v2/cmd/aqua@v2.53.3
     ```
 
     cf. <https://aquaproj.github.io/docs/install>

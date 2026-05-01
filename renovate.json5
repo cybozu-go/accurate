@@ -235,5 +235,25 @@
         'KUBERNETES_VERSION := (?<currentValue>.*?) # renovate: kindest\\/node',
       ],
     },
+    {
+      customType: 'regex',
+      datasourceTemplate: 'github-releases',
+      managerFilePatterns: [
+        '/^e2e\\/Makefile$/',
+      ],
+      matchStrings: [
+        '# renovate: datasource=github-releases depName=(?<depName>[^\\s]+)\\nCERT_MANAGER_VERSION = (?<currentValue>v[^\\s]+)',
+      ],
+    },
+    {
+      customType: 'regex',
+      datasourceTemplate: 'github-releases',
+      managerFilePatterns: [
+        '/^\\.github\\/workflows\\/.+\\.ya?ml$/',
+      ],
+      matchStrings: [
+        '# renovate: datasource=github-releases depName=(?<depName>[^\\s]+)\\n\\s+CERT_MANAGER_VERSION: (?<currentValue>v[^\\s]+)',
+      ],
+    },
   ],
 }

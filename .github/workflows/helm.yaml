@@ -53,8 +53,14 @@ jobs:
           registry_name: kind-registry
           registry_port: 5000
       - name: Apply cert-manager
+        env:
+          # renovate: datasource=github-releases depName=cert-manager/cert-manager
+          CERT_MANAGER_VERSION: v1.20.2
+          CERT_MANAGER_SHA256: 1ce11cae912adecc69e6bb623435fafc9ed21505f9efff98bd71d7b80f01db1f
         run: |
-          kubectl apply -f https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
+          curl -fsSL -o cert-manager.yaml https://github.com/cert-manager/cert-manager/releases/download/${CERT_MANAGER_VERSION}/cert-manager.yaml
+          echo "${CERT_MANAGER_SHA256}  cert-manager.yaml" | sha256sum --check
+          kubectl apply -f cert-manager.yaml
           kubectl -n cert-manager wait --for=condition=available --timeout=180s --all deployments
       - name: Prepare values.yaml
         run: |

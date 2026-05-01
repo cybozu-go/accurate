@@ -45,13 +45,18 @@ kubectl krew install accurate
    VERSION=< The version you want to install >
    ```
 
-4. Download the binary and put it in a directory of your `PATH`.
+4. Download the binary, verify the checksum, and put it in a directory of your `PATH`.
 
     The following is an example to install the plugin in `/usr/local/bin`.
 
     ```bash
-    curl -L -sS https://github.com/cybozu-go/accurate/releases/download/$(VERSION)/kubectl-accurate_$(VERSION)_$(OS)_$(ARCH).tar.gz \
-      | tar xz -C /usr/local/bin kubectl-accurate
+    curl -fsSL -o /tmp/kubectl-accurate.tar.gz \
+      https://github.com/cybozu-go/accurate/releases/download/${VERSION}/kubectl-accurate_${VERSION}_${OS}_${ARCH}.tar.gz
+    curl -fsSL -o /tmp/kubectl-accurate-checksums.txt \
+      https://github.com/cybozu-go/accurate/releases/download/${VERSION}/checksums.txt
+    cd /tmp && sha256sum --check --ignore-missing kubectl-accurate-checksums.txt
+    tar xz -C /usr/local/bin kubectl-accurate < /tmp/kubectl-accurate.tar.gz
+    rm /tmp/kubectl-accurate.tar.gz /tmp/kubectl-accurate-checksums.txt
     ```
 
 5. Check the installation

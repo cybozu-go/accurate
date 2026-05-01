@@ -1,4 +1,7 @@
 KUBERNETES_VERSION = v1.35.0@sha256:4613778f3cfcd10e615029370f5786704559103cf27bef934597ba562b269661 # renovate: kindest/node
+# renovate: datasource=github-releases depName=cert-manager/cert-manager
+CERT_MANAGER_VERSION = v1.20.2
+CERT_MANAGER_SHA256 = 1ce11cae912adecc69e6bb623435fafc9ed21505f9efff98bd71d7b80f01db1f
 
 KUBECTL_ACCURATE := $(dir $(shell pwd))/bin/kubectl-accurate
 KUBECONFIG := $(shell pwd)/.kubeconfig
@@ -22,7 +25,10 @@ start: setup $(KUBECTL_ACCURATE)
 	kind create cluster --name=accurate --config=$(KIND_CONFIG) --image=kindest/node:$(KUBERNETES_VERSION) --wait 1m
 	cd ..; docker build --no-cache -t accurate:dev .
 	kind load docker-image accurate:dev --name=accurate
-	kubectl apply -f https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
+	curl -fsSL -o cert-manager.yaml https://github.com/cert-manager/cert-manager/releases/download/$(CERT_MANAGER_VERSION)/cert-manager.yaml
+	echo "$(CERT_MANAGER_SHA256)  cert-manager.yaml" | sha256sum --check
+	kubectl apply -f cert-manager.yaml
+	rm -f cert-manager.yaml
 	kubectl -n cert-manager wait --for=condition=available --timeout=180s --all deployments
 	helm install --create-namespace --namespace accurate accurate ../charts/accurate -f values.yaml
 	kubectl -n accurate wait --for=condition=available --timeout=180s --all deployments
