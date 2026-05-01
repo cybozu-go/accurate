@@ -14,7 +14,13 @@ helm repo update
 ### Installing cert-manager
 
 ```bash
-curl -fsL https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml | kubectl apply -f -
+CERT_MANAGER_VERSION=v1.20.2
+CERT_MANAGER_SHA256=1ce11cae912adecc69e6bb623435fafc9ed21505f9efff98bd71d7b80f01db1f
+curl -fsSL -o cert-manager.yaml \
+	https://github.com/cert-manager/cert-manager/releases/download/${CERT_MANAGER_VERSION}/cert-manager.yaml
+echo "${CERT_MANAGER_SHA256}  cert-manager.yaml" | sha256sum --check
+kubectl apply -f cert-manager.yaml
+rm -f cert-manager.yaml
 ```
 
 ### Installing CustomResourceDefinitions (optional)
