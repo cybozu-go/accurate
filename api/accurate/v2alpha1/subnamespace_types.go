@@ -61,10 +61,6 @@ type SubNamespaceList struct {
 	Items           []SubNamespace `json:"items"`
 }
 
-func init() {
-	SchemeBuilder.Register(&SubNamespace{}, &SubNamespaceList{})
-}
-
 const (
 	SubNamespaceConflict string = "Conflict"
 )
