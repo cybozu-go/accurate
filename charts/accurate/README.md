@@ -15,12 +15,15 @@ helm repo update
 
 ```bash
 CERT_MANAGER_VERSION=v1.20.2
-CERT_MANAGER_SHA256=1ce11cae912adecc69e6bb623435fafc9ed21505f9efff98bd71d7b80f01db1f
-curl -fsSL -o cert-manager.yaml \
-	https://github.com/cert-manager/cert-manager/releases/download/${CERT_MANAGER_VERSION}/cert-manager.yaml
-echo "${CERT_MANAGER_SHA256}  cert-manager.yaml" | sha256sum --check
-kubectl apply -f cert-manager.yaml
-rm -f cert-manager.yaml
+CERT_MANAGER_GPG_KEY_URL=https://cert-manager.io/public-keys/cert-manager-keyring-2021-09-20-1020CF3C033D4F35BAE1C19E1226061C665DF13E.gpg
+curl -fsSL -o cert-manager-keyring.gpg "${CERT_MANAGER_GPG_KEY_URL}"
+helm pull oci://quay.io/jetstack/charts/cert-manager \
+  --version "${CERT_MANAGER_VERSION}" \
+  --verify --keyring cert-manager-keyring.gpg \
+  --untar --untardir ./cert-manager-chart
+helm install cert-manager ./cert-manager-chart/cert-manager \
+  --namespace cert-manager --create-namespace --set crds.enabled=true
+rm -rf cert-manager-keyring.gpg ./cert-manager-chart
 ```
 
 ### Installing CustomResourceDefinitions (optional)

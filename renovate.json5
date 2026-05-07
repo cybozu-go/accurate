@@ -237,22 +237,24 @@
     },
     {
       customType: 'regex',
-      datasourceTemplate: 'github-releases',
+      datasourceTemplate: 'helm',
+      registryUrlTemplate: 'https://charts.jetstack.io',
       managerFilePatterns: [
-        '/^e2e\\/Makefile$/',
+        '/^e2e\/Makefile$/',
       ],
       matchStrings: [
-        '# renovate: datasource=github-releases depName=(?<depName>[^\\s]+)\\nCERT_MANAGER_VERSION = (?<currentValue>v[^\\s]+)',
+        '# renovate: datasource=helm registryUrl=https://charts.jetstack.io depName=(?<depName>[^\\s]+)\\nCERT_MANAGER_VERSION = (?<currentValue>v[^\\s]+)',
       ],
     },
     {
       customType: 'regex',
-      datasourceTemplate: 'github-releases',
+      datasourceTemplate: 'helm',
+      registryUrlTemplate: 'https://charts.jetstack.io',
       managerFilePatterns: [
         '/^\\.github\\/workflows\\/.+\\.ya?ml$/',
       ],
       matchStrings: [
-        '# renovate: datasource=github-releases depName=(?<depName>[^\\s]+)\\n\\s+CERT_MANAGER_VERSION: (?<currentValue>v[^\\s]+)',
+        '# renovate: datasource=helm registryUrl=https://charts.jetstack.io depName=(?<depName>[^\\s]+)\\n\\s+CERT_MANAGER_VERSION: (?<currentValue>v[^\\s]+)',
       ],
     },
   ],
