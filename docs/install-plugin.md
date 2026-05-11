@@ -50,13 +50,14 @@ kubectl krew install accurate
     The following is an example to install the plugin in `/usr/local/bin`.
 
     ```bash
-    curl -fsSL -o /tmp/kubectl-accurate.tar.gz \
-      https://github.com/cybozu-go/accurate/releases/download/${VERSION}/kubectl-accurate_${VERSION}_${OS}_${ARCH}.tar.gz
-    curl -fsSL -o /tmp/kubectl-accurate-checksums.txt \
-      https://github.com/cybozu-go/accurate/releases/download/${VERSION}/checksums.txt
-    cd /tmp && sha256sum --check --ignore-missing kubectl-accurate-checksums.txt
-    tar xz -C /usr/local/bin kubectl-accurate < /tmp/kubectl-accurate.tar.gz
-    rm /tmp/kubectl-accurate.tar.gz /tmp/kubectl-accurate-checksums.txt
+    BINARY=kubectl-accurate_${VERSION}_${OS}_${ARCH}.tar.gz
+    curl -fsSL -o /tmp/${BINARY} \
+      https://github.com/cybozu-go/accurate/releases/download/${VERSION}/${BINARY}
+    curl -fsSL https://github.com/cybozu-go/accurate/releases/download/${VERSION}/checksums.txt \
+      | grep "${BINARY}" > /tmp/${BINARY}.sha256
+    cd /tmp && sha256sum --check /tmp/${BINARY}.sha256
+    tar xz -C /usr/local/bin kubectl-accurate < /tmp/${BINARY}
+    rm /tmp/${BINARY} /tmp/${BINARY}.sha256
     ```
 
 5. Check the installation
