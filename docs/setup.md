@@ -6,8 +6,16 @@
     If cert-manager is not installed on your cluster, install it as follows:
 
     ```bash
-    curl -fsLO https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
-    kubectl apply -f cert-manager.yaml
+    CERT_MANAGER_VERSION=v1.20.2
+    CERT_MANAGER_GPG_KEY_URL=https://cert-manager.io/public-keys/cert-manager-keyring-2021-09-20-1020CF3C033D4F35BAE1C19E1226061C665DF13E.gpg
+    curl -fsSL -o cert-manager-keyring.gpg "${CERT_MANAGER_GPG_KEY_URL}"
+    helm pull oci://quay.io/jetstack/charts/cert-manager \
+      --version "${CERT_MANAGER_VERSION}" \
+      --verify --keyring cert-manager-keyring.gpg \
+      --untar --untardir ./cert-manager-chart
+    helm install cert-manager ./cert-manager-chart/cert-manager \
+      --namespace cert-manager --create-namespace --set crds.enabled=true
+    rm -rf cert-manager-keyring.gpg ./cert-manager-chart
     ```
 
 2. Setup Accurate Helm repository

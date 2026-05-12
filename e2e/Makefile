@@ -1,4 +1,10 @@
 KUBERNETES_VERSION = v1.35.0@sha256:4613778f3cfcd10e615029370f5786704559103cf27bef934597ba562b269661 # renovate: kindest/node
+# renovate: datasource=helm registryUrl=https://charts.jetstack.io depName=cert-manager
+CERT_MANAGER_VERSION = v1.20.2
+CERT_MANAGER_GPG_KEY_URL = https://cert-manager.io/public-keys/cert-manager-keyring-2021-09-20-1020CF3C033D4F35BAE1C19E1226061C665DF13E.gpg
+
+PROJECT_DIR := $(CURDIR)/../
+CHART_DIR := $(PROJECT_DIR)/tmp-charts
 
 KUBECTL_ACCURATE := $(dir $(shell pwd))/bin/kubectl-accurate
 KUBECONFIG := $(shell pwd)/.kubeconfig
@@ -18,11 +24,12 @@ help:
 	@echo "stop       Stop the kind cluster"
 
 .PHONY: start
-start: setup $(KUBECTL_ACCURATE)
+start: setup $(KUBECTL_ACCURATE) $(CHART_DIR)/cert-manager/Chart.yaml
 	kind create cluster --name=accurate --config=$(KIND_CONFIG) --image=kindest/node:$(KUBERNETES_VERSION) --wait 1m
 	cd ..; docker build --no-cache -t accurate:dev .
 	kind load docker-image accurate:dev --name=accurate
-	kubectl apply -f https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
+	helm install cert-manager $(CHART_DIR)/cert-manager \
+		--namespace cert-manager --create-namespace --set crds.enabled=true
 	kubectl -n cert-manager wait --for=condition=available --timeout=180s --all deployments
 	helm install --create-namespace --namespace accurate accurate ../charts/accurate -f values.yaml
 	kubectl -n accurate wait --for=condition=available --timeout=180s --all deployments
@@ -56,6 +63,18 @@ stop: setup
 $(KUBECTL_ACCURATE): $(wildcard ../cmd/kubectl-accurate/*/*.go)
 	mkdir -p ../bin
 	cd ..; GOBIN=$$(pwd)/bin go install ./cmd/kubectl-accurate
+
+$(CHART_DIR):
+	mkdir -p $(CHART_DIR)
+
+$(CHART_DIR)/cert-manager-keyring.gpg: | $(CHART_DIR)
+	curl -fsSL -o $(CHART_DIR)/cert-manager-keyring.gpg $(CERT_MANAGER_GPG_KEY_URL)
+
+$(CHART_DIR)/cert-manager/Chart.yaml: $(CHART_DIR)/cert-manager-keyring.gpg
+	helm pull oci://quay.io/jetstack/charts/cert-manager \
+		--version $(CERT_MANAGER_VERSION) \
+		--verify --keyring $(CHART_DIR)/cert-manager-keyring.gpg \
+		--untar --untardir $(CHART_DIR)
 
 setup:
 	aqua i -l
