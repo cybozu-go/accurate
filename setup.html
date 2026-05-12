@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-16cf0cf0.js";
+            window.path_to_searchindex_js = "searchindex-882c7f71.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-b72d374f.js"></script>
@@ -186,8 +186,16 @@
 <p>(Optional) Prepare cert-manager</p>
 <p>Accurate depends on <a href="https://cert-manager.io/">cert-manager</a> to issue TLS certificate for admission webhooks.
 If cert-manager is not installed on your cluster, install it as follows:</p>
-<pre><code class="language-bash">curl -fsLO https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml
-kubectl apply -f cert-manager.yaml
+<pre><code class="language-bash">CERT_MANAGER_VERSION=v1.20.2
+CERT_MANAGER_GPG_KEY_URL=https://cert-manager.io/public-keys/cert-manager-keyring-2021-09-20-1020CF3C033D4F35BAE1C19E1226061C665DF13E.gpg
+curl -fsSL -o cert-manager-keyring.gpg "${CERT_MANAGER_GPG_KEY_URL}"
+helm pull oci://quay.io/jetstack/charts/cert-manager \
+  --version "${CERT_MANAGER_VERSION}" \
+  --verify --keyring cert-manager-keyring.gpg \
+  --untar --untardir ./cert-manager-chart
+helm install cert-manager ./cert-manager-chart/cert-manager \
+  --namespace cert-manager --create-namespace --set crds.enabled=true
+rm -rf cert-manager-keyring.gpg ./cert-manager-chart
 </code></pre>
 </li>
 <li>

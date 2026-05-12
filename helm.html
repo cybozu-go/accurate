@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-16cf0cf0.js";
+            window.path_to_searchindex_js = "searchindex-882c7f71.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-b72d374f.js"></script>
@@ -188,7 +188,16 @@ helm repo update
 </code></pre>
 <h2 id="quick-start"><a class="header" href="#quick-start">Quick start</a></h2>
 <h3 id="installing-cert-manager"><a class="header" href="#installing-cert-manager">Installing cert-manager</a></h3>
-<pre><code class="language-bash">curl -fsL https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml | kubectl apply -f -
+<pre><code class="language-bash">CERT_MANAGER_VERSION=v1.20.2
+CERT_MANAGER_GPG_KEY_URL=https://cert-manager.io/public-keys/cert-manager-keyring-2021-09-20-1020CF3C033D4F35BAE1C19E1226061C665DF13E.gpg
+curl -fsSL -o cert-manager-keyring.gpg "${CERT_MANAGER_GPG_KEY_URL}"
+helm pull oci://quay.io/jetstack/charts/cert-manager \
+  --version "${CERT_MANAGER_VERSION}" \
+  --verify --keyring cert-manager-keyring.gpg \
+  --untar --untardir ./cert-manager-chart
+helm install cert-manager ./cert-manager-chart/cert-manager \
+  --namespace cert-manager --create-namespace --set crds.enabled=true
+rm -rf cert-manager-keyring.gpg ./cert-manager-chart
 </code></pre>
 <h3 id="installing-customresourcedefinitions-optional"><a class="header" href="#installing-customresourcedefinitions-optional">Installing CustomResourceDefinitions (optional)</a></h3>
 <p>Accurate does not use the <a href="https://helm.sh/docs/chart_best_practices/custom_resource_definitions/">official helm method</a> of installing CRD resources.

@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-16cf0cf0.js";
+            window.path_to_searchindex_js = "searchindex-882c7f71.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-b72d374f.js"></script>
@@ -212,10 +212,16 @@ kubectl krew install accurate
 </code></pre>
 </li>
 <li>
-<p>Download the binary and put it in a directory of your <code>PATH</code>.</p>
+<p>Download the binary, verify the checksum, and put it in a directory of your <code>PATH</code>.</p>
 <p>The following is an example to install the plugin in <code>/usr/local/bin</code>.</p>
-<pre><code class="language-bash">curl -L -sS https://github.com/cybozu-go/accurate/releases/download/$(VERSION)/kubectl-accurate_$(VERSION)_$(OS)_$(ARCH).tar.gz \
-  | tar xz -C /usr/local/bin kubectl-accurate
+<pre><code class="language-bash">BINARY=kubectl-accurate_${VERSION}_${OS}_${ARCH}.tar.gz
+curl -fsSL -o /tmp/${BINARY} \
+  https://github.com/cybozu-go/accurate/releases/download/${VERSION}/${BINARY}
+curl -fsSL https://github.com/cybozu-go/accurate/releases/download/${VERSION}/checksums.txt \
+  | grep "${BINARY}" &gt; /tmp/${BINARY}.sha256
+cd /tmp &amp;&amp; sha256sum --check /tmp/${BINARY}.sha256
+tar xz -C /usr/local/bin kubectl-accurate &lt; /tmp/${BINARY}
+rm /tmp/${BINARY} /tmp/${BINARY}.sha256
 </code></pre>
 </li>
 <li>
