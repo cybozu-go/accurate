@@ -3,214 +3,95 @@
   gitAuthor: 'cybozu-neco <neco@cybozu.com>',
   extends: [
     'config:best-practices',
-    'github>aquaproj/aqua-renovate-config#2.8.2',
+    'github>aquaproj/aqua-renovate-config#2.12.1',
     ':semanticCommitTypeAll(chore)',
     ':timezone(Asia/Tokyo)',
-  ],
-  ignorePresets: [
-    ':prHourlyLimit2',
   ],
   labels: [
     'dependencies',
   ],
   minimumReleaseAge: '14 days',
+  prConcurrentLimit: 5,
+  branchConcurrentLimit: 5,
+  prHourlyLimit: 5,
+  dependencyDashboard: true,
+  enabledManagers: [
+    'custom.regex',
+    'dockerfile',
+    'gomod',
+    'github-actions',
+    'renovate-config',
+  ],
   packageRules: [
     {
-      description: 'Group all minor and patch updates except Kubernetes packages',
-      matchUpdateTypes: [
-        'minor',
-        'patch',
+      description: 'Enable tools in aqua.yaml',
+      enabled: true,
+      matchDatasources: ['github-tags'],
+      // kubernetes/code-generator has version tags but no GitHub Releases.
+      // Re-enable github-tags only for these tools.
+      // FYI: https://github.com/aquaproj/aqua-renovate-config/blob/d0ba359d63e8b70eed7370f1a39adc536127118c/default.json#L649
+      matchDepNames: [
+        'kubernetes/code-generator/applyconfiguration-gen',
+        'kubernetes/code-generator/conversion-gen',
       ],
-      groupName: 'all minor and patch updates',
-      groupSlug: 'all-minor-patch',
-      matchPackageNames: [
-        '!/^k8s\\.io\\/.*/',
-        '!/^sigs\\.k8s\\.io\\/.*/',
-        '!aquaproj/aqua-installer',
-        '!azure/setup-helm',
-        '!goreleaser/goreleaser-action',
-        '!helm/chart-releaser-action',
-        '!helm/chart-testing-action',
-        '!helm/kind-action',
-        '!kindest/node',
-        '!kubernetes/kubectl',
-        '!kubernetes-sigs/controller-tools/controller-gen',
-        '!rajatjindal/krew-release-bot',
-        '!renovatebot/github-action',
+      matchFileNames: [
+        'aqua.yaml',
       ],
     },
     {
-      description: 'Separate minor and patch updates for Kubernetes packages',
-      matchDatasources: [
-        'go',
+      description: 'Group all dependencies updates',
+      groupName: 'all dependencies updates',
+      groupSlug: 'all-dependencies-updates',
+      matchManagers: [
+        'custom.regex',
+        'dockerfile',
+        'gomod',
+        'github-actions',
       ],
-      separateMinorPatch: true,
-      matchPackageNames: [
-        '/^k8s\\.io\\/.*/',
-      ],
+      separateMajorMinor: true,
     },
     {
-      // For controller-tools/controller-gen managed by aqua.yaml
-      description: 'Separate minor and patch updates for controller-tools/controller-gen',
-      separateMinorPatch: true,
-      matchPackageNames: [
-        'kubernetes-sigs/controller-tools/controller-gen',
-      ],
-    },
-    {
-      dependencyDashboardApproval: true,
-      description: 'Require approval for Kubernetes packages major and minor updates',
-      matchDatasources: [
-        'go',
-      ],
-      matchUpdateTypes: [
-        'major',
-        'minor',
+      description: 'Group Go Kubernetes dependencies updates',
+      groupName: 'kubernetes dependencies',
+      groupSlug: 'kubernetes-dependencies',
+      matchManagers: [
+        'gomod',
       ],
       matchPackageNames: [
         '/^k8s\\.io\\/.*/',
         '/^sigs\\.k8s\\.io\\/.*/',
       ],
-    },
-    {
-      // For controller-tools/controller-gen managed by aqua.yaml
-      dependencyDashboardApproval: true,
-      description: 'Require approval for controller-tools/controller-gen major and minor updates',
-      matchUpdateTypes: [
-        'major',
-        'minor',
-      ],
-      matchPackageNames: [
-        'kubernetes-sigs/controller-tools/controller-gen',
-      ],
-    },
-    {
-      description: 'Group patch updates for Kubernetes packages',
-      matchDatasources: [
-        'go',
-      ],
-      matchUpdateTypes: [
-        'patch',
-      ],
-      groupName: 'all minor and patch updates',
-      groupSlug: 'all-minor-patch',
-      matchPackageNames: [
-        '/^k8s\\.io\\/.*/',
-        '/^sigs\\.k8s\\.io\\/.*/',
-      ],
-    },
-    {
-      // For controller-tools/controller-gen managed by aqua.yaml
-      description: 'Group patch updates for controller-gen',
-      matchUpdateTypes: [
-        'patch',
-      ],
-      groupName: 'all minor and patch updates',
-      groupSlug: 'all-minor-patch',
-      matchPackageNames: [
-        'kubernetes-sigs/controller-tools/controller-gen',
-      ],
-    },
-    {
-      description: 'Disable major updates for k8s.io/client-go',
-      enabled: false,
-      matchDatasources: [
-        'go',
-      ],
-      matchPackageNames: [
-        'k8s.io/client-go',
-      ],
-      matchUpdateTypes: [
-        'major',
-      ],
-    },
-    {
-      description: 'Separate minor and patch updates for kubectl',
-      matchPackageNames: [
-        'kubernetes/kubectl',
-      ],
+      separateMajorMinor: true,
       separateMinorPatch: true,
     },
     {
-      description: 'Disable major and minor update for kubectl',
-      enabled: false,
+      description: 'Group Kubernetes dependencies updates',
+      groupName: 'kubernetes dependencies',
+      groupSlug: 'kubernetes-dependencies',
+      matchFileNames: [
+        'aqua.yaml',
+      ],
       matchPackageNames: [
-        'kubernetes/kubectl',
+        '/^kubernetes-sigs\\/.*/',
+        '/^kubernetes\\/.*/',
       ],
-      matchUpdateTypes: [
-        'major',
-        'minor',
-      ],
-    },
-    {
-      description: 'Group patch updates for kubectl',
-      matchPackageNames: [
-        'kubernetes/kubectl',
-      ],
-      matchUpdateTypes: [
-        'patch',
-      ],
-      groupName: 'all minor and patch updates',
-      groupSlug: 'all-minor-patch',
-    },
-    {
-      description: 'Separate minor and patch update for Kubernetes',
-      matchPackageNames: [
-        'kindest/node',
-      ],
+      separateMajorMinor: true,
       separateMinorPatch: true,
     },
     {
-      description: 'Group patch updates for kindest/node',
+      description: 'Group Kubernetes image updates',
+      groupName: 'kubernetes dependencies',
+      groupSlug: 'kubernetes-dependencies',
       matchPackageNames: [
         'kindest/node',
       ],
-      matchUpdateTypes: [
-        'patch',
-      ],
-      groupName: 'all minor and patch updates',
-      groupSlug: 'all-minor-patch',
-    },
-    {
-      description: 'Disable major and minor update for Kubernetes',
-      enabled: false,
-      matchPackageNames: [
-        'kindest/node',
-      ],
-      matchUpdateTypes: [
-        'major',
-        'minor',
-      ],
-    },
-    {
-      dependencyDashboardApproval: true,
-      description: 'Require approval for GitHub Action updates',
-      matchDatasources: [
-        'github-tags',
-      ],
-      matchPackageNames: [
-        'aquaproj/aqua-installer',
-        'azure/setup-helm',
-        'goreleaser/goreleaser-action',
-        'helm/chart-releaser-action',
-        'helm/chart-testing-action',
-        'helm/kind-action',
-        'rajatjindal/krew-release-bot',
-        'renovatebot/github-action',
-      ],
-    },
-    {
-      "description": "Enable golangci-lint in aqua.yaml",
-      "enabled": true,
-      "matchDatasources": ["github-tags"],
-      "matchDepNames": ["golangci/golangci-lint"],
-      "matchFileNames": [
-        "aqua.yaml",
-      ],
+      separateMajorMinor: true,
+      separateMinorPatch: true,
     },
   ],
   postUpdateOptions: [
     'gomodTidy',
+    'gomodUpdateImportPaths',
   ],
   customManagers: [
     {
@@ -219,20 +100,11 @@
       depNameTemplate: 'kindest/node',
       managerFilePatterns: [
         '/^\\.github\\/workflows\\/.+\\.ya?ml$/',
+        'e2e/Makefile',
       ],
       matchStrings: [
-        '- (?<currentValue>.+?) # renovate: kindest\\/node',
-      ],
-    },
-    {
-      customType: 'regex',
-      datasourceTemplate: 'docker',
-      depNameTemplate: 'kindest/node',
-      managerFilePatterns: [
-        '/^e2e\\/Makefile$/',
-      ],
-      matchStrings: [
-        'KUBERNETES_VERSION := (?<currentValue>.*?) # renovate: kindest\\/node',
+        '- (?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+) # renovate: kindest\\/node',
+        '# renovate:\\s+KUBERNETES_VERSION\\s*:?=\\s*["\']?(?<currentValue>[^@"\'\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)["\']?',
       ],
     },
     {
@@ -241,19 +113,10 @@
       registryUrlTemplate: 'https://charts.jetstack.io',
       managerFilePatterns: [
         '/^e2e\/Makefile$/',
-      ],
-      matchStrings: [
-        '# renovate: datasource=helm registryUrl=https://charts.jetstack.io depName=(?<depName>[^\\s]+)\\nCERT_MANAGER_VERSION = (?<currentValue>v[^\\s]+)',
-      ],
-    },
-    {
-      customType: 'regex',
-      datasourceTemplate: 'helm',
-      registryUrlTemplate: 'https://charts.jetstack.io',
-      managerFilePatterns: [
         '/^\\.github\\/workflows\\/.+\\.ya?ml$/',
       ],
       matchStrings: [
+        '# renovate: datasource=helm registryUrl=https://charts.jetstack.io depName=(?<depName>[^\\s]+)\\nCERT_MANAGER_VERSION = (?<currentValue>v[^\\s]+)',
         '# renovate: datasource=helm registryUrl=https://charts.jetstack.io depName=(?<depName>[^\\s]+)\\n\\s+CERT_MANAGER_VERSION: (?<currentValue>v[^\\s]+)',
       ],
     },
