@@ -88,6 +88,21 @@
       separateMajorMinor: true,
       separateMinorPatch: true,
     },
+    {
+      description: 'Disable major/minor updates for Kubernetes related dependencies',
+      matchPackageNames: [
+        '/^k8s\\.io\\/.*/',
+        '/^sigs\\.k8s\\.io\\/.*/',
+        '/^kubernetes-sigs\\/.*/',
+        '/^kubernetes\\/.*/',
+        'kindest/node',
+      ],
+      matchUpdateTypes: [
+        'major',
+        'minor',
+      ],
+      enabled: false,
+    },
   ],
   postUpdateOptions: [
     'gomodTidy',
@@ -104,7 +119,7 @@
       ],
       matchStrings: [
         '- (?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+) # renovate: kindest\\/node',
-        '# renovate:\\s+KUBERNETES_VERSION\\s*:?=\\s*["\']?(?<currentValue>[^@"\'\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)["\']?',
+        '# renovate:\\n+KUBERNETES_VERSION\\s*:?=\\s*["\']?(?<currentValue>[^@"\'\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)["\']?',
       ],
     },
     {
