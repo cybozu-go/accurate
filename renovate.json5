@@ -108,6 +108,11 @@
     'gomodTidy',
     'gomodUpdateImportPaths',
   ],
+  postUpgradeTasks: {
+    "commands": ["/usr/local/bin/aqua update-checksum --prune"],
+    "fileFilters": ["aqua-checksums.json"],
+    "executionMode": "branch"
+  },
   customManagers: [
     {
       customType: 'regex',

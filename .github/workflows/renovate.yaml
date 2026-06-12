@@ -17,8 +17,16 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           token: ${{ steps.app-token.outputs.token }}
+      - uses: ./.github/actions/aqua
+      - name: Resolve the installation path of `aqua`
+        id: resolve-aqua-path
+        run: echo "AQUA_PATH=$(readlink -f $(which aqua))" >> "$GITHUB_OUTPUT"
       - name: Self-hosted Renovate
         uses: renovatebot/github-action@68a3ea99af6ad249940b5a9fdf44fc6d7f14378b # v46.1.6
         with:
           configurationFile: config.json
           token: ${{ steps.app-token.outputs.token }}
+          # Mount the aqua installed on the runner into the renovate container so that `aqua update-checksum` can be executed within it.
+          docker-volumes: |
+            /tmp:/tmp ;
+            ${{ steps.resolve-aqua-path.outputs.AQUA_PATH }}:/usr/local/bin/aqua
