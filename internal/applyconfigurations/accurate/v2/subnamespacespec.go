@@ -11,6 +11,8 @@ type SubNamespaceSpecApplyConfiguration struct {
 	Labels map[string]string `json:"labels,omitempty"`
 	// Annotations are the annotations to be propagated to the sub-namespace.
 	Annotations map[string]string `json:"annotations,omitempty"`
+	// Parent specifies the namespace that this subns should belong to.
+	Parent *string `json:"parent,omitempty"`
 }
 
 // SubNamespaceSpecApplyConfiguration constructs a declarative configuration of the SubNamespaceSpec type for use with
@@ -44,5 +46,13 @@ func (b *SubNamespaceSpecApplyConfiguration) WithAnnotations(entries map[string]
 	for k, v := range entries {
 		b.Annotations[k] = v
 	}
+	return b
+}
+
+// WithParent sets the Parent field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Parent field is set to the value of the last call.
+func (b *SubNamespaceSpecApplyConfiguration) WithParent(value string) *SubNamespaceSpecApplyConfiguration {
+	b.Parent = &value
 	return b
 }
