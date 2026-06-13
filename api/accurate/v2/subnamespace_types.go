@@ -29,6 +29,10 @@ type SubNamespaceSpec struct {
 	// Annotations are the annotations to be propagated to the sub-namespace.
 	// +optional
 	Annotations map[string]string `json:"annotations,omitempty"`
+
+	// Parent specifies the namespace that this subns should belong to.
+	// +optional
+	Parent string `json:"parent,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -50,6 +54,16 @@ type SubNamespace struct {
 	Status SubNamespaceStatus `json:"status,omitempty"`
 }
 
+// IsMoveRequested returns true if this SubNamespace represents the source side of an accepted move.
+func (s *SubNamespace) IsMoveRequested() bool {
+	return s.Spec.Parent != "" && s.Spec.Parent != s.Namespace
+}
+
+// IsMoveAccepted returns true if this SubNamespace represents the target side of an accepted move.
+func (s *SubNamespace) IsMoveAccepted() bool {
+	return s.Spec.Parent != "" && s.Spec.Parent == s.Namespace
+}
+
 //+kubebuilder:object:root=true
 
 // SubNamespaceList contains a list of SubNamespace
@@ -60,5 +74,9 @@ type SubNamespaceList struct {
 }
 
 const (
-	SubNamespaceConflict string = "Conflict"
+	SubNamespaceTypeMoveStalled string = "MoveStalled"
+
+	SubNamespaceReasonConflict           string = "Conflict"
+	SubNamespaceReasonMoveTargetNotFound string = "MoveTargetNotFound"
+	SubNamespaceReasonMoveNotAccepted    string = "MoveNotAccepted"
 )

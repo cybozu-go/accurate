@@ -9,9 +9,11 @@ import (
 	"github.com/cybozu-go/accurate/pkg/indexing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	gomegaTypes "github.com/onsi/gomega/types"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	kstatus "sigs.k8s.io/cli-utils/pkg/kstatus/status"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/config"
 	"sigs.k8s.io/controller-runtime/pkg/envtest/komega"
@@ -99,7 +101,7 @@ var _ = Describe("SubNamespace controller", func() {
 
 		Eventually(komega.Object(sn)).Should(HaveField("Status.ObservedGeneration", BeNumerically(">", 0)))
 		Expect(sn.Status.Conditions).To(HaveLen(1))
-		Expect(sn.Status.Conditions[0].Reason).To(Equal(accuratev2.SubNamespaceConflict))
+		Expect(sn.Status.Conditions[0].Reason).To(Equal(accuratev2.SubNamespaceReasonConflict))
 
 		// It's tempting to test if a conflict can be resolved by deleting the conflicting namespace,
 		// but this is currently not possible because EnvTest does not support namespace deletion.
@@ -127,7 +129,7 @@ var _ = Describe("SubNamespace controller", func() {
 		})()).To(Succeed())
 
 		Eventually(komega.Object(sn)).Should(HaveField("Status.Conditions", HaveLen(1)))
-		Expect(sn.Status.Conditions[0].Reason).To(Equal(accuratev2.SubNamespaceConflict))
+		Expect(sn.Status.Conditions[0].Reason).To(Equal(accuratev2.SubNamespaceReasonConflict))
 
 		Expect(k8sClient.Delete(ctx, sn)).To(Succeed())
 
@@ -160,4 +162,215 @@ var _ = Describe("SubNamespace controller", func() {
 
 		Eventually(komega.Object(sub1)).Should(HaveField("UID", Not(Equal(uid))))
 	})
+
+	It("should move a sub-namespace when source and target SubNamespaces have the same desired parent", func() {
+		sourceParent := "test5-old"
+		targetParent := "test5-new"
+		childName := "test5-sub1"
+
+		createNamespace(ctx, sourceParent)
+		createNamespace(ctx, targetParent)
+
+		sourceSN := createSubNamespace(ctx, sourceParent, childName, "")
+		expectNamespaceParent(ctx, childName, sourceParent)
+
+		Eventually(komega.Object(sourceSN)).Should(SatisfyAll(
+			HaveField("Status.Conditions", notHaveConditionType(accuratev2.SubNamespaceTypeMoveStalled)),
+			HaveField("Status.Conditions", notHaveConditionType(string(kstatus.ConditionStalled))),
+		))
+
+		targetSN := createSubNamespace(ctx, targetParent, childName, targetParent)
+
+		Eventually(komega.Object(targetSN)).Should(
+			HaveField("Status.Conditions",
+				haveCondition(
+					string(kstatus.ConditionStalled),
+					metav1.ConditionTrue,
+					accuratev2.SubNamespaceReasonConflict,
+				),
+			),
+		)
+
+		Expect(komega.Update(sourceSN, func() {
+			sourceSN.Spec.Parent = targetParent
+		})()).To(Succeed())
+
+		expectNamespaceParent(ctx, childName, targetParent)
+
+		Eventually(komega.Object(sourceSN)).Should(SatisfyAll(
+			HaveField("Status.Conditions", haveCondition(
+				string(kstatus.ConditionStalled),
+				metav1.ConditionTrue,
+				accuratev2.SubNamespaceReasonConflict,
+			)),
+			HaveField("Status.Conditions", notHaveConditionType(accuratev2.SubNamespaceTypeMoveStalled))),
+		)
+	})
+
+	It("should set MoveStalled=True when target SubNamespace does not exist", func() {
+		sourceParent := "test6-old"
+		targetParent := "test6-new"
+		childName := "test6-sub1"
+
+		createNamespace(ctx, sourceParent)
+		createNamespace(ctx, targetParent)
+
+		sourceSN := createSubNamespace(ctx, sourceParent, childName, "")
+		expectNamespaceParent(ctx, childName, sourceParent)
+
+		Expect(komega.Update(sourceSN, func() {
+			sourceSN.Spec.Parent = targetParent
+		})()).To(Succeed())
+
+		Eventually(komega.Object(sourceSN)).Should(SatisfyAll(
+			HaveField("Status.Conditions", haveCondition(
+				accuratev2.SubNamespaceTypeMoveStalled,
+				metav1.ConditionTrue,
+				accuratev2.SubNamespaceReasonMoveTargetNotFound,
+			)),
+			HaveField("Status.Conditions", notHaveConditionType(string(kstatus.ConditionStalled))),
+		))
+
+		expectNamespaceParent(ctx, childName, sourceParent)
+	})
+
+	It("should set MoveStalled=True when target SubNamespace has a different desired parent", func() {
+		sourceParent := "test7-old"
+		targetParent := "test7-new"
+		otherParent := "test7-other"
+		childName := "test7-sub1"
+
+		createNamespace(ctx, sourceParent)
+		createNamespace(ctx, targetParent)
+		createNamespace(ctx, otherParent)
+
+		sourceSN := createSubNamespace(ctx, sourceParent, childName, "")
+		expectNamespaceParent(ctx, childName, sourceParent)
+
+		targetSN := createSubNamespace(ctx, targetParent, childName, otherParent)
+		Eventually(komega.Object(targetSN)).Should(SatisfyAll(
+			HaveField("Status.Conditions", haveCondition(
+				accuratev2.SubNamespaceTypeMoveStalled,
+				metav1.ConditionTrue,
+				accuratev2.SubNamespaceReasonMoveTargetNotFound,
+			)),
+			HaveField("Status.Conditions", notHaveConditionType(string(kstatus.ConditionStalled))),
+		))
+		expectNamespaceParent(ctx, childName, sourceParent)
+
+		Expect(komega.Update(sourceSN, func() {
+			sourceSN.Spec.Parent = targetParent
+		})()).To(Succeed())
+
+		Eventually(komega.Object(sourceSN)).Should(SatisfyAll(
+			HaveField("Status.Conditions", haveCondition(
+				accuratev2.SubNamespaceTypeMoveStalled,
+				metav1.ConditionTrue,
+				accuratev2.SubNamespaceReasonMoveNotAccepted,
+			)),
+			HaveField("Status.Conditions", notHaveConditionType(string(kstatus.ConditionStalled))),
+		))
+		Eventually(komega.Object(targetSN)).Should(SatisfyAll(
+			HaveField("Status.Conditions", haveCondition(
+				accuratev2.SubNamespaceTypeMoveStalled,
+				metav1.ConditionTrue,
+				accuratev2.SubNamespaceReasonMoveTargetNotFound,
+			)),
+			HaveField("Status.Conditions", notHaveConditionType(string(kstatus.ConditionStalled))),
+		))
+
+		expectNamespaceParent(ctx, childName, sourceParent)
+	})
+
+	It("should move a sub-namespace after the target SubNamespace is created", func() {
+		sourceParent := "test9-old"
+		targetParent := "test9-new"
+		childName := "test9-sub1"
+
+		createNamespace(ctx, sourceParent)
+		createNamespace(ctx, targetParent)
+
+		sourceSN := createSubNamespace(ctx, sourceParent, childName, targetParent)
+		expectNamespaceParent(ctx, childName, sourceParent)
+
+		Eventually(komega.Object(sourceSN)).Should(SatisfyAll(
+			HaveField("Status.Conditions", notHaveConditionType(string(kstatus.ConditionStalled))),
+			HaveField("Status.Conditions", haveCondition(
+				accuratev2.SubNamespaceTypeMoveStalled,
+				metav1.ConditionTrue,
+				accuratev2.SubNamespaceReasonMoveTargetNotFound,
+			)),
+		))
+
+		targetNS := createSubNamespace(ctx, targetParent, childName, targetParent)
+		expectNamespaceParent(ctx, childName, targetParent)
+
+		Eventually(komega.Object(sourceSN)).Should(SatisfyAll(
+			HaveField("Status.Conditions", haveCondition(
+				string(kstatus.ConditionStalled),
+				metav1.ConditionTrue,
+				accuratev2.SubNamespaceReasonConflict,
+			)),
+			HaveField("Status.Conditions", notHaveConditionType(accuratev2.SubNamespaceTypeMoveStalled)),
+		))
+
+		Eventually(komega.Object(targetNS)).Should(SatisfyAll(
+			HaveField("Status.Conditions", notHaveConditionType(string(kstatus.ConditionStalled))),
+			HaveField("Status.Conditions", notHaveConditionType(accuratev2.SubNamespaceTypeMoveStalled)),
+		))
+	})
 })
+
+func createNamespace(ctx context.Context, name string) *corev1.Namespace {
+	GinkgoHelper()
+
+	ns := &corev1.Namespace{}
+	ns.Name = name
+
+	Expect(k8sClient.Create(ctx, ns)).To(Succeed())
+	Eventually(komega.Get(ns)).Should(Succeed())
+
+	return ns
+}
+
+func createSubNamespace(ctx context.Context, namespace, name, parent string) *accuratev2.SubNamespace {
+	GinkgoHelper()
+
+	sn := &accuratev2.SubNamespace{}
+	sn.Namespace = namespace
+	sn.Name = name
+	sn.Spec.Parent = parent
+
+	Expect(k8sClient.Create(ctx, sn)).To(Succeed())
+	Eventually(komega.Get(sn)).Should(Succeed())
+
+	return sn
+}
+
+func expectNamespaceParent(ctx context.Context, name, expectedParent string) *corev1.Namespace {
+	GinkgoHelper()
+
+	ns := &corev1.Namespace{}
+	ns.Name = name
+
+	Eventually(komega.Get(ns)).Should(Succeed())
+	Eventually(komega.Object(ns)).Should(
+		HaveField("Labels", HaveKeyWithValue(constants.LabelParent, expectedParent)),
+	)
+
+	return ns
+}
+
+func haveCondition(conditionType string, status metav1.ConditionStatus, reason string) gomegaTypes.GomegaMatcher {
+	return ContainElement(SatisfyAll(
+		HaveField("Type", Equal(conditionType)),
+		HaveField("Status", Equal(status)),
+		HaveField("Reason", Equal(reason)),
+	))
+}
+
+func notHaveConditionType(conditionType string) gomegaTypes.GomegaMatcher {
+	return Not(ContainElement(
+		HaveField("Type", Equal(conditionType)),
+	))
+}

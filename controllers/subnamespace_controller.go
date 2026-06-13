@@ -118,6 +118,7 @@ func (r *SubNamespaceReconciler) removeFinalizer(ctx context.Context, sn *accura
 func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2.SubNamespace) error {
 	logger := log.FromContext(ctx)
 
+	// should create a namespace even when spec.parent differs from the namespace
 	ns := &corev1.Namespace{}
 	if err := r.Get(ctx, client.ObjectKey{Name: sn.Name}, ns); err != nil {
 		if !apierrors.IsNotFound(err) {
@@ -136,61 +137,195 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2
 		logger.Info("created a sub namespace", "name", sn.Name)
 	}
 
-	ac := accuratev2ac.SubNamespace(sn.Name, sn.Namespace).
-		WithStatus(
-			accuratev2ac.SubNamespaceStatus().
-				WithObservedGeneration(sn.Generation),
-		)
+	// Move reconciliation is driven by the source SubNamespace.
+	// When the target SubNamespace becomes move-accepted, the source SubNamespace
+	// is enqueued and completes the move.
+	if sn.IsMoveRequested() {
+		return r.reconcileMove(ctx, sn, ns)
+	}
+
+	ac := subNamespaceStatusApplyConfig(sn)
 
 	if ns.Labels[constants.LabelParent] != sn.Namespace {
 		logger.Info("a conflicting namespace already exists")
-		ac.Status.WithConditions(
-			conditionPatch(sn.Status.Conditions,
-				metav1ac.Condition().
-					WithType(string(kstatus.ConditionStalled)).
-					WithStatus(metav1.ConditionTrue).
-					WithObservedGeneration(sn.Generation).
-					WithReason(accuratev2.SubNamespaceConflict).
-					WithMessage("Conflicting namespace already exists"),
-			),
+		withStalledCondition(
+			ac, sn,
+			accuratev2.SubNamespaceReasonConflict,
+			"Conflicting namespace already exists",
 		)
 	}
 
 	return r.Status().Apply(ctx, ac, fieldOwner, client.ForceOwnership)
 }
 
+// reconcileMove reconciles a move request on the source SubNamespace.
+func (r *SubNamespaceReconciler) reconcileMove(ctx context.Context, sn *accuratev2.SubNamespace, childNS *corev1.Namespace) error {
+	logger := log.FromContext(ctx)
+
+	target := &accuratev2.SubNamespace{}
+	targetKey := types.NamespacedName{
+		Namespace: sn.Spec.Parent,
+		Name:      sn.Name,
+	}
+
+	if err := r.Get(ctx, targetKey, target); err != nil {
+		if apierrors.IsNotFound(err) {
+			ac := subNamespaceStatusApplyConfig(sn)
+			withMoveStalledCondition(
+				ac, sn,
+				accuratev2.SubNamespaceReasonMoveTargetNotFound,
+				fmt.Sprintf("Target SubNamespace %s/%s does not exist", sn.Spec.Parent, sn.Name),
+			)
+			return r.Status().Apply(ctx, ac, fieldOwner, client.ForceOwnership)
+		}
+		return err
+	}
+
+	if !target.IsMoveAccepted() {
+		ac := subNamespaceStatusApplyConfig(sn)
+		withMoveStalledCondition(
+			ac, sn,
+			accuratev2.SubNamespaceReasonMoveNotAccepted,
+			fmt.Sprintf(
+				"Target SubNamespace %q/%q has not accepted the move request",
+				sn.Spec.Parent,
+				sn.Name,
+			),
+		)
+		return r.Status().Apply(ctx, ac, fieldOwner, client.ForceOwnership)
+	}
+
+	currentParent := childNS.Labels[constants.LabelParent]
+
+	if sn.Namespace != currentParent {
+		ac := subNamespaceStatusApplyConfig(sn)
+		withStalledCondition(
+			ac, sn,
+			accuratev2.SubNamespaceReasonConflict,
+			"Conflicting namespace already exists",
+		)
+
+		if sn.Spec.Parent != currentParent {
+			withMoveStalledCondition(
+				ac, sn,
+				accuratev2.SubNamespaceReasonMoveNotAccepted,
+				fmt.Sprintf(
+					"Target SubNamespace %q/%q has not accepted the move request",
+					sn.Spec.Parent,
+					sn.Name,
+				),
+			)
+		}
+
+		return r.Status().Apply(ctx, ac, fieldOwner, client.ForceOwnership)
+	}
+
+	base := childNS.DeepCopy()
+
+	if childNS.Labels == nil {
+		childNS.Labels = map[string]string{}
+	}
+	childNS.Labels[constants.LabelParent] = sn.Spec.Parent
+
+	if err := r.Patch(ctx, childNS, client.MergeFrom(base)); err != nil {
+		return fmt.Errorf("failed to update parent label of namespace %s: %w", childNS.Name, err)
+	}
+
+	logger.Info(
+		"updated sub namespace parent label",
+		"name", sn.Name,
+		"sourceParent", sn.Namespace,
+		"targetParent", sn.Spec.Parent,
+	)
+	return nil
+}
+
 // SetupWithManager sets up the controller with the Manager.
 func (r *SubNamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	nsHandler := func(ctx context.Context, o client.Object) (requests []reconcile.Request) {
-		parent := o.GetLabels()[constants.LabelParent]
-		if parent != "" {
-			requests = append(requests, reconcile.Request{NamespacedName: types.NamespacedName{
-				Namespace: parent,
-				Name:      o.GetName(),
-			}})
+	moveTargetHandler := func(ctx context.Context, o client.Object) (requests []reconcile.Request) {
+		target, ok := o.(*accuratev2.SubNamespace)
+		if !ok {
+			return nil
 		}
-		if o.GetDeletionTimestamp() != nil {
-			// The namespace is in terminating state.
-			// Let's find all subnamespaces that might want to recreate it.
-			snList := &accuratev2.SubNamespaceList{}
-			err := r.List(ctx, snList, client.MatchingFields{constants.SubNamespaceNameKey: o.GetName()})
-			if err != nil {
-				logger := log.FromContext(ctx)
-				logger.Error(err, "failed to list subnamespaces")
-				return
+
+		if !target.IsMoveAccepted() {
+			return nil
+		}
+
+		snList := &accuratev2.SubNamespaceList{}
+		if err := r.List(ctx, snList, client.MatchingFields{
+			constants.SubNamespaceNameKey: target.Name,
+		}); err != nil {
+			logger := log.FromContext(ctx)
+			logger.Error(err, "failed to list subnamespaces")
+			return nil
+		}
+
+		for _, sn := range snList.Items {
+			if !sn.IsMoveRequested() {
+				continue
 			}
-			for _, sn := range snList.Items {
-				requests = append(requests, reconcile.Request{NamespacedName: types.NamespacedName{
+
+			if sn.Spec.Parent != target.Namespace {
+				continue
+			}
+
+			requests = append(requests, reconcile.Request{
+				NamespacedName: types.NamespacedName{
 					Namespace: sn.Namespace,
 					Name:      sn.Name,
-				}})
-			}
+				},
+			})
 		}
+
+		return requests
+	}
+
+	nsHandler := func(ctx context.Context, o client.Object) (requests []reconcile.Request) {
+		// Reconcile all SubNamespaces with the same name when the Namespace changes,
+		// such as parent label updates or deletion.
+		snList := &accuratev2.SubNamespaceList{}
+		err := r.List(ctx, snList, client.MatchingFields{constants.SubNamespaceNameKey: o.GetName()})
+		if err != nil {
+			logger := log.FromContext(ctx)
+			logger.Error(err, "failed to list subnamespaces")
+			return
+		}
+		for _, sn := range snList.Items {
+			requests = append(requests, reconcile.Request{NamespacedName: types.NamespacedName{
+				Namespace: sn.Namespace,
+				Name:      sn.Name,
+			}})
+		}
+
 		return
 	}
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&accuratev2.SubNamespace{}).
+		// Requeue the source SubNamespace when the target SubNamespace becomes move-accepted.
+		Watches(
+			&accuratev2.SubNamespace{},
+			handler.EnqueueRequestsFromMapFunc(moveTargetHandler),
+			builder.WithPredicates(predicate.Funcs{
+				CreateFunc: func(e event.TypedCreateEvent[client.Object]) bool {
+					sn, ok := e.Object.(*accuratev2.SubNamespace)
+					return ok && sn.IsMoveAccepted()
+				},
+				UpdateFunc: func(e event.TypedUpdateEvent[client.Object]) bool {
+					oldSN, oldOK := e.ObjectOld.(*accuratev2.SubNamespace)
+					newSN, newOK := e.ObjectNew.(*accuratev2.SubNamespace)
+					if !oldOK || !newOK {
+						return false
+					}
+
+					return !oldSN.IsMoveAccepted() && newSN.IsMoveAccepted()
+				},
+				DeleteFunc: func(e event.TypedDeleteEvent[client.Object]) bool {
+					return false
+				},
+			}),
+		).
 		Watches(&corev1.Namespace{}, handler.EnqueueRequestsFromMapFunc(nsHandler), builder.WithPredicates(predicate.Funcs{
 			CreateFunc: func(e event.TypedCreateEvent[client.Object]) bool {
 				return false
@@ -210,4 +345,50 @@ func conditionPatch(existingConditions []metav1.Condition, condition *metav1ac.C
 	}
 
 	return condition
+}
+
+func subNamespaceStatusApplyConfig(sn *accuratev2.SubNamespace) *accuratev2ac.SubNamespaceApplyConfiguration {
+	return accuratev2ac.SubNamespace(sn.Name, sn.Namespace).
+		WithStatus(
+			accuratev2ac.SubNamespaceStatus().
+				WithObservedGeneration(sn.Generation),
+		)
+}
+
+func withMoveStalledCondition(
+	ac *accuratev2ac.SubNamespaceApplyConfiguration,
+	sn *accuratev2.SubNamespace,
+	reason string,
+	message string,
+) {
+	ac.Status.WithConditions(
+		conditionPatch(
+			sn.Status.Conditions,
+			metav1ac.Condition().
+				WithType(accuratev2.SubNamespaceTypeMoveStalled).
+				WithStatus(metav1.ConditionTrue).
+				WithObservedGeneration(sn.Generation).
+				WithReason(reason).
+				WithMessage(message),
+		),
+	)
+}
+
+func withStalledCondition(
+	ac *accuratev2ac.SubNamespaceApplyConfiguration,
+	sn *accuratev2.SubNamespace,
+	reason string,
+	message string,
+) {
+	ac.Status.WithConditions(
+		conditionPatch(
+			sn.Status.Conditions,
+			metav1ac.Condition().
+				WithType(string(kstatus.ConditionStalled)).
+				WithStatus(metav1.ConditionTrue).
+				WithObservedGeneration(sn.Generation).
+				WithReason(reason).
+				WithMessage(message),
+		),
+	)
 }

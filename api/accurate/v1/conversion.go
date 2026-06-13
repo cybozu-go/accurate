@@ -77,3 +77,14 @@ func Convert_v2_SubNamespace_To_v1_SubNamespace(in *accuratev2.SubNamespace, out
 	}
 	return nil
 }
+
+// Convert_v2_SubNamespaceSpec_To_v1_SubNamespaceSpec complements the generated conversion functions.
+// Parent exists only in v2 and is intentionally dropped when converting to v1.
+func Convert_v2_SubNamespaceSpec_To_v1_SubNamespaceSpec(in *accuratev2.SubNamespaceSpec, out *SubNamespaceSpec, s conversion.Scope) error {
+	if err := autoConvert_v2_SubNamespaceSpec_To_v1_SubNamespaceSpec(in, out, s); err != nil {
+		return err
+	}
+
+	// Drop in.Parent intentionally.
+	return nil
+}
