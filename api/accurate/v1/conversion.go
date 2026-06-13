@@ -37,6 +37,14 @@ func Convert_v1_SubNamespace_To_v2_SubNamespace(in *SubNamespace, out *accuratev
 
 		delete(out.Annotations, constants.AnnConditions)
 	}
+	if v, ok := out.Annotations[constants.AnnParent]; ok {
+		out.Spec.Parent = v
+
+		delete(out.Annotations, constants.AnnParent)
+	}
+	if len(out.Annotations) == 0 {
+		out.Annotations = nil
+	}
 	return nil
 }
 
@@ -71,6 +79,9 @@ func Convert_v2_SubNamespace_To_v1_SubNamespace(in *accuratev2.SubNamespace, out
 			return fmt.Errorf("error marshalling conditions to JSON")
 		}
 		out.Annotations[constants.AnnConditions] = string(buf)
+	}
+	if in.Spec.Parent != "" {
+		out.Annotations[constants.AnnParent] = in.Spec.Parent
 	}
 	if len(out.Annotations) == 0 {
 		out.Annotations = nil
