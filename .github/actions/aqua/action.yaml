@@ -9,6 +9,6 @@ runs:
   steps:
     - uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c  # v4.0.4
       with:
-        aqua_version: v2.53.3
+        aqua_version: v2.59.1
         policy_allow: "true"
         github_token: ${{ inputs.github_token }}
