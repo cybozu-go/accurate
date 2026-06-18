@@ -20,6 +20,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 	// Group=accurate.cybozu.com, Version=v2
 	case v2.SchemeGroupVersion.WithKind("SubNamespace"):
 		return &accuratev2.SubNamespaceApplyConfiguration{}
+	case v2.SchemeGroupVersion.WithKind("SubNamespaceMoveSpec"):
+		return &accuratev2.SubNamespaceMoveSpecApplyConfiguration{}
 	case v2.SchemeGroupVersion.WithKind("SubNamespaceSpec"):
 		return &accuratev2.SubNamespaceSpecApplyConfiguration{}
 	case v2.SchemeGroupVersion.WithKind("SubNamespaceStatus"):

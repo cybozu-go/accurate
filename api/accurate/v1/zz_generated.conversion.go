@@ -127,6 +127,6 @@ func Convert_v1_SubNamespaceSpec_To_v2_SubNamespaceSpec(in *SubNamespaceSpec, ou
 func autoConvert_v2_SubNamespaceSpec_To_v1_SubNamespaceSpec(in *v2.SubNamespaceSpec, out *SubNamespaceSpec, s conversion.Scope) error {
 	out.Labels = *(*map[string]string)(unsafe.Pointer(&in.Labels))
 	out.Annotations = *(*map[string]string)(unsafe.Pointer(&in.Annotations))
-	// WARNING: in.Parent requires manual conversion: does not exist in peer-type
+	// WARNING: in.Move requires manual conversion: does not exist in peer-type
 	return nil
 }
