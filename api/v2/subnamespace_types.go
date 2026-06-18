@@ -30,9 +30,20 @@ type SubNamespaceSpec struct {
 	// +optional
 	Annotations map[string]string `json:"annotations,omitempty"`
 
-	// Parent specifies the namespace that this subns should belong to.
+	// Move specifies a requested or accepted move of this SubNamespace.
 	// +optional
-	Parent string `json:"parent,omitempty"`
+	Move *SubNamespaceMoveSpec `json:"move,omitempty"`
+}
+
+// SubNamespaceMoveSpec defines a move between parent namespaces.
+type SubNamespaceMoveSpec struct {
+	// SourceParent is the current parent namespace of the sub-namespace.
+	// +optional
+	SourceParent string `json:"sourceParent,omitempty"`
+
+	// TargetParent is the desired parent namespace of the sub-namespace.
+	// +optional
+	TargetParent string `json:"targetParent,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -54,14 +65,39 @@ type SubNamespace struct {
 	Status SubNamespaceStatus `json:"status,omitempty"`
 }
 
-// IsMoveRequested returns true if this SubNamespace represents the source side of an accepted move.
-func (s *SubNamespace) IsMoveRequested() bool {
-	return s.Spec.Parent != "" && s.Spec.Parent != s.Namespace
+// MoveSourceParent returns the source parent specified in the move.
+func (s *SubNamespace) MoveSourceParent() string {
+	if s.Spec.Move == nil {
+		return ""
+	}
+	return s.Spec.Move.SourceParent
 }
 
-// IsMoveAccepted returns true if this SubNamespace represents the target side of an accepted move.
-func (s *SubNamespace) IsMoveAccepted() bool {
-	return s.Spec.Parent != "" && s.Spec.Parent == s.Namespace
+// MoveTargetParent returns the target parent specified in the move.
+func (s *SubNamespace) MoveTargetParent() string {
+	if s.Spec.Move == nil {
+		return ""
+	}
+	return s.Spec.Move.TargetParent
+}
+
+// IsMoveRequested returns true if this SubNamespace requests a move to another parent.
+func (s *SubNamespace) IsMoveRequested() bool {
+	return s.Spec.Move != nil &&
+		s.Spec.Move.TargetParent != "" &&
+		s.Spec.Move.TargetParent != s.Namespace
+}
+
+// IsAcceptingMove returns true if this SubNamespace accepts a move from another parent.
+func (s *SubNamespace) IsAcceptingMove() bool {
+	return s.Spec.Move != nil &&
+		s.Spec.Move.SourceParent != "" &&
+		s.Spec.Move.SourceParent != s.Namespace
+}
+
+// AcceptsMoveFrom returns true if this SubNamespace accepts a move from the given parent.
+func (s *SubNamespace) AcceptsMoveFrom(sourceParent string) bool {
+	return s.IsAcceptingMove() && s.MoveSourceParent() == sourceParent
 }
 
 //+kubebuilder:object:root=true
