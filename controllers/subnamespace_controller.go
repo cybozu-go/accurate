@@ -162,9 +162,11 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2
 func (r *SubNamespaceReconciler) reconcileMove(ctx context.Context, sn *accuratev2.SubNamespace, childNS *corev1.Namespace) error {
 	logger := log.FromContext(ctx)
 
+	targetParent := sn.MoveTargetParent()
+
 	target := &accuratev2.SubNamespace{}
 	targetKey := types.NamespacedName{
-		Namespace: sn.Spec.Parent,
+		Namespace: targetParent,
 		Name:      sn.Name,
 	}
 
@@ -174,29 +176,29 @@ func (r *SubNamespaceReconciler) reconcileMove(ctx context.Context, sn *accurate
 			withMoveStalledCondition(
 				ac, sn,
 				accuratev2.SubNamespaceReasonMoveTargetNotFound,
-				fmt.Sprintf("Target SubNamespace %s/%s does not exist", sn.Spec.Parent, sn.Name),
+				fmt.Sprintf("Target SubNamespace %s/%s does not exist", targetParent, sn.Name),
 			)
 			return r.Status().Apply(ctx, ac, fieldOwner, client.ForceOwnership)
 		}
 		return err
 	}
 
-	if !target.IsMoveAccepted() {
+	if !target.AcceptsMoveFrom(sn.Namespace) {
 		ac := subNamespaceStatusApplyConfig(sn)
 		withMoveStalledCondition(
 			ac, sn,
 			accuratev2.SubNamespaceReasonMoveNotAccepted,
 			fmt.Sprintf(
-				"Target SubNamespace %q/%q has not accepted the move request",
-				sn.Spec.Parent,
+				"Target SubNamespace %q/%q has not accepted a move from %q",
+				targetParent,
 				sn.Name,
+				sn.Namespace,
 			),
 		)
 		return r.Status().Apply(ctx, ac, fieldOwner, client.ForceOwnership)
 	}
 
 	currentParent := childNS.Labels[constants.LabelParent]
-
 	if sn.Namespace != currentParent {
 		ac := subNamespaceStatusApplyConfig(sn)
 		withStalledCondition(
@@ -205,14 +207,15 @@ func (r *SubNamespaceReconciler) reconcileMove(ctx context.Context, sn *accurate
 			"Conflicting namespace already exists",
 		)
 
-		if sn.Spec.Parent != currentParent {
+		if targetParent != currentParent {
 			withMoveStalledCondition(
 				ac, sn,
 				accuratev2.SubNamespaceReasonMoveNotAccepted,
 				fmt.Sprintf(
-					"Target SubNamespace %q/%q has not accepted the move request",
-					sn.Spec.Parent,
+					"Target SubNamespace %q/%q has not accepted a move from %q",
+					targetParent,
 					sn.Name,
+					sn.Namespace,
 				),
 			)
 		}
@@ -221,11 +224,10 @@ func (r *SubNamespaceReconciler) reconcileMove(ctx context.Context, sn *accurate
 	}
 
 	base := childNS.DeepCopy()
-
 	if childNS.Labels == nil {
 		childNS.Labels = map[string]string{}
 	}
-	childNS.Labels[constants.LabelParent] = sn.Spec.Parent
+	childNS.Labels[constants.LabelParent] = targetParent
 
 	if err := r.Patch(ctx, childNS, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("failed to update parent label of namespace %s: %w", childNS.Name, err)
@@ -235,20 +237,23 @@ func (r *SubNamespaceReconciler) reconcileMove(ctx context.Context, sn *accurate
 		"updated sub namespace parent label",
 		"name", sn.Name,
 		"sourceParent", sn.Namespace,
-		"targetParent", sn.Spec.Parent,
+		"targetParent", targetParent,
 	)
+
 	return nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *SubNamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	// Move reconciliation is performed by the source SubNamespace,
+	// so changes to a move-accepting target must trigger reconciliation of matching sources.
 	moveTargetHandler := func(ctx context.Context, o client.Object) (requests []reconcile.Request) {
 		target, ok := o.(*accuratev2.SubNamespace)
 		if !ok {
 			return nil
 		}
 
-		if !target.IsMoveAccepted() {
+		if !target.IsAcceptingMove() {
 			return nil
 		}
 
@@ -266,7 +271,7 @@ func (r *SubNamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				continue
 			}
 
-			if sn.Spec.Parent != target.Namespace {
+			if !target.AcceptsMoveFrom(sn.Namespace) {
 				continue
 			}
 
@@ -310,7 +315,7 @@ func (r *SubNamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			builder.WithPredicates(predicate.Funcs{
 				CreateFunc: func(e event.TypedCreateEvent[client.Object]) bool {
 					sn, ok := e.Object.(*accuratev2.SubNamespace)
-					return ok && sn.IsMoveAccepted()
+					return ok && sn.IsAcceptingMove()
 				},
 				UpdateFunc: func(e event.TypedUpdateEvent[client.Object]) bool {
 					oldSN, oldOK := e.ObjectOld.(*accuratev2.SubNamespace)
@@ -319,7 +324,11 @@ func (r *SubNamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 						return false
 					}
 
-					return !oldSN.IsMoveAccepted() && newSN.IsMoveAccepted()
+					if !newSN.IsAcceptingMove() {
+						return false
+					}
+
+					return oldSN.MoveSourceParent() != newSN.MoveSourceParent()
 				},
 				DeleteFunc: func(e event.TypedDeleteEvent[client.Object]) bool {
 					return false

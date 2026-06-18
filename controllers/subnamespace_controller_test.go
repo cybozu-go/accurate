@@ -163,7 +163,7 @@ var _ = Describe("SubNamespace controller", func() {
 		Eventually(komega.Object(sub1)).Should(HaveField("UID", Not(Equal(uid))))
 	})
 
-	It("should move a sub-namespace when source and target SubNamespaces have the same desired parent", func() {
+	It("should move a sub-namespace when the target SubNamespace accepts the source parent", func() {
 		sourceParent := "test5-old"
 		targetParent := "test5-new"
 		childName := "test5-sub1"
@@ -171,7 +171,7 @@ var _ = Describe("SubNamespace controller", func() {
 		createNamespace(ctx, sourceParent)
 		createNamespace(ctx, targetParent)
 
-		sourceSN := createSubNamespace(ctx, sourceParent, childName, "")
+		sourceSN := createSubNamespace(ctx, sourceParent, childName, "", "")
 		expectNamespaceParent(ctx, childName, sourceParent)
 
 		Eventually(komega.Object(sourceSN)).Should(SatisfyAll(
@@ -179,7 +179,7 @@ var _ = Describe("SubNamespace controller", func() {
 			HaveField("Status.Conditions", notHaveConditionType(string(kstatus.ConditionStalled))),
 		))
 
-		targetSN := createSubNamespace(ctx, targetParent, childName, targetParent)
+		targetSN := createSubNamespace(ctx, targetParent, childName, sourceParent, "")
 
 		Eventually(komega.Object(targetSN)).Should(
 			HaveField("Status.Conditions",
@@ -192,7 +192,9 @@ var _ = Describe("SubNamespace controller", func() {
 		)
 
 		Expect(komega.Update(sourceSN, func() {
-			sourceSN.Spec.Parent = targetParent
+			sourceSN.Spec.Move = &accuratev2.SubNamespaceMoveSpec{
+				TargetParent: targetParent,
+			}
 		})()).To(Succeed())
 
 		expectNamespaceParent(ctx, childName, targetParent)
@@ -215,11 +217,13 @@ var _ = Describe("SubNamespace controller", func() {
 		createNamespace(ctx, sourceParent)
 		createNamespace(ctx, targetParent)
 
-		sourceSN := createSubNamespace(ctx, sourceParent, childName, "")
+		sourceSN := createSubNamespace(ctx, sourceParent, childName, "", "")
 		expectNamespaceParent(ctx, childName, sourceParent)
 
 		Expect(komega.Update(sourceSN, func() {
-			sourceSN.Spec.Parent = targetParent
+			sourceSN.Spec.Move = &accuratev2.SubNamespaceMoveSpec{
+				TargetParent: targetParent,
+			}
 		})()).To(Succeed())
 
 		Eventually(komega.Object(sourceSN)).Should(SatisfyAll(
@@ -234,7 +238,7 @@ var _ = Describe("SubNamespace controller", func() {
 		expectNamespaceParent(ctx, childName, sourceParent)
 	})
 
-	It("should set MoveStalled=True when target SubNamespace has a different desired parent", func() {
+	It("should set MoveStalled=True when the target SubNamespace does not accept the source parent", func() {
 		sourceParent := "test7-old"
 		targetParent := "test7-new"
 		otherParent := "test7-other"
@@ -244,10 +248,10 @@ var _ = Describe("SubNamespace controller", func() {
 		createNamespace(ctx, targetParent)
 		createNamespace(ctx, otherParent)
 
-		sourceSN := createSubNamespace(ctx, sourceParent, childName, "")
+		sourceSN := createSubNamespace(ctx, sourceParent, childName, "", "")
 		expectNamespaceParent(ctx, childName, sourceParent)
 
-		targetSN := createSubNamespace(ctx, targetParent, childName, otherParent)
+		targetSN := createSubNamespace(ctx, targetParent, childName, "", otherParent)
 		Eventually(komega.Object(targetSN)).Should(SatisfyAll(
 			HaveField("Status.Conditions", haveCondition(
 				accuratev2.SubNamespaceTypeMoveStalled,
@@ -259,7 +263,9 @@ var _ = Describe("SubNamespace controller", func() {
 		expectNamespaceParent(ctx, childName, sourceParent)
 
 		Expect(komega.Update(sourceSN, func() {
-			sourceSN.Spec.Parent = targetParent
+			sourceSN.Spec.Move = &accuratev2.SubNamespaceMoveSpec{
+				TargetParent: targetParent,
+			}
 		})()).To(Succeed())
 
 		Eventually(komega.Object(sourceSN)).Should(SatisfyAll(
@@ -290,7 +296,7 @@ var _ = Describe("SubNamespace controller", func() {
 		createNamespace(ctx, sourceParent)
 		createNamespace(ctx, targetParent)
 
-		sourceSN := createSubNamespace(ctx, sourceParent, childName, targetParent)
+		sourceSN := createSubNamespace(ctx, sourceParent, childName, "", targetParent)
 		expectNamespaceParent(ctx, childName, sourceParent)
 
 		Eventually(komega.Object(sourceSN)).Should(SatisfyAll(
@@ -302,7 +308,7 @@ var _ = Describe("SubNamespace controller", func() {
 			)),
 		))
 
-		targetNS := createSubNamespace(ctx, targetParent, childName, targetParent)
+		targetNS := createSubNamespace(ctx, targetParent, childName, sourceParent, "")
 		expectNamespaceParent(ctx, childName, targetParent)
 
 		Eventually(komega.Object(sourceSN)).Should(SatisfyAll(
@@ -333,17 +339,22 @@ func createNamespace(ctx context.Context, name string) *corev1.Namespace {
 	return ns
 }
 
-func createSubNamespace(ctx context.Context, namespace, name, parent string) *accuratev2.SubNamespace {
+func createSubNamespace(ctx context.Context, namespace, name, sourceParent, targetParent string) *accuratev2.SubNamespace {
 	GinkgoHelper()
 
 	sn := &accuratev2.SubNamespace{}
 	sn.Namespace = namespace
 	sn.Name = name
-	sn.Spec.Parent = parent
+
+	if sourceParent != "" || targetParent != "" {
+		sn.Spec.Move = &accuratev2.SubNamespaceMoveSpec{
+			SourceParent: sourceParent,
+			TargetParent: targetParent,
+		}
+	}
 
 	Expect(k8sClient.Create(ctx, sn)).To(Succeed())
 	Eventually(komega.Get(sn)).Should(Succeed())
-
 	return sn
 }
 

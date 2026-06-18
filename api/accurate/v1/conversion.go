@@ -37,10 +37,14 @@ func Convert_v1_SubNamespace_To_v2_SubNamespace(in *SubNamespace, out *accuratev
 
 		delete(out.Annotations, constants.AnnConditions)
 	}
-	if v, ok := out.Annotations[constants.AnnParent]; ok {
-		out.Spec.Parent = v
+	if v, ok := out.Annotations[constants.AnnMove]; ok {
+		move := &accuratev2.SubNamespaceMoveSpec{}
+		if err := json.Unmarshal([]byte(v), move); err != nil {
+			return err
+		}
 
-		delete(out.Annotations, constants.AnnParent)
+		out.Spec.Move = move
+		delete(out.Annotations, constants.AnnMove)
 	}
 	if len(out.Annotations) == 0 {
 		out.Annotations = nil
@@ -80,8 +84,16 @@ func Convert_v2_SubNamespace_To_v1_SubNamespace(in *accuratev2.SubNamespace, out
 		}
 		out.Annotations[constants.AnnConditions] = string(buf)
 	}
-	if in.Spec.Parent != "" {
-		out.Annotations[constants.AnnParent] = in.Spec.Parent
+	if in.Spec.Move != nil {
+		if out.Annotations == nil {
+			out.Annotations = make(map[string]string)
+		}
+
+		buf, err := json.Marshal(in.Spec.Move)
+		if err != nil {
+			return err
+		}
+		out.Annotations[constants.AnnMove] = string(buf)
 	}
 	if len(out.Annotations) == 0 {
 		out.Annotations = nil
@@ -96,6 +108,5 @@ func Convert_v2_SubNamespaceSpec_To_v1_SubNamespaceSpec(in *accuratev2.SubNamesp
 		return err
 	}
 
-	// Drop in.Parent intentionally.
 	return nil
 }
