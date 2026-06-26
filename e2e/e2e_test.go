@@ -4,7 +4,6 @@ import (
 	_ "embed"
 	"encoding/json"
 	"errors"
-	"os"
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/cybozu-go/accurate/pkg/constants"
@@ -27,17 +26,8 @@ var serviceAccountWithDummySecretsYAML []byte
 var conflictingSubnamespaceYAML []byte
 
 var (
-	sealedJSON      []byte
 	k8sMinorVersion int
 )
-
-func init() {
-	data, err := os.ReadFile("sealed.json")
-	if err != nil {
-		panic(err)
-	}
-	sealedJSON = data
-}
 
 var _ = Describe("kubectl accurate", func() {
 	It("should get Kubernetes minor version", func() {
@@ -173,7 +163,8 @@ var _ = Describe("kubectl accurate", func() {
 		kubectlSafe(nil, "accurate", "ns", "set-type", "root2", "root")
 		kubectlSafe(nil, "accurate", "ns", "set-type", "root3", "root")
 		kubectlSafe(nil, "accurate", "sub", "create", "sub1", "root2")
-		kubectlSafe(sealedJSON, "apply", "-f", "-")
+		kubectlSafe(nil, "create", "-n", "root2", "secret", "generic", "mysecret", "--from-literal=foo=bar")
+		kubectlSafe(nil, "annotate", "-n", "root2", "secret", "mysecret", "accurate.cybozu.com/propagate=create")
 
 		Eventually(func() error {
 			_, err := kubectl(nil, "get", "-n", "sub1", "secrets", "mysecret")

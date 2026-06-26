@@ -29,31 +29,3 @@ metadata:
     accurate.cybozu.com/propagate: <mode>
 ```
 
-## Annotating a resource to propagate resources created from it (DEPRECATED)
-
-<div class="warning">
-Propagating generated resources is a deprecated feature and is subject for
-removal soon. Commonly used tools like cert-manager and sealed-secrets now
-provide features for adding annotations/labels to resources created from
-user-facing custom resources. These features can be used for migration to
-ensure the standard `accurate.cybozu.com/propagate` annotation is added to
-generated resources.
-</div>
-
-For example, a Secret created from cert-manager's Certificate can automatically be propagated.
-
-To do this, Certificate should be annotated with `accurate.cybozu.com/propagate-generated=<mode>` at the time of creation.
-
-```yaml
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  namespace: default
-  name: example-cert
-  annotations:
-    accurate.cybozu.com/propagate-generated: <mode>
-spec:
-  ...
-```
-
-`accurate-controller` needs to be able to get Certificate objects.

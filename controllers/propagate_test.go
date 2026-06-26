@@ -332,42 +332,4 @@ var _ = Describe("SubNamespace controller", func() {
 		Entry("from a template namespace", tmplNS, instanceNS),
 	)
 
-	It("should manage generated resources", func() {
-		cm1 := &corev1.ConfigMap{}
-		cm1.Namespace = rootNS
-		cm1.Name = "cm-generate"
-		//nolint:staticcheck // SA1019: subject for removal
-		cm1.Annotations = map[string]string{constants.AnnPropagateGenerated: constants.PropagateUpdate}
-		cm1.Data = map[string]string{"foo": "bar"}
-		Expect(k8sClient.Create(ctx, cm1)).To(Succeed())
-
-		cm2 := &corev1.ConfigMap{}
-		cm2.Namespace = rootNS
-		cm2.Name = "cm-no-generate"
-		cm2.Data = map[string]string{"abc": "def"}
-		Expect(k8sClient.Create(ctx, cm2)).To(Succeed())
-
-		svc1 := &corev1.Service{}
-		svc1.Namespace = rootNS
-		svc1.Name = "svc1"
-		Expect(ctrl.SetControllerReference(cm1, svc1, scheme)).To(Succeed())
-		svc1.Spec.ClusterIP = "None"
-		svc1.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt32(3333)}}
-		Expect(k8sClient.Create(ctx, svc1)).To(Succeed())
-
-		Eventually(komega.Object(svc1)).Should(HaveField("Annotations", HaveKeyWithValue(constants.AnnPropagate, constants.PropagateUpdate)))
-		//nolint:staticcheck // SA1019: subject for removal
-		Expect(svc1.Annotations).NotTo(HaveKey(constants.AnnGenerated))
-
-		svc2 := &corev1.Service{}
-		svc2.Namespace = rootNS
-		svc2.Name = "svc2"
-		Expect(ctrl.SetControllerReference(cm2, svc2, scheme)).To(Succeed())
-		svc2.Spec.ClusterIP = "None"
-		svc2.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt32(3333)}}
-		Expect(k8sClient.Create(ctx, svc2)).To(Succeed())
-
-		//nolint:staticcheck // SA1019: subject for removal
-		Eventually(komega.Object(svc2)).Should(HaveField("Annotations", HaveKeyWithValue(constants.AnnGenerated, notGenerated)))
-	})
 })
