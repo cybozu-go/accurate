@@ -19,9 +19,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
-	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	//+kubebuilder:scaffold:imports
 )
@@ -65,10 +63,6 @@ var _ = BeforeSuite(func() {
 
 	scheme = runtime.NewScheme()
 	err = clientgoscheme.AddToScheme(scheme)
-	Expect(err).NotTo(HaveOccurred())
-	err = accuratev1.AddToScheme(scheme)
-	Expect(err).NotTo(HaveOccurred())
-	err = accuratev2alpha1.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())
 	err = accuratev2.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())

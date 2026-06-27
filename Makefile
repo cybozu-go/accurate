@@ -45,8 +45,7 @@ HELM_CRDS_FILE := charts/accurate/templates/generated/crds.yaml
 .PHONY: manifests
 manifests: setup ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	controller-gen $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="{./api/..., ./controllers/..., ./hooks/...}" output:crd:artifacts:config=config/crd/bases
-	echo '{{- include "accurate.crd-check" . }}' > $(HELM_CRDS_FILE)
-	echo '{{- if or .Values.crds.enabled .Values.installCRDs }}' >> $(HELM_CRDS_FILE)
+	echo '{{- if .Values.crds.enabled }}' > $(HELM_CRDS_FILE)
 	kustomize build config/kustomize-to-helm/overlays/crds | yq e "." -p yaml - >> $(HELM_CRDS_FILE)
 	echo '{{- end }}' >> $(HELM_CRDS_FILE)
 	kustomize build config/kustomize-to-helm/overlays/templates | yq e "."  -p yaml - > charts/accurate/templates/generated/generated.yaml
@@ -77,7 +76,7 @@ generate-conversion: setup ## Generate conversion functions to support API conve
 
 .PHONY: apidoc
 apidoc: setup $(wildcard api/*/*_types.go)
-	crd-to-markdown --links docs/links.csv -f api/accurate/v1/subnamespace_types.go -n SubNamespace > docs/crd_subnamespace.md
+	crd-to-markdown --links docs/links.csv -f api/accurate/v2/subnamespace_types.go -n SubNamespace > docs/crd_subnamespace.md
 
 .PHONY: book
 book: setup
