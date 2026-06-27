@@ -1,4 +1,5 @@
-KUBERNETES_VERSION = v1.36.1@sha256:3489c7674813ba5d8b1a9977baea8a6e553784dab7b84759d1014dbd78f7ebd5 # renovate: kindest/node
+# renovate:
+KUBERNETES_VERSION = v1.36.1@sha256:3489c7674813ba5d8b1a9977baea8a6e553784dab7b84759d1014dbd78f7ebd5
 # renovate: datasource=helm registryUrl=https://charts.jetstack.io depName=cert-manager
 CERT_MANAGER_VERSION = v1.20.2
 CERT_MANAGER_GPG_KEY_URL = https://cert-manager.io/public-keys/cert-manager-keyring-2021-09-20-1020CF3C033D4F35BAE1C19E1226061C665DF13E.gpg
@@ -33,7 +34,7 @@ start: setup $(KUBECTL_ACCURATE) $(CHART_DIR)/cert-manager/Chart.yaml
 	kubectl -n cert-manager wait --for=condition=available --timeout=180s --all deployments
 	helm install --create-namespace --namespace accurate accurate ../charts/accurate -f values.yaml
 	kubectl -n accurate wait --for=condition=available --timeout=180s --all deployments
-	helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
+	helm repo add sealed-secrets https://bitnami.github.io/sealed-secrets
 	helm repo update
 	helm install sealed-secrets-controller --namespace kube-system sealed-secrets/sealed-secrets
 	kubectl -n kube-system wait --for=condition=available --timeout=180s --all deployments

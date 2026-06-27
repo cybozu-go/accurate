@@ -1,6 +1,3 @@
-# Deprecated: Use crds.enabled and crds.keep instead.
-installCRDs: true
-
 crds:
   # This option decides if the CRDs should be installed
   # as part of the Helm installation.

@@ -2,5 +2,6 @@
   "username": "cybozu-neco",
   "platform": "github",
   "onboarding": false,
-  "repositories": ["cybozu-go/accurate"]
+  "repositories": ["cybozu-go/accurate"],
+  "allowedCommands": ["^aqua update-checksum --prune$"]
 }
