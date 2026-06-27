@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-f01907ee.js";
+            window.path_to_searchindex_js = "searchindex-81b710b8.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-ff269338.js"></script>
@@ -525,11 +525,6 @@ add annotations preventing Helm from uninstalling the CRD when the Helm release 
 <p>The recommended approach is to let helm manage CRDs, but if you want to manage CRDs yourself, now is the time.</p>
 <pre><code class="language-bash">kubectl apply -k https://github.com/cybozu-go/accurate//config/crd-only/
 </code></pre>
-<blockquote class="blockquote-tag blockquote-tag-note">
-<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
-<p>Since the CRDs contain configuration of conversion webhooks, you may have to tweak the webhook settings
-if installing the chart using non-standard values.</p>
-</blockquote>
 <p>If you decided to manage CRDs outside of Helm, make sure you set the <code>crds.enabled</code> Helm value to <code>false</code>.</p>
 <h3 id="installing-the-chart"><a class="header" href="#installing-the-chart">Installing the Chart</a></h3>
 <blockquote class="blockquote-tag blockquote-tag-note">
@@ -899,9 +894,10 @@ metadata:
 <ul>
 <li><a href="#subnamespacelist">SubNamespaceList</a></li>
 <li><a href="#subnamespacespec">SubNamespaceSpec</a></li>
+<li><a href="#subnamespacestatus">SubNamespaceStatus</a></li>
 </ul>
 <h4 id="subnamespace"><a class="header" href="#subnamespace">SubNamespace</a></h4>
-<p>SubNamespace is the Schema for the subnamespaces API Deprecated: This type will be removed in one of the next releases.</p>
+<p>SubNamespace is the Schema for the subnamespaces API</p>
 <div class="table-wrapper">
 <table>
 <thead>
@@ -910,13 +906,13 @@ metadata:
 <tbody>
 <tr><td>metadata</td><td></td><td>metav1.ObjectMeta</td><td>false</td></tr>
 <tr><td>spec</td><td>Spec is the spec of SubNamespace.</td><td><a href="#subnamespacespec">SubNamespaceSpec</a></td><td>false</td></tr>
-<tr><td>status</td><td>Status is the status of SubNamespace.</td><td>SubNamespaceStatus</td><td>false</td></tr>
+<tr><td>status</td><td>Status is the status of SubNamespace.</td><td><a href="#subnamespacestatus">SubNamespaceStatus</a></td><td>false</td></tr>
 </tbody>
 </table>
 </div>
 <p><a href="#custom-resources">Back to Custom Resources</a></p>
 <h4 id="subnamespacelist"><a class="header" href="#subnamespacelist">SubNamespaceList</a></h4>
-<p>SubNamespaceList contains a list of SubNamespace Deprecated: This type will be removed in one of the next releases.</p>
+<p>SubNamespaceList contains a list of SubNamespace</p>
 <div class="table-wrapper">
 <table>
 <thead>
@@ -939,6 +935,20 @@ metadata:
 <tbody>
 <tr><td>labels</td><td>Labels are the labels to be propagated to the sub-namespace</td><td>map[string]string</td><td>false</td></tr>
 <tr><td>annotations</td><td>Annotations are the annotations to be propagated to the sub-namespace.</td><td>map[string]string</td><td>false</td></tr>
+</tbody>
+</table>
+</div>
+<p><a href="#custom-resources">Back to Custom Resources</a></p>
+<h4 id="subnamespacestatus"><a class="header" href="#subnamespacestatus">SubNamespaceStatus</a></h4>
+<p>SubNamespaceStatus defines the observed state of SubNamespace</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Field</th><th>Description</th><th>Scheme</th><th>Required</th></tr>
+</thead>
+<tbody>
+<tr><td>observedGeneration</td><td>The generation observed by the object controller.</td><td>int64</td><td>false</td></tr>
+<tr><td>conditions</td><td>Conditions represent the latest available observations of an object’s state</td><td>[]metav1.Condition</td><td>false</td></tr>
 </tbody>
 </table>
 </div>
