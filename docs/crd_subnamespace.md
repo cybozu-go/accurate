@@ -7,22 +7,23 @@
 
 * [SubNamespaceList](#subnamespacelist)
 * [SubNamespaceSpec](#subnamespacespec)
+* [SubNamespaceStatus](#subnamespacestatus)
 
 #### SubNamespace
 
-SubNamespace is the Schema for the subnamespaces API Deprecated: This type will be removed in one of the next releases.
+SubNamespace is the Schema for the subnamespaces API
 
 | Field | Description | Scheme | Required |
 | ----- | ----------- | ------ | -------- |
 | metadata |  | metav1.ObjectMeta | false |
 | spec | Spec is the spec of SubNamespace. | [SubNamespaceSpec](#subnamespacespec) | false |
-| status | Status is the status of SubNamespace. | SubNamespaceStatus | false |
+| status | Status is the status of SubNamespace. | [SubNamespaceStatus](#subnamespacestatus) | false |
 
 [Back to Custom Resources](#custom-resources)
 
 #### SubNamespaceList
 
-SubNamespaceList contains a list of SubNamespace Deprecated: This type will be removed in one of the next releases.
+SubNamespaceList contains a list of SubNamespace
 
 | Field | Description | Scheme | Required |
 | ----- | ----------- | ------ | -------- |
@@ -39,5 +40,16 @@ SubNamespaceSpec defines the desired state of SubNamespace
 | ----- | ----------- | ------ | -------- |
 | labels | Labels are the labels to be propagated to the sub-namespace | map[string]string | false |
 | annotations | Annotations are the annotations to be propagated to the sub-namespace. | map[string]string | false |
+
+[Back to Custom Resources](#custom-resources)
+
+#### SubNamespaceStatus
+
+SubNamespaceStatus defines the observed state of SubNamespace
+
+| Field | Description | Scheme | Required |
+| ----- | ----------- | ------ | -------- |
+| observedGeneration | The generation observed by the object controller. | int64 | false |
+| conditions | Conditions represent the latest available observations of an object's state | []metav1.Condition | false |
 
 [Back to Custom Resources](#custom-resources)

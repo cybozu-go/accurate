@@ -28,9 +28,7 @@ import (
 	"sigs.k8s.io/kustomize/api/krusty"
 	"sigs.k8s.io/kustomize/kyaml/filesys"
 
-	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
-	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
 	"github.com/cybozu-go/accurate/hooks"
 	"github.com/cybozu-go/accurate/pkg/indexing"
 )
@@ -55,11 +53,7 @@ var _ = BeforeSuite(func() {
 	cancelMgr = cancel
 
 	scheme := runtime.NewScheme()
-	err := accuratev1.AddToScheme(scheme)
-	Expect(err).NotTo(HaveOccurred())
-	err = accuratev2alpha1.AddToScheme(scheme)
-	Expect(err).NotTo(HaveOccurred())
-	err = accuratev2.AddToScheme(scheme)
+	err := accuratev2.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())
 	err = clientgoscheme.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())

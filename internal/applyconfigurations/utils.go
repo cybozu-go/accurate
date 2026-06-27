@@ -4,9 +4,7 @@ package applyconfigurations
 
 import (
 	v2 "github.com/cybozu-go/accurate/api/accurate/v2"
-	v2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
 	accuratev2 "github.com/cybozu-go/accurate/internal/applyconfigurations/accurate/v2"
-	accuratev2alpha1 "github.com/cybozu-go/accurate/internal/applyconfigurations/accurate/v2alpha1"
 	internal "github.com/cybozu-go/accurate/internal/applyconfigurations/internal"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -24,14 +22,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &accuratev2.SubNamespaceSpecApplyConfiguration{}
 	case v2.SchemeGroupVersion.WithKind("SubNamespaceStatus"):
 		return &accuratev2.SubNamespaceStatusApplyConfiguration{}
-
-		// Group=accurate.cybozu.com, Version=v2alpha1
-	case v2alpha1.SchemeGroupVersion.WithKind("SubNamespace"):
-		return &accuratev2alpha1.SubNamespaceApplyConfiguration{}
-	case v2alpha1.SchemeGroupVersion.WithKind("SubNamespaceSpec"):
-		return &accuratev2alpha1.SubNamespaceSpecApplyConfiguration{}
-	case v2alpha1.SchemeGroupVersion.WithKind("SubNamespaceStatus"):
-		return &accuratev2alpha1.SubNamespaceStatusApplyConfiguration{}
 
 	}
 	return nil

@@ -76,7 +76,7 @@ generate-conversion: setup ## Generate conversion functions to support API conve
 
 .PHONY: apidoc
 apidoc: setup $(wildcard api/*/*_types.go)
-	crd-to-markdown --links docs/links.csv -f api/accurate/v1/subnamespace_types.go -n SubNamespace > docs/crd_subnamespace.md
+	crd-to-markdown --links docs/links.csv -f api/accurate/v2/subnamespace_types.go -n SubNamespace > docs/crd_subnamespace.md
 
 .PHONY: book
 book: setup

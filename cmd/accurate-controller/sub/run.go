@@ -8,9 +8,7 @@ import (
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	accuratev1 "github.com/cybozu-go/accurate/api/accurate/v1"
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
-	accuratev2alpha1 "github.com/cybozu-go/accurate/api/accurate/v2alpha1"
 	"github.com/cybozu-go/accurate/controllers"
 	"github.com/cybozu-go/accurate/hooks"
 	"github.com/cybozu-go/accurate/pkg/config"
@@ -38,12 +36,6 @@ func subMain(ns, addr string, port int) error {
 	scheme := runtime.NewScheme()
 	if err := clientgoscheme.AddToScheme(scheme); err != nil {
 		return fmt.Errorf("unable to add client-go objects: %w", err)
-	}
-	if err := accuratev1.AddToScheme(scheme); err != nil {
-		return fmt.Errorf("unable to add Accurate v1 objects: %w", err)
-	}
-	if err := accuratev2alpha1.AddToScheme(scheme); err != nil {
-		return fmt.Errorf("unable to add Accurate v2alpha1 objects: %w", err)
 	}
 	if err := accuratev2.AddToScheme(scheme); err != nil {
 		return fmt.Errorf("unable to add Accurate v2 objects: %w", err)

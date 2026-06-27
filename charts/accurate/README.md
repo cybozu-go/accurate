@@ -41,10 +41,6 @@ The recommended approach is to let helm manage CRDs, but if you want to manage C
 kubectl apply -k https://github.com/cybozu-go/accurate//config/crd-only/
 ```
 
-> [!NOTE]
-> Since the CRDs contain configuration of conversion webhooks, you may have to tweak the webhook settings
-> if installing the chart using non-standard values.
-
 If you decided to manage CRDs outside of Helm, make sure you set the `crds.enabled` Helm value to `false`.
 
 ### Installing the Chart
