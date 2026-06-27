@@ -1,13 +1,7 @@
 # Accurate Helm Chart
 
-## How to use Accurate Helm repository
-
-You need to add this repository to your Helm repositories:
-
-```bash
-helm repo add accurate https://cybozu-go.github.io/accurate/
-helm repo update
-```
+The Accurate Helm chart is published to an OCI registry at `oci://ghcr.io/cybozu-go/charts/accurate`.
+There is no need to add a Helm repository; the chart can be referenced directly by its OCI URL.
 
 ## Quick start
 
@@ -55,7 +49,7 @@ If you decided to manage CRDs outside of Helm, make sure you set the `crds.enabl
 To install the chart with the release name `accurate` using a dedicated namespace(recommended):
 
 ```bash
-helm install --create-namespace --namespace accurate accurate accurate/accurate
+helm install --create-namespace --namespace accurate accurate oci://ghcr.io/cybozu-go/charts/accurate
 ```
 
 Specify parameters using `--set key=value[,key=value]` argument to `helm install`.
@@ -63,7 +57,7 @@ Specify parameters using `--set key=value[,key=value]` argument to `helm install
 Alternatively a YAML file that specifies the values for the parameters can be provided like this:
 
 ```bash
-helm install --create-namespace --namespace accurate accurate -f values.yaml accurate/accurate
+helm install --create-namespace --namespace accurate accurate -f values.yaml oci://ghcr.io/cybozu-go/charts/accurate
 ```
 
 ## Values
@@ -93,5 +87,15 @@ helm install --create-namespace --namespace accurate accurate -f values.yaml acc
 You can use the `helm template` command to render manifests.
 
 ```bash
-helm template --namespace accurate accurate accurate/accurate
+helm template --namespace accurate accurate oci://ghcr.io/cybozu-go/charts/accurate
+```
+
+## Older chart versions
+
+Charts older than v0.7.13 are not available in the OCI registry.
+To find older versions, use the legacy Helm chart repository:
+
+```bash
+helm repo add accurate https://cybozu-go.github.io/accurate
+helm search repo accurate/accurate --versions
 ```

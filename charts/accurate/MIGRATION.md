@@ -9,9 +9,7 @@ There is no significant difference between the manifests installed by kustomize 
 If a resource with the same name already exists in the Cluster, Helm will not be able to create the resource.
 
 ```console
-$ helm repo add accurate https://cybozu-go.github.io/accurate/
-$ helm repo update
-$ helm install --namespace accurate accurate accurate/accurate
+$ helm install --namespace accurate accurate oci://ghcr.io/cybozu-go/charts/accurate
 Error: rendered manifests contain a resource that already exists. Unable to continue with install: ServiceAccount "accurate-controller-manager" in namespace "accurate" exists and cannot be imported into the current release: invalid ownership metadata; label validation error: missing key "app.kubernetes.io/managed-by": must be set to "Helm"; annotation validation error: missing key "meta.helm.sh/release-name": must be set to "accurate"; annotation validation error: missing key "meta.helm.sh/release-namespace": must be set to "accurate"
 ```
 
@@ -19,7 +17,7 @@ Before installing Helm chart, you need to manually delete the resources.
 You do not need to delete Namespace, CRD and SubNamespace custom resources at this time.
 
 ```console
-$ helm template --namespace accurate accurate accurate/accurate | kubectl delete -f -
+$ helm template --namespace accurate accurate oci://ghcr.io/cybozu-go/charts/accurate | kubectl delete -f -
 serviceaccount "accurate-controller-manager" deleted
 clusterrole.rbac.authorization.k8s.io "accurate-manager-role" deleted
 clusterrole.rbac.authorization.k8s.io "accurate-subnamespace-editor-role" deleted
@@ -40,7 +38,7 @@ Error from server (NotFound): error when deleting "STDIN": configmaps "accurate-
 Then install Helm chart again.
 
 ```console
-$ helm install --namespace accurate accurate accurate/accurate
+$ helm install --namespace accurate accurate oci://ghcr.io/cybozu-go/charts/accurate
 NAME: accurate
 LAST DEPLOYED: Fri Aug 20 10:12:03 2021
 NAMESPACE: accurate
@@ -122,7 +120,7 @@ controller:
 The values file can be specified with the `-f` option when you install Helm chart.
 
 ```bash
-helm install --create-namespace --namespace accurate accurate accurate/accurate -f values.yaml
+helm install --create-namespace --namespace accurate accurate oci://ghcr.io/cybozu-go/charts/accurate -f values.yaml
 ```
 
 There are several other configurable items besides the Accurate config file. See [README.md](./README.md) for details.
