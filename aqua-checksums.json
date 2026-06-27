@@ -246,6 +246,26 @@
       "algorithm": "sha256"
     },
     {
+      "id": "github_release/github.com/oras-project/oras/v1.3.2/oras_1.3.2_darwin_amd64.tar.gz",
+      "checksum": "2621F6B252B222F6FBF4E114D2FCAA0CEC6B632624FFAF73143F66E4E0994F86",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/oras-project/oras/v1.3.2/oras_1.3.2_darwin_arm64.tar.gz",
+      "checksum": "7929F792CF272268412375ECAD6F0FB3C20F164368D5B57966E67AD6D36ECA53",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/oras-project/oras/v1.3.2/oras_1.3.2_linux_amd64.tar.gz",
+      "checksum": "9229CCC6D17BB282039AD4A69ABB16DCB887A5BCE567C075D731D9B3C7AD8EAF",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/oras-project/oras/v1.3.2/oras_1.3.2_linux_arm64.tar.gz",
+      "checksum": "8DB4A223BD6034DEFF198E791EA7CB3AF0840DF25B7E9F370E2F1F3FD20D389B",
+      "algorithm": "sha256"
+    },
+    {
       "id": "github_release/github.com/rust-lang/mdBook/v0.5.2/mdbook-v0.5.2-x86_64-apple-darwin.tar.gz",
       "checksum": "17CC64478EC279A73881420E850BD8F9D460552E56B50159FF465BC97EB90D6C",
       "algorithm": "sha256"
@@ -253,6 +273,36 @@
     {
       "id": "github_release/github.com/rust-lang/mdBook/v0.5.2/mdbook-v0.5.2-x86_64-unknown-linux-musl.tar.gz",
       "checksum": "8E9D802BBECEA34380AABFC65BEC4FDBA23C07453EF2C7E06FA34C282082E2C4",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/rust-lang/mdBook/v0.5.3/mdbook-v0.5.3-x86_64-apple-darwin.tar.gz",
+      "checksum": "9B74591168F8DBF19FCDF2386B68031FECC4B847B2E81E2DE2D23ED502618875",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/rust-lang/mdBook/v0.5.3/mdbook-v0.5.3-x86_64-unknown-linux-musl.tar.gz",
+      "checksum": "DFB86D8E20A3FED91BF549AA450B9D7F46A275B700292E050CDFD3171732E7FD",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/sigstore/cosign/v3.1.1/cosign-darwin-amd64",
+      "checksum": "14D2678DFBFDE18798151E86FBD91EBDADBB7424B18412A42A155DD8A2DF4C7A",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/sigstore/cosign/v3.1.1/cosign-darwin-arm64",
+      "checksum": "94B42A9E697BE95675F6160AB031A9A5F1EC1E646D6F648D7B2F5CD59ECECBC5",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/sigstore/cosign/v3.1.1/cosign-linux-amd64",
+      "checksum": "AE1ECD212663F3693AD9EDF8B1A183900C9A52D3155BA6E354237F9A0F6463FC",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/sigstore/cosign/v3.1.1/cosign-linux-arm64",
+      "checksum": "2EC865872E331C32FD12B08DAE15332D3F92C0AA029219589684A4903CA85D11",
       "algorithm": "sha256"
     },
     {
@@ -273,16 +323,6 @@
     {
       "id": "github_release/github.com/suzuki-shunsuke/pinact/v4.0.0/pinact_linux_arm64.tar.gz",
       "checksum": "C5D8EF4B253A749B754AD04F484D93C78FADE5470BB549D58DF6A8AECA9B18BF",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/rust-lang/mdBook/v0.5.3/mdbook-v0.5.3-x86_64-apple-darwin.tar.gz",
-      "checksum": "9B74591168F8DBF19FCDF2386B68031FECC4B847B2E81E2DE2D23ED502618875",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/rust-lang/mdBook/v0.5.3/mdbook-v0.5.3-x86_64-unknown-linux-musl.tar.gz",
-      "checksum": "DFB86D8E20A3FED91BF549AA450B9D7F46A275B700292E050CDFD3171732E7FD",
       "algorithm": "sha256"
     },
     {

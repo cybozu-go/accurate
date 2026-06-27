@@ -1,5 +1,0 @@
-owner: cybozu-go
-git-repo: accurate
-release-name-template: "{{ .Name }}-chart-{{ .Version }}"
-make-release-latest: false
-release-notes-file: RELEASE.md
