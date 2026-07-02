@@ -20,9 +20,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
-	"github.com/cybozu-go/accurate/pkg/config"
 	"github.com/cybozu-go/accurate/pkg/constants"
-	"github.com/cybozu-go/accurate/pkg/feature"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -51,9 +49,6 @@ var _ = BeforeSuite(func() {
 		zap.StacktraceLevel(zapcore.DPanicLevel),
 		zap.Level(zapcore.Level(-5)),
 	))
-
-	// Some tests are still testing the propagate-generated feature
-	Expect(config.DefaultMutableFeatureGate.SetFromMap(map[string]bool{string(feature.DisablePropagateGenerated): false})).To(Succeed())
 
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{

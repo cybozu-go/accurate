@@ -63,7 +63,6 @@ Flags:
       --feature-gates mapStringBool        A set of key=value pairs that describe feature gates for alpha/experimental features. Options are:
                                            AllAlpha=true|false (ALPHA - default=false)
                                            AllBeta=true|false (BETA - default=false)
-                                           DisablePropagateGenerated=true|false (BETA - default=true)
       --health-probe-addr string           Listen address for health probes (default ":8081")
   -h, --help                               help for accurate-controller
       --leader-election-id string          ID for leader election by controller-runtime (default "accurate")

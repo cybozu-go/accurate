@@ -34,14 +34,6 @@ start: setup $(KUBECTL_ACCURATE) $(CHART_DIR)/cert-manager/Chart.yaml
 	kubectl -n cert-manager wait --for=condition=available --timeout=180s --all deployments
 	helm install --create-namespace --namespace accurate accurate ../charts/accurate -f values.yaml
 	kubectl -n accurate wait --for=condition=available --timeout=180s --all deployments
-	helm repo add sealed-secrets https://bitnami.github.io/sealed-secrets
-	helm repo update
-	helm install sealed-secrets-controller --namespace kube-system sealed-secrets/sealed-secrets
-	kubectl -n kube-system wait --for=condition=available --timeout=180s --all deployments
-	# wait for a secret to be created
-	sleep 5
-	kubectl -n root2 create secret generic mysecret --dry-run=client --from-literal=foo=bar -o json | \
-		kubeseal | jq '. * {metadata: {annotations: {"accurate.cybozu.com/propagate-generated": "create"}}}' > sealed.json
 
 .PHONY: test
 test:

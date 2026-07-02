@@ -25,15 +25,3 @@ Mode is one of the following:
 - `create`: the resource will be created in referencing Namespaces if missing.
 - `update`: the resource will be created in referencing Namespaces if missing, or will be updated if not identical, or will be deleted when the resource in the referenced Namespace is deleted.
 
-## Propagating generated resources (DEPRECATED)
-
-<div class="warning">
-Propagating generated resources is a deprecated feature and is subject for
-removal soon.
-</div>
-
-If a resource annotated with `accurate.cybozu.com/propagate-generated=<mode>` creates a resource and set an owner reference in the created resource, Accurate automatically adds `accurate.cybozu.com/propagate=<mode>` to the created resource.
-
-This can be used, for example, to propagate Secret created from [SealedSecret][].
-
-[SealedSecret]: https://github.com/bitnami-labs/sealed-secrets

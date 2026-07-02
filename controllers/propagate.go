@@ -5,25 +5,17 @@ import (
 	"fmt"
 
 	utilerrors "github.com/cybozu-go/accurate/internal/util/errors"
-	"github.com/cybozu-go/accurate/pkg/config"
 	"github.com/cybozu-go/accurate/pkg/constants"
-	"github.com/cybozu-go/accurate/pkg/feature"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
-
-// Deprecated: Part of the deprecated propagate-generated feature subject for
-// removal soon.
-const notGenerated = "false"
 
 type ResourceCloner struct {
 	LabelKeyExcludes      []string
@@ -67,8 +59,7 @@ func (rc *ResourceCloner) cloneResource(res *unstructured.Unstructured, ns strin
 type PropagateController struct {
 	client.Client
 	ResourceCloner
-	reader client.Reader
-	res    *unstructured.Unstructured
+	res *unstructured.Unstructured
 }
 
 // NewPropagateController creates a new PropagateController.
@@ -141,14 +132,6 @@ func (r *PropagateController) Reconcile(ctx context.Context, req ctrl.Request) (
 		if err := r.propagateUpdate(ctx, obj, nil); err != nil {
 			logger.Error(err, "failed to propagate an object", "mode", "update", "parent", "none")
 			return ctrl.Result{}, err
-		}
-	case "":
-		//nolint:staticcheck // SA1019: subject for removal
-		if !config.DefaultFeatureGate.Enabled(feature.DisablePropagateGenerated) && ann[constants.AnnGenerated] != notGenerated {
-			if err := r.checkController(ctx, obj); err != nil {
-				logger.Error(err, "failed to check the controller reference")
-				return ctrl.Result{}, err
-			}
 		}
 	}
 
@@ -335,46 +318,6 @@ func (r *PropagateController) propagateUpdate(ctx context.Context, obj, parent *
 	return nil
 }
 
-// Deprecated: Part of the deprecated propagate-generated feature subject for
-// removal soon.
-func (r *PropagateController) checkController(ctx context.Context, obj *unstructured.Unstructured) error {
-	cref := metav1.GetControllerOfNoCopy(obj)
-	if cref == nil {
-		return nil
-	}
-
-	logger := log.FromContext(ctx)
-	owner := &unstructured.Unstructured{}
-	owner.SetGroupVersionKind(schema.FromAPIVersionAndKind(cref.APIVersion, cref.Kind))
-	if err := r.reader.Get(ctx, client.ObjectKey{Namespace: obj.GetNamespace(), Name: cref.Name}, owner); err != nil {
-		if apierrors.IsNotFound(err) {
-			logger.Info("the controller object is not found", "gvk", owner.GroupVersionKind().String(), "owner", cref.Name)
-			return nil
-		}
-		return err
-	}
-
-	patched := obj.DeepCopy()
-	ann := patched.GetAnnotations()
-	if ann == nil {
-		ann = make(map[string]string)
-	}
-	mode, ok := owner.GetAnnotations()[constants.AnnPropagateGenerated]
-	if !ok {
-		ann[constants.AnnGenerated] = notGenerated
-	} else {
-		ann[constants.AnnPropagate] = mode
-	}
-	patched.SetAnnotations(ann)
-
-	if err := r.Patch(ctx, patched, client.MergeFrom(obj)); err != nil {
-		return fmt.Errorf("failed to add %s annotation: %w", constants.AnnPropagateGenerated, err)
-	}
-
-	logger.Info("annotated to store the result of checking the owner")
-	return nil
-}
-
 // SetupWithManager sets up the controller with the Manager.
 func (r *PropagateController) SetupWithManager(mgr ctrl.Manager) error {
 	pred := func(obj client.Object) bool {
@@ -385,18 +328,10 @@ func (r *PropagateController) SetupWithManager(mgr ctrl.Manager) error {
 		if _, ok := ann[constants.AnnPropagate]; ok {
 			return true
 		}
-		//nolint:staticcheck // SA1019: subject for removal
-		if config.DefaultFeatureGate.Enabled(feature.DisablePropagateGenerated) || ann[constants.AnnGenerated] == notGenerated {
-			return false
-		}
-		if metav1.GetControllerOfNoCopy(obj) != nil {
-			return true
-		}
 		return false
 	}
 
 	r.Client = mgr.GetClient()
-	r.reader = mgr.GetAPIReader()
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(r.res).
