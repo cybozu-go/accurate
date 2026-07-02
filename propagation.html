@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-81b710b8.js";
+            window.path_to_searchindex_js = "searchindex-93b6973f.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-ff269338.js"></script>
@@ -199,29 +199,6 @@ metadata:
   annotations:
     accurate.cybozu.com/propagate: &lt;mode&gt;
 </code></pre>
-<h2 id="annotating-a-resource-to-propagate-resources-created-from-it-deprecated"><a class="header" href="#annotating-a-resource-to-propagate-resources-created-from-it-deprecated">Annotating a resource to propagate resources created from it (DEPRECATED)</a></h2>
-<div class="warning">
-Propagating generated resources is a deprecated feature and is subject for
-removal soon. Commonly used tools like cert-manager and sealed-secrets now
-provide features for adding annotations/labels to resources created from
-user-facing custom resources. These features can be used for migration to
-ensure the standard `accurate.cybozu.com/propagate` annotation is added to
-generated resources.
-</div>
-
-<p>For example, a Secret created from cert-manager’s Certificate can automatically be propagated.</p>
-<p>To do this, Certificate should be annotated with <code>accurate.cybozu.com/propagate-generated=&lt;mode&gt;</code> at the time of creation.</p>
-<pre><code class="language-yaml">apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  namespace: default
-  name: example-cert
-  annotations:
-    accurate.cybozu.com/propagate-generated: &lt;mode&gt;
-spec:
-  ...
-</code></pre>
-<p><code>accurate-controller</code> needs to be able to get Certificate objects.</p>
 
                     </main>
 

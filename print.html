@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-81b710b8.js";
+            window.path_to_searchindex_js = "searchindex-93b6973f.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-ff269338.js"></script>
@@ -265,14 +265,6 @@ Labels, annotations, and resources can be propagated from a template Namespace t
 <li><code>create</code>: the resource will be created in referencing Namespaces if missing.</li>
 <li><code>update</code>: the resource will be created in referencing Namespaces if missing, or will be updated if not identical, or will be deleted when the resource in the referenced Namespace is deleted.</li>
 </ul>
-<h2 id="propagating-generated-resources-deprecated"><a class="header" href="#propagating-generated-resources-deprecated">Propagating generated resources (DEPRECATED)</a></h2>
-<div class="warning">
-Propagating generated resources is a deprecated feature and is subject for
-removal soon.
-</div>
-
-<p>If a resource annotated with <code>accurate.cybozu.com/propagate-generated=&lt;mode&gt;</code> creates a resource and set an owner reference in the created resource, Accurate automatically adds <code>accurate.cybozu.com/propagate=&lt;mode&gt;</code> to the created resource.</p>
-<p>This can be used, for example, to propagate Secret created from <a href="https://github.com/bitnami-labs/sealed-secrets">SealedSecret</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="getting-started"><a class="header" href="#getting-started">Getting started</a></h1>
 <p>Follow these steps to install Accurate on your cluster and start using it.</p>
@@ -431,36 +423,6 @@ controller:
           - delete
 &lt;snip&gt;
 </code></pre>
-<h2 id="feature-gates"><a class="header" href="#feature-gates">Feature Gates</a></h2>
-<p>Feature gates are a set of key=value pairs that describe operator features.
-You can turn these features on or off using the <code>--feature-gates</code> command line flag.
-Use <code>-h</code> flag to see a full set of feature gates.</p>
-<p>To set feature gates, use the <code>--feature-gates</code> flag assigned to a list of feature pairs:</p>
-<pre><code class="language-shell">--feature-gates=...,DisablePropagateGenerated=false
-</code></pre>
-<p>The following table is a summary of the feature gates that you can set.</p>
-<ul>
-<li>The “Since” column contains the Accurate release when a feature is introduced
-or its release stage is changed.</li>
-<li>The “Until” column, if not empty, contains the last Accurate release in which
-you can still use a feature gate.</li>
-</ul>
-<div class="table-wrapper">
-<table>
-<thead>
-<tr><th>Feature</th><th>Default</th><th>Stage</th><th>Since</th><th>Until</th></tr>
-</thead>
-<tbody>
-<tr><td><code>DisablePropagateGenerated</code></td><td><code>false</code></td><td>Alpha</td><td>1.2.0</td><td>1.3.0</td></tr>
-<tr><td><code>DisablePropagateGenerated</code></td><td><code>true</code></td><td>Beta</td><td>1.3.0</td><td></td></tr>
-</tbody>
-</table>
-</div>
-<p>Each feature gate is designed for enabling/disabling a specific feature:</p>
-<ul>
-<li><code>DisablePropagateGenerated</code>: Disable <a href="#propagating-generated-resources">propagating generated resources</a>,
-which is a feature subject for removal soon.</li>
-</ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="deploying-accurate"><a class="header" href="#deploying-accurate">Deploying Accurate</a></h1>
 <ol>
@@ -736,29 +698,6 @@ metadata:
   annotations:
     accurate.cybozu.com/propagate: &lt;mode&gt;
 </code></pre>
-<h2 id="annotating-a-resource-to-propagate-resources-created-from-it-deprecated"><a class="header" href="#annotating-a-resource-to-propagate-resources-created-from-it-deprecated">Annotating a resource to propagate resources created from it (DEPRECATED)</a></h2>
-<div class="warning">
-Propagating generated resources is a deprecated feature and is subject for
-removal soon. Commonly used tools like cert-manager and sealed-secrets now
-provide features for adding annotations/labels to resources created from
-user-facing custom resources. These features can be used for migration to
-ensure the standard `accurate.cybozu.com/propagate` annotation is added to
-generated resources.
-</div>
-
-<p>For example, a Secret created from cert-manager’s Certificate can automatically be propagated.</p>
-<p>To do this, Certificate should be annotated with <code>accurate.cybozu.com/propagate-generated=&lt;mode&gt;</code> at the time of creation.</p>
-<pre><code class="language-yaml">apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  namespace: default
-  name: example-cert
-  annotations:
-    accurate.cybozu.com/propagate-generated: &lt;mode&gt;
-spec:
-  ...
-</code></pre>
-<p><code>accurate-controller</code> needs to be able to get Certificate objects.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="sub-namespace-operations"><a class="header" href="#sub-namespace-operations">Sub-namespace operations</a></h1>
 <p>Sub-namespaces is a feature of Accurate to allow tenant users to create Namespaces and delete the created Namespaces.</p>
@@ -1113,7 +1052,6 @@ watches:
       --feature-gates mapStringBool        A set of key=value pairs that describe feature gates for alpha/experimental features. Options are:
                                            AllAlpha=true|false (ALPHA - default=false)
                                            AllBeta=true|false (BETA - default=false)
-                                           DisablePropagateGenerated=true|false (BETA - default=true)
       --health-probe-addr string           Listen address for health probes (default ":8081")
   -h, --help                               help for accurate-controller
       --leader-election-id string          ID for leader election by controller-runtime (default "accurate")
@@ -1165,8 +1103,6 @@ watches:
 <tbody>
 <tr><td><code>accurate.cybozu.com/from</code></td><td>Namespace name</td><td>Copied or propagated resources</td><td>The namespace name from which the source resource was copied.</td></tr>
 <tr><td><code>accurate.cybozu.com/propagate</code></td><td><code>"create"</code> or <code>"update"</code></td><td>Namespace-scoped resources</td><td>Specify propagation mode.</td></tr>
-<tr><td><code>accurate.cybozu.com/propagate-generated</code> ⚠️</td><td><code>"create"</code> or <code>"update"</code></td><td>Namespace-scoped resources</td><td><code>DEPRECATED</code> Specify propagation mode of generated resources.</td></tr>
-<tr><td><code>accurate.cybozu.com/generated</code> ⚠️</td><td><code>false</code></td><td>Namespace-scoped resources</td><td><code>DEPRECATED</code> The result of checking if this is generated from another resource.</td></tr>
 </tbody>
 </table>
 </div>
@@ -1220,12 +1156,6 @@ Since we consider resource-propagation alone is highly useful, the feature is av
 <ul>
 <li><code>create</code>: if the resource does not exist, copy the resource from the parent namespace.</li>
 <li><code>update</code>: if the resource is missing or different from the parent namespace, create or update it.  If the parent resource is deleted, the copy will also be deleted.</li>
-</ul>
-</li>
-<li>⚠️ Propagate generated resources (DEPRECATED)
-<ul>
-<li>Resources created and controlled by another resource can be automatically propagated.</li>
-<li>The generator resource should be annotated with <code>accurate.cybozu.com/propagate-generated: &lt;mode&gt;</code>.</li>
 </ul>
 </li>
 <li>Propagate labels and annotations of parent or template namespaces
@@ -1351,9 +1281,6 @@ With this rule, Accurate can delete such orphaned resources when the controller 
 <li>If the resource exists and the annotation value is <code>update</code>, Accurate creates or updates a copy in all sub-namespaces if missing or different.</li>
 <li>When a resource is deleted, Accurate checks sub-namespaces and delete the resource of the same kind and the same name if the resource is annotated with <code>accurate.cybozu.com/propagate=update</code>.</li>
 </ul>
-<h3 id="resources-owned-by-another-resource-that-is-annotated-with-accuratecybozucompropagate-generated-deprecated"><a class="header" href="#resources-owned-by-another-resource-that-is-annotated-with-accuratecybozucompropagate-generated-deprecated">Resources owned by another resource that is annotated with <code>accurate.cybozu.com/propagate-generated</code> (DEPRECATED)</a></h3>
-<p>Accurate annotates the resource with <code>accurate.cybozu.com/propagate</code>.
-The annotation value is the same as <code>accurate.cybozu.com/propagate-generated</code> annotation.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="release-procedure"><a class="header" href="#release-procedure">Release procedure</a></h1>
 <p>This document describes how to release a new version.</p>

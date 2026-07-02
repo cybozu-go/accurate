@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-81b710b8.js";
+            window.path_to_searchindex_js = "searchindex-93b6973f.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-ff269338.js"></script>
@@ -229,12 +229,6 @@ Since we consider resource-propagation alone is highly useful, the feature is av
 <ul>
 <li><code>create</code>: if the resource does not exist, copy the resource from the parent namespace.</li>
 <li><code>update</code>: if the resource is missing or different from the parent namespace, create or update it.  If the parent resource is deleted, the copy will also be deleted.</li>
-</ul>
-</li>
-<li>⚠️ Propagate generated resources (DEPRECATED)
-<ul>
-<li>Resources created and controlled by another resource can be automatically propagated.</li>
-<li>The generator resource should be annotated with <code>accurate.cybozu.com/propagate-generated: &lt;mode&gt;</code>.</li>
 </ul>
 </li>
 <li>Propagate labels and annotations of parent or template namespaces
