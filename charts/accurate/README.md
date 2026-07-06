@@ -96,6 +96,7 @@ Charts older than v0.7.13 are not available in the OCI registry.
 To find older versions, use the legacy Helm chart repository:
 
 ```bash
-helm repo add accurate https://cybozu-go.github.io/accurate
+helm repo add accurate https://cybozu-go.github.io/accurate/
+helm repo update
 helm search repo accurate/accurate --versions
 ```

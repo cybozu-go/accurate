@@ -18,7 +18,7 @@
     rm -rf cert-manager-keyring.gpg ./cert-manager-chart
     ```
 
-2. Configuration Helm chart values
+2. Configure Helm chart values
 
     Read [Configurations](config.md) for details.
 
