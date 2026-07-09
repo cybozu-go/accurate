@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-93b6973f.js";
+            window.path_to_searchindex_js = "searchindex-b6fecc05.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-ff269338.js"></script>
@@ -199,18 +199,13 @@ rm -rf cert-manager-keyring.gpg ./cert-manager-chart
 </code></pre>
 </li>
 <li>
-<p>Setup Accurate Helm repository</p>
-<pre><code class="language-bash">helm repo add accurate https://cybozu-go.github.io/accurate/
-helm repo update
-</code></pre>
-</li>
-<li>
-<p>Configuration Helm chart values</p>
+<p>Configure Helm chart values</p>
 <p>Read <a href="config.html">Configurations</a> for details.</p>
 </li>
 <li>
 <p>Install the Accurate Helm chart</p>
-<pre><code class="language-bash">helm install --create-namespace --namespace accurate accurate accurate/accurate -f values.yaml
+<p>The Accurate Helm chart is published to an OCI registry, so it can be installed directly by its OCI URL.</p>
+<pre><code class="language-bash">helm install --create-namespace --namespace accurate accurate oci://ghcr.io/cybozu-go/charts/accurate -f values.yaml
 </code></pre>
 </li>
 </ol>

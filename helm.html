@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-93b6973f.js";
+            window.path_to_searchindex_js = "searchindex-b6fecc05.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-ff269338.js"></script>
@@ -181,11 +181,8 @@
                 <div id="mdbook-content" class="content">
                     <main>
                         <h1 id="accurate-helm-chart"><a class="header" href="#accurate-helm-chart">Accurate Helm Chart</a></h1>
-<h2 id="how-to-use-accurate-helm-repository"><a class="header" href="#how-to-use-accurate-helm-repository">How to use Accurate Helm repository</a></h2>
-<p>You need to add this repository to your Helm repositories:</p>
-<pre><code class="language-bash">helm repo add accurate https://cybozu-go.github.io/accurate/
-helm repo update
-</code></pre>
+<p>The Accurate Helm chart is published to an OCI registry at <code>oci://ghcr.io/cybozu-go/charts/accurate</code>.
+There is no need to add a Helm repository; the chart can be referenced directly by its OCI URL.</p>
 <h2 id="quick-start"><a class="header" href="#quick-start">Quick start</a></h2>
 <h3 id="installing-cert-manager"><a class="header" href="#installing-cert-manager">Installing cert-manager</a></h3>
 <pre><code class="language-bash">CERT_MANAGER_VERSION=v1.20.2
@@ -215,11 +212,11 @@ add annotations preventing Helm from uninstalling the CRD when the Helm release 
 <p>This installation method requires cert-manager to be installed beforehand.</p>
 </blockquote>
 <p>To install the chart with the release name <code>accurate</code> using a dedicated namespace(recommended):</p>
-<pre><code class="language-bash">helm install --create-namespace --namespace accurate accurate accurate/accurate
+<pre><code class="language-bash">helm install --create-namespace --namespace accurate accurate oci://ghcr.io/cybozu-go/charts/accurate
 </code></pre>
 <p>Specify parameters using <code>--set key=value[,key=value]</code> argument to <code>helm install</code>.</p>
 <p>Alternatively a YAML file that specifies the values for the parameters can be provided like this:</p>
-<pre><code class="language-bash">helm install --create-namespace --namespace accurate accurate -f values.yaml accurate/accurate
+<pre><code class="language-bash">helm install --create-namespace --namespace accurate accurate -f values.yaml oci://ghcr.io/cybozu-go/charts/accurate
 </code></pre>
 <h2 id="values"><a class="header" href="#values">Values</a></h2>
 <div class="table-wrapper">
@@ -250,7 +247,14 @@ add annotations preventing Helm from uninstalling the CRD when the Helm release 
 </div>
 <h2 id="generate-manifests"><a class="header" href="#generate-manifests">Generate Manifests</a></h2>
 <p>You can use the <code>helm template</code> command to render manifests.</p>
-<pre><code class="language-bash">helm template --namespace accurate accurate accurate/accurate
+<pre><code class="language-bash">helm template --namespace accurate accurate oci://ghcr.io/cybozu-go/charts/accurate
+</code></pre>
+<h2 id="older-chart-versions"><a class="header" href="#older-chart-versions">Older chart versions</a></h2>
+<p>Charts older than v0.7.13 are not available in the OCI registry.
+To find older versions, use the legacy Helm chart repository:</p>
+<pre><code class="language-bash">helm repo add accurate https://cybozu-go.github.io/accurate/
+helm repo update
+helm search repo accurate/accurate --versions
 </code></pre>
 
                     </main>
