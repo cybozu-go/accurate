@@ -30,3 +30,5 @@ packages:
     registry: local
   - name: golangci/golangci-lint@v2.12.2
   - name: suzuki-shunsuke/pinact@v4.0.0
+  - name: oras-project/oras@v1.3.2
+  - name: sigstore/cosign@v3.1.1

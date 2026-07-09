@@ -18,21 +18,16 @@
     rm -rf cert-manager-keyring.gpg ./cert-manager-chart
     ```
 
-2. Setup Accurate Helm repository
-
-   ```bash
-   helm repo add accurate https://cybozu-go.github.io/accurate/
-   helm repo update
-   ```
-
-3. Configuration Helm chart values
+2. Configure Helm chart values
 
     Read [Configurations](config.md) for details.
 
-4. Install the Accurate Helm chart
+3. Install the Accurate Helm chart
+
+    The Accurate Helm chart is published to an OCI registry, so it can be installed directly by its OCI URL.
 
     ```bash
-    helm install --create-namespace --namespace accurate accurate accurate/accurate -f values.yaml
+    helm install --create-namespace --namespace accurate accurate oci://ghcr.io/cybozu-go/charts/accurate -f values.yaml
     ```
 
 [cert-manager]: https://cert-manager.io/
