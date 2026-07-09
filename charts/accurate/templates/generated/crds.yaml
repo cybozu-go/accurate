@@ -55,6 +55,16 @@ spec:
                     type: string
                   description: Labels are the labels to be propagated to the sub-namespace
                   type: object
+                move:
+                  description: Move specifies a requested or accepted move of this SubNamespace.
+                  properties:
+                    sourceParent:
+                      description: SourceParent is the current parent namespace of the sub-namespace.
+                      type: string
+                    targetParent:
+                      description: TargetParent is the desired parent namespace of the sub-namespace.
+                      type: string
+                  type: object
               type: object
             status:
               description: Status is the status of SubNamespace.

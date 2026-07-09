@@ -36,4 +36,5 @@ const InternalMetaPrefix = "internal.accurate.cybozu.com/"
 const (
 	AnnObservedGeneration = InternalMetaPrefix + "observed-generation"
 	AnnConditions         = InternalMetaPrefix + "conditions"
+	AnnMove               = InternalMetaPrefix + "move"
 )
