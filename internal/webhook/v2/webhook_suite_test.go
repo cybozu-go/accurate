@@ -1,4 +1,4 @@
-package hooks
+package v2
 
 import (
 	"context"
@@ -67,7 +67,7 @@ var _ = BeforeSuite(func() {
 		Scheme: scheme,
 		CRDs:   loadCRDs(),
 		WebhookInstallOptions: envtest.WebhookInstallOptions{
-			Paths: []string{filepath.Join("..", "config", "webhook")},
+			Paths: []string{filepath.Join("..", "..", "..", "config", "webhook")},
 		},
 	}
 
@@ -168,7 +168,7 @@ var _ = AfterSuite(func() {
 func loadCRDs() []*apiextensionsv1.CustomResourceDefinition {
 	kOpts := krusty.MakeDefaultOptions()
 	k := krusty.MakeKustomizer(kOpts)
-	m, err := k.Run(filesys.FileSystemOrOnDisk{}, filepath.Join("..", "config", "crd"))
+	m, err := k.Run(filesys.FileSystemOrOnDisk{}, filepath.Join("..", "..", "..", "config", "crd"))
 	Expect(err).To(Succeed())
 	resources := m.Resources()
 

@@ -29,7 +29,7 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/filesys"
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
-	"github.com/cybozu-go/accurate/hooks"
+	hooks "github.com/cybozu-go/accurate/internal/webhook/v2"
 	"github.com/cybozu-go/accurate/pkg/indexing"
 )
 
@@ -67,7 +67,7 @@ var _ = BeforeSuite(func() {
 		Scheme: scheme,
 		CRDs:   loadCRDs(),
 		WebhookInstallOptions: envtest.WebhookInstallOptions{
-			Paths: []string{filepath.Join("..", "..", "config", "webhook")},
+			Paths: []string{filepath.Join("..", "..", "..", "..", "config", "webhook")},
 		},
 	}
 
@@ -134,7 +134,7 @@ var _ = AfterSuite(func() {
 func loadCRDs() []*apiextensionsv1.CustomResourceDefinition {
 	kOpts := krusty.MakeDefaultOptions()
 	k := krusty.MakeKustomizer(kOpts)
-	m, err := k.Run(filesys.FileSystemOrOnDisk{}, filepath.Join("..", "..", "config", "crd"))
+	m, err := k.Run(filesys.FileSystemOrOnDisk{}, filepath.Join("..", "..", "..", "..", "config", "crd"))
 	Expect(err).To(Succeed())
 	resources := m.Resources()
 
