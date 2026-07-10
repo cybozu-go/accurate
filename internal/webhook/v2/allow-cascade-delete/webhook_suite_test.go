@@ -29,8 +29,8 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/filesys"
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	"github.com/cybozu-go/accurate/internal/indexing"
 	hooks "github.com/cybozu-go/accurate/internal/webhook/v2"
-	"github.com/cybozu-go/accurate/pkg/indexing"
 )
 
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
