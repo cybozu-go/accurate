@@ -95,7 +95,7 @@ envtest: setup
 	source <(setup-envtest use -p env); \
 		go test -v -count 1 -race ./internal/controller -ginkgo.show-node-events -ginkgo.v -ginkgo.fail-fast
 	source <(setup-envtest use -p env); \
-		go test -v -count 1 -race ./hooks/... -ginkgo.show-node-events -ginkgo.v
+		go test -v -count 1 -race ./internal/webhook/... -ginkgo.show-node-events -ginkgo.v
 
 .PHONY: lint
 lint: setup
