@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/cybozu-go/accurate/internal/indexing"
-	"github.com/cybozu-go/accurate/pkg/constants"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -95,7 +95,7 @@ var _ = Describe("SubNamespace controller", func() {
 		svc1 := &corev1.Service{}
 		svc1.Namespace = rootNS
 		svc1.Name = "svc1"
-		svc1.Annotations = map[string]string{constants.AnnPropagate: constants.PropagateCreate}
+		svc1.Annotations = map[string]string{accuratev2.AnnPropagate: accuratev2.PropagateCreate}
 		svc1.Spec.ClusterIP = "None"
 		svc1.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt32(3333)}}
 		Expect(k8sClient.Create(ctx, svc1)).To(Succeed())
@@ -127,13 +127,13 @@ var _ = Describe("SubNamespace controller", func() {
 		svc1Sub1Sub.Name = "svc1"
 		svc1Sub1Sub.Namespace = sub1SubNS
 		Eventually(komega.Get(svc1Sub1Sub)).Should(Succeed())
-		Expect(svc1Sub1.Annotations).To(HaveKeyWithValue(constants.AnnFrom, rootNS))
+		Expect(svc1Sub1.Annotations).To(HaveKeyWithValue(accuratev2.AnnFrom, rootNS))
 		Expect(svc1Sub1.Spec.Ports).To(HaveLen(1))
 		Expect(svc1Sub1.Spec.Ports[0].Port).To(BeNumerically("==", 3333))
-		Expect(svc1Sub2.Annotations).To(HaveKeyWithValue(constants.AnnFrom, rootNS))
+		Expect(svc1Sub2.Annotations).To(HaveKeyWithValue(accuratev2.AnnFrom, rootNS))
 		Expect(svc1Sub2.Spec.Ports).To(HaveLen(1))
 		Expect(svc1Sub2.Spec.Ports[0].Port).To(BeNumerically("==", 3333))
-		Expect(svc1Sub1Sub.Annotations).To(HaveKeyWithValue(constants.AnnFrom, sub1NS))
+		Expect(svc1Sub1Sub.Annotations).To(HaveKeyWithValue(accuratev2.AnnFrom, sub1NS))
 		Expect(svc1Sub1Sub.Spec.Ports).To(HaveLen(1))
 		Expect(svc1Sub1Sub.Spec.Ports[0].Port).To(BeNumerically("==", 3333))
 
@@ -158,13 +158,13 @@ var _ = Describe("SubNamespace controller", func() {
 		By("changing a sub-resource to a non-sub-resource")
 		Expect(komega.Update(svc1Sub1Sub, func() {
 			svc1Sub1Sub.Annotations = map[string]string{
-				constants.AnnPropagate: constants.PropagateUpdate,
+				accuratev2.AnnPropagate: accuratev2.PropagateUpdate,
 			}
 		})()).To(Succeed())
 
-		Eventually(komega.Object(svc1Sub1Sub)).Should(HaveField("Annotations", HaveKeyWithValue(constants.AnnPropagate, constants.PropagateUpdate)))
-		Consistently(komega.Object(svc1Sub1Sub)).Should(HaveField("Annotations", HaveKeyWithValue(constants.AnnPropagate, constants.PropagateUpdate)))
-		Expect(svc1Sub1Sub.Annotations).NotTo(HaveKey(constants.AnnFrom))
+		Eventually(komega.Object(svc1Sub1Sub)).Should(HaveField("Annotations", HaveKeyWithValue(accuratev2.AnnPropagate, accuratev2.PropagateUpdate)))
+		Consistently(komega.Object(svc1Sub1Sub)).Should(HaveField("Annotations", HaveKeyWithValue(accuratev2.AnnPropagate, accuratev2.PropagateUpdate)))
+		Expect(svc1Sub1Sub.Annotations).NotTo(HaveKey(accuratev2.AnnFrom))
 
 		By("deleting the root resource")
 		Expect(k8sClient.Delete(ctx, svc1)).To(Succeed())
@@ -178,7 +178,7 @@ var _ = Describe("SubNamespace controller", func() {
 		svc1 := &corev1.Service{}
 		svc1.Namespace = tmplNS
 		svc1.Name = "svc1"
-		svc1.Annotations = map[string]string{constants.AnnPropagate: constants.PropagateCreate}
+		svc1.Annotations = map[string]string{accuratev2.AnnPropagate: accuratev2.PropagateCreate}
 		svc1.Spec.ClusterIP = "None"
 		svc1.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt32(3333)}}
 		Expect(k8sClient.Create(ctx, svc1)).To(Succeed())
@@ -202,7 +202,7 @@ var _ = Describe("SubNamespace controller", func() {
 		svc1Instance.Name = "svc1"
 		svc1Instance.Namespace = instanceNS
 		Eventually(komega.Get(svc1Instance)).Should(Succeed())
-		Expect(svc1Instance.Annotations).To(HaveKeyWithValue(constants.AnnFrom, tmplNS))
+		Expect(svc1Instance.Annotations).To(HaveKeyWithValue(accuratev2.AnnFrom, tmplNS))
 		Expect(svc1Instance.Spec.Ports).To(HaveLen(1))
 		Expect(svc1Instance.Spec.Ports[0].Port).To(BeNumerically("==", 3333))
 
@@ -222,7 +222,7 @@ var _ = Describe("SubNamespace controller", func() {
 		svc1 := &corev1.Service{}
 		svc1.Namespace = rootNS
 		svc1.Name = "svc1"
-		svc1.Annotations = map[string]string{constants.AnnPropagate: constants.PropagateUpdate}
+		svc1.Annotations = map[string]string{accuratev2.AnnPropagate: accuratev2.PropagateUpdate}
 		svc1.Spec.ClusterIP = "None"
 		svc1.Spec.Ports = []corev1.ServicePort{{Port: 3333, TargetPort: intstr.FromInt32(3333)}}
 		Expect(k8sClient.Create(ctx, svc1)).To(Succeed())
@@ -248,13 +248,13 @@ var _ = Describe("SubNamespace controller", func() {
 		svc1Sub1Sub.Name = "svc1"
 		svc1Sub1Sub.Namespace = sub1SubNS
 		Eventually(komega.Get(svc1Sub1Sub)).Should(Succeed())
-		Expect(svc1Sub1.Annotations).To(HaveKeyWithValue(constants.AnnFrom, rootNS))
+		Expect(svc1Sub1.Annotations).To(HaveKeyWithValue(accuratev2.AnnFrom, rootNS))
 		Expect(svc1Sub1.Spec.Ports).To(HaveLen(1))
 		Expect(svc1Sub1.Spec.Ports[0].Port).To(BeNumerically("==", 3333))
-		Expect(svc1Sub2.Annotations).To(HaveKeyWithValue(constants.AnnFrom, rootNS))
+		Expect(svc1Sub2.Annotations).To(HaveKeyWithValue(accuratev2.AnnFrom, rootNS))
 		Expect(svc1Sub2.Spec.Ports).To(HaveLen(1))
 		Expect(svc1Sub2.Spec.Ports[0].Port).To(BeNumerically("==", 3333))
-		Expect(svc1Sub1Sub.Annotations).To(HaveKeyWithValue(constants.AnnFrom, sub1NS))
+		Expect(svc1Sub1Sub.Annotations).To(HaveKeyWithValue(accuratev2.AnnFrom, sub1NS))
 		Expect(svc1Sub1Sub.Spec.Ports).To(HaveLen(1))
 		Expect(svc1Sub1Sub.Spec.Ports[0].Port).To(BeNumerically("==", 3333))
 
@@ -265,12 +265,12 @@ var _ = Describe("SubNamespace controller", func() {
 
 		By("updating a sub-resource to check that Accurate fixes it")
 		Expect(komega.Update(svc1Sub1, func() {
-			svc1Sub1.Annotations[constants.AnnPropagate] = constants.PropagateCreate
+			svc1Sub1.Annotations[accuratev2.AnnPropagate] = accuratev2.PropagateCreate
 		})()).To(Succeed())
 		rv := svc1Sub1.ResourceVersion
 		rv2 := svc1Sub1Sub.ResourceVersion
 		Eventually(komega.Object(svc1Sub1)).Should(HaveField("ResourceVersion", Not(Equal(rv))))
-		Expect(svc1Sub1.Annotations).To(HaveKeyWithValue(constants.AnnPropagate, constants.PropagateUpdate))
+		Expect(svc1Sub1.Annotations).To(HaveKeyWithValue(accuratev2.AnnPropagate, accuratev2.PropagateUpdate))
 		time.Sleep(100 * time.Millisecond)
 		Expect(svc1Sub1Sub.ResourceVersion).To(Equal(rv2))
 
@@ -306,9 +306,9 @@ var _ = Describe("SubNamespace controller", func() {
 			svc.Namespace = sourceNs
 			svc.Name = "svc"
 			svc.Annotations = map[string]string{
-				constants.AnnPropagate: constants.PropagateUpdate,
-				excludedAnnotation:     "bar",
-				"foo.bar/baz":          "baz",
+				accuratev2.AnnPropagate: accuratev2.PropagateUpdate,
+				excludedAnnotation:      "bar",
+				"foo.bar/baz":           "baz",
 			}
 			svc.Labels = map[string]string{
 				excludedLabel: "bar",

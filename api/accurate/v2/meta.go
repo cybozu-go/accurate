@@ -1,4 +1,4 @@
-package constants
+package v2
 
 // MetaPrefix is the MetaPrefix for labels, annotations, and finalizers of Accurate.
 const MetaPrefix = "accurate.cybozu.com/"
@@ -28,12 +28,4 @@ const (
 	PropagateCreate = "create"
 	PropagateUpdate = "update"
 	PropagateAny    = "any" // defined as an in-memory index value
-)
-
-// InternalMetaPrefix is the MetaPrefix for internal (not user-facing) annotations of Accurate.
-const InternalMetaPrefix = "internal.accurate.cybozu.com/"
-
-const (
-	AnnObservedGeneration = InternalMetaPrefix + "observed-generation"
-	AnnConditions         = InternalMetaPrefix + "conditions"
 )

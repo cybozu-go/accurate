@@ -7,8 +7,8 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/cybozu-go/accurate/pkg/config"
-	"github.com/cybozu-go/accurate/pkg/constants"
 	"github.com/spf13/cobra"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -121,18 +121,18 @@ func (o *nsDescribeOpts) Run(ctx context.Context) error {
 
 	o.printf("Name: %s\n", ns.Name)
 
-	typ := ns.Labels[constants.LabelType]
+	typ := ns.Labels[accuratev2.LabelType]
 	switch typ {
-	case constants.NSTypeRoot:
+	case accuratev2.NSTypeRoot:
 		o.printf("Type: %s\n", typ)
-		children, err := o.getChildren(ctx, constants.LabelParent)
+		children, err := o.getChildren(ctx, accuratev2.LabelParent)
 		if err != nil {
 			return err
 		}
 		o.printf("# of children: %d\n", len(children))
-	case constants.NSTypeTemplate:
+	case accuratev2.NSTypeTemplate:
 		o.printf("Type: %s\n", typ)
-		children, err := o.getChildren(ctx, constants.LabelTemplate)
+		children, err := o.getChildren(ctx, accuratev2.LabelTemplate)
 		if err != nil {
 			return err
 		}
@@ -141,10 +141,10 @@ func (o *nsDescribeOpts) Run(ctx context.Context) error {
 		o.printf("Type: none\n")
 	}
 
-	if parent, ok := ns.Labels[constants.LabelParent]; ok {
+	if parent, ok := ns.Labels[accuratev2.LabelParent]; ok {
 		o.printf("Parent: %s\n", parent)
 	}
-	if tmpl, ok := ns.Labels[constants.LabelTemplate]; ok {
+	if tmpl, ok := ns.Labels[accuratev2.LabelTemplate]; ok {
 		o.printf("Template: %s\n", tmpl)
 	}
 
@@ -175,8 +175,8 @@ func (o *nsDescribeOpts) printResource(ctx context.Context, w io.Writer, gvk met
 	}
 	for _, obj := range objList.Items {
 		anns := obj.GetAnnotations()
-		from := anns[constants.AnnFrom]
-		mode := anns[constants.AnnPropagate]
+		from := anns[accuratev2.AnnFrom]
+		mode := anns[accuratev2.AnnPropagate]
 		if from == "" && mode == "" {
 			continue
 		}

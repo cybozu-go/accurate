@@ -6,7 +6,6 @@ import (
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/cybozu-go/accurate/internal/indexing"
-	"github.com/cybozu-go/accurate/pkg/constants"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -97,10 +96,10 @@ var _ = Describe("Namespace controller", func() {
 		tmpl := &corev1.Namespace{}
 		tmpl.Name = "tmpl"
 		tmpl.Labels = map[string]string{
-			constants.LabelType: constants.NSTypeTemplate,
-			"foo.bar/baz":       "baz",
-			"team":              "neco",
-			"memo":              "randum",
+			accuratev2.LabelType: accuratev2.NSTypeTemplate,
+			"foo.bar/baz":        "baz",
+			"team":               "neco",
+			"memo":               "randum",
 		}
 		tmpl.Annotations = map[string]string{
 			"foo.bar/zot": "zot",
@@ -124,7 +123,7 @@ var _ = Describe("Namespace controller", func() {
 		role2 := roleRes.DeepCopy()
 		role2.SetNamespace("tmpl")
 		role2.SetName("role2")
-		role2.SetAnnotations(map[string]string{constants.AnnPropagate: constants.PropagateCreate})
+		role2.SetAnnotations(map[string]string{accuratev2.AnnPropagate: accuratev2.PropagateCreate})
 		role2.Object["rules"] = []any{
 			map[string]any{
 				"apiGroups": []any{""},
@@ -140,7 +139,7 @@ var _ = Describe("Namespace controller", func() {
 		secret.Object["data"] = map[string]any{
 			"foo": "MjAyMC0wOS0xM1QwNDozOToxMFo=",
 		}
-		secret.SetAnnotations(map[string]string{constants.AnnPropagate: constants.PropagateUpdate})
+		secret.SetAnnotations(map[string]string{accuratev2.AnnPropagate: accuratev2.PropagateUpdate})
 		Expect(k8sClient.Create(ctx, secret)).To(Succeed())
 
 		ns1 := &corev1.Namespace{}
@@ -153,14 +152,14 @@ var _ = Describe("Namespace controller", func() {
 		secret2.Object["data"] = map[string]any{
 			"bar": "MjAyMC0wOS0xM1QwNDozOToxMFo=",
 		}
-		secret2.SetAnnotations(map[string]string{constants.AnnPropagate: constants.PropagateUpdate})
+		secret2.SetAnnotations(map[string]string{accuratev2.AnnPropagate: accuratev2.PropagateUpdate})
 		Expect(k8sClient.Create(ctx, secret2)).To(Succeed())
 
 		time.Sleep(100 * time.Millisecond)
 
 		By("setting the template namespace")
 		Expect(komega.Update(ns1, func() {
-			ns1.Labels = map[string]string{constants.LabelTemplate: "tmpl"}
+			ns1.Labels = map[string]string{accuratev2.LabelTemplate: "tmpl"}
 		})()).To(Succeed())
 
 		Eventually(komega.Object(ns1)).Should(HaveField("Labels", HaveKeyWithValue("team", "neco")))
@@ -174,18 +173,18 @@ var _ = Describe("Namespace controller", func() {
 		pRole.Name = "role2"
 		pRole.Namespace = ns1.Name
 		Eventually(komega.Get(pRole)).Should(Succeed())
-		Expect(pRole.Labels).To(HaveKeyWithValue(constants.LabelCreatedBy, constants.CreatedBy))
-		Expect(pRole.Annotations).To(HaveKeyWithValue(constants.AnnFrom, "tmpl"))
-		Expect(pRole.Annotations).To(HaveKeyWithValue(constants.AnnPropagate, constants.PropagateCreate))
+		Expect(pRole.Labels).To(HaveKeyWithValue(accuratev2.LabelCreatedBy, accuratev2.CreatedBy))
+		Expect(pRole.Annotations).To(HaveKeyWithValue(accuratev2.AnnFrom, "tmpl"))
+		Expect(pRole.Annotations).To(HaveKeyWithValue(accuratev2.AnnPropagate, accuratev2.PropagateCreate))
 		Expect(pRole.Rules).To(HaveLen(1))
 
 		pSecret := &corev1.Secret{}
 		pSecret.Name = "foo"
 		pSecret.Namespace = ns1.Name
 		Eventually(komega.Get(pSecret)).Should(Succeed())
-		Expect(pSecret.Labels).To(HaveKeyWithValue(constants.LabelCreatedBy, constants.CreatedBy))
-		Expect(pSecret.Annotations).To(HaveKeyWithValue(constants.AnnFrom, "tmpl"))
-		Expect(pSecret.Annotations).To(HaveKeyWithValue(constants.AnnPropagate, constants.PropagateUpdate))
+		Expect(pSecret.Labels).To(HaveKeyWithValue(accuratev2.LabelCreatedBy, accuratev2.CreatedBy))
+		Expect(pSecret.Annotations).To(HaveKeyWithValue(accuratev2.AnnFrom, "tmpl"))
+		Expect(pSecret.Annotations).To(HaveKeyWithValue(accuratev2.AnnPropagate, accuratev2.PropagateUpdate))
 		Expect(pSecret.Data).To(HaveKey("foo"))
 
 		pRole2 := &rbacv1.Role{}
@@ -214,21 +213,21 @@ var _ = Describe("Namespace controller", func() {
 		tmpl2 := &corev1.Namespace{}
 		tmpl2.Name = "tmpl2"
 		tmpl2.Labels = map[string]string{
-			constants.LabelType: constants.NSTypeTemplate,
-			"team":              "maneki",
+			accuratev2.LabelType: accuratev2.NSTypeTemplate,
+			"team":               "maneki",
 		}
 		Expect(k8sClient.Create(ctx, tmpl2)).To(Succeed())
 
 		sec2 := &corev1.Secret{}
 		sec2.Namespace = tmpl2.Name
 		sec2.Name = "sec2"
-		sec2.Annotations = map[string]string{constants.AnnPropagate: constants.PropagateUpdate}
+		sec2.Annotations = map[string]string{accuratev2.AnnPropagate: accuratev2.PropagateUpdate}
 		sec2.Data = map[string][]byte{"foo": []byte("barbar")}
 		Expect(k8sClient.Create(ctx, sec2)).To(Succeed())
 
 		By("changing the template namespace to tmpl2")
 		Expect(komega.Update(ns1, func() {
-			ns1.Labels[constants.LabelTemplate] = "tmpl2"
+			ns1.Labels[accuratev2.LabelTemplate] = "tmpl2"
 		})()).To(Succeed())
 
 		Eventually(komega.Get(pSecret)).Should(WithTransform(apierrors.IsNotFound, BeTrue()))
@@ -248,7 +247,7 @@ var _ = Describe("Namespace controller", func() {
 
 		By("unsetting the template")
 		Expect(komega.Update(ns1, func() {
-			delete(ns1.Labels, constants.LabelTemplate)
+			delete(ns1.Labels, accuratev2.LabelTemplate)
 		})()).To(Succeed())
 		Eventually(komega.Get(pSec2)).Should(WithTransform(apierrors.IsNotFound, BeTrue()))
 	})
@@ -257,16 +256,16 @@ var _ = Describe("Namespace controller", func() {
 		tmpl1 := &corev1.Namespace{}
 		tmpl1.Name = "tree-tmpl-1"
 		tmpl1.Labels = map[string]string{
-			constants.LabelType: constants.NSTypeTemplate,
-			"team":              "neco",
+			accuratev2.LabelType: accuratev2.NSTypeTemplate,
+			"team":               "neco",
 		}
 		Expect(k8sClient.Create(ctx, tmpl1)).To(Succeed())
 
 		tmpl2 := &corev1.Namespace{}
 		tmpl2.Name = "tree-tmpl-2"
 		tmpl2.Labels = map[string]string{
-			constants.LabelType:     constants.NSTypeTemplate,
-			constants.LabelTemplate: "tree-tmpl-1",
+			accuratev2.LabelType:     accuratev2.NSTypeTemplate,
+			accuratev2.LabelTemplate: "tree-tmpl-1",
 		}
 		tmpl2.Annotations = map[string]string{"memo": "mome"}
 		Expect(k8sClient.Create(ctx, tmpl2)).To(Succeed())
@@ -274,7 +273,7 @@ var _ = Describe("Namespace controller", func() {
 		instance := &corev1.Namespace{}
 		instance.Name = "tree-instance"
 		instance.Labels = map[string]string{
-			constants.LabelTemplate: "tree-tmpl-2",
+			accuratev2.LabelTemplate: "tree-tmpl-2",
 		}
 		Expect(k8sClient.Create(ctx, instance)).To(Succeed())
 
@@ -305,7 +304,7 @@ var _ = Describe("Namespace controller", func() {
 		secret := &corev1.Secret{}
 		secret.Namespace = "default"
 		secret.Name = "independent"
-		secret.Annotations = map[string]string{constants.AnnPropagate: constants.PropagateUpdate}
+		secret.Annotations = map[string]string{accuratev2.AnnPropagate: accuratev2.PropagateUpdate}
 		secret.Data = map[string][]byte{"foo": []byte("bar")}
 
 		Expect(k8sClient.Create(ctx, secret)).To(Succeed())
@@ -328,7 +327,7 @@ var _ = Describe("Namespace controller", func() {
 		root := &corev1.Namespace{}
 		root.Name = "root"
 		root.Labels = map[string]string{
-			constants.LabelType:        constants.NSTypeRoot,
+			accuratev2.LabelType:       accuratev2.NSTypeRoot,
 			"team":                     "neco",
 			"foo.glob/a":               "glob",
 			"do.not.match/glob.patten": "glob",
@@ -350,26 +349,26 @@ var _ = Describe("Namespace controller", func() {
 		sec2 := &corev1.Secret{}
 		sec2.Namespace = "root"
 		sec2.Name = "sec2"
-		sec2.Annotations = map[string]string{constants.AnnPropagate: constants.PropagateCreate}
+		sec2.Annotations = map[string]string{accuratev2.AnnPropagate: accuratev2.PropagateCreate}
 		sec2.Data = map[string][]byte{"foo": []byte("bar")}
 		Expect(k8sClient.Create(ctx, sec2)).To(Succeed())
 
 		sec3 := &corev1.Secret{}
 		sec3.Namespace = "root"
 		sec3.Name = "sec3"
-		sec3.Annotations = map[string]string{constants.AnnPropagate: constants.PropagateUpdate}
+		sec3.Annotations = map[string]string{accuratev2.AnnPropagate: accuratev2.PropagateUpdate}
 		sec3.Data = map[string][]byte{"foo": []byte("bar")}
 		Expect(k8sClient.Create(ctx, sec3)).To(Succeed())
 
 		By("creating a sub namespace")
 		sub1 := &corev1.Namespace{}
 		sub1.Name = "sub1"
-		sub1.Labels = map[string]string{constants.LabelParent: "root"}
+		sub1.Labels = map[string]string{accuratev2.LabelParent: "root"}
 		Expect(k8sClient.Create(ctx, sub1)).To(Succeed())
 
 		Eventually(komega.Object(sub1)).Should(HaveField("Labels", HaveKeyWithValue("team", "neco")))
 		Expect(sub1.Labels).Should(HaveKeyWithValue("foo.glob/a", "glob"))
-		Expect(sub1.Labels).NotTo(HaveKey(constants.LabelType))
+		Expect(sub1.Labels).NotTo(HaveKey(accuratev2.LabelType))
 		Expect(sub1.Labels).NotTo(HaveKey("do.not.match/glob/patten"))
 		Expect(sub1.Annotations).Should(HaveKeyWithValue("bar.glob/b", "glob"))
 		Expect(sub1.Annotations).Should(HaveKeyWithValue("baz.glob/c", "delete-me"))
@@ -388,7 +387,7 @@ var _ = Describe("Namespace controller", func() {
 		By("creating a grandchild namespace")
 		sub2 := &corev1.Namespace{}
 		sub2.Name = "sub2"
-		sub2.Labels = map[string]string{constants.LabelParent: "sub1"}
+		sub2.Labels = map[string]string{accuratev2.LabelParent: "sub1"}
 		Expect(k8sClient.Create(ctx, sub2)).To(Succeed())
 
 		Eventually(komega.Object(sub2)).Should(HaveField("Labels", HaveKeyWithValue("team", "neco")))
@@ -419,13 +418,13 @@ var _ = Describe("Namespace controller", func() {
 		root2 := &corev1.Namespace{}
 		root2.Name = "root2"
 		root2.Labels = map[string]string{
-			constants.LabelType: constants.NSTypeRoot,
-			"foo.bar/baz":       "baz",
+			accuratev2.LabelType: accuratev2.NSTypeRoot,
+			"foo.bar/baz":        "baz",
 		}
 		Expect(k8sClient.Create(ctx, root2)).To(Succeed())
 
 		Expect(komega.Update(sub2, func() {
-			sub2.Labels[constants.LabelParent] = "root2"
+			sub2.Labels[accuratev2.LabelParent] = "root2"
 		})()).To(Succeed())
 
 		Eventually(komega.Object(sub2)).Should(HaveField("Labels", HaveKeyWithValue("foo.bar/baz", "baz")))
@@ -446,7 +445,7 @@ var _ = Describe("Namespace controller", func() {
 			"memo":  "neco",
 			"empty": "true",
 		}
-		sn.Finalizers = []string{constants.Finalizer}
+		sn.Finalizers = []string{accuratev2.Finalizer}
 		Expect(k8sClient.Create(ctx, sn)).To(Succeed())
 		Eventually(komega.Object(sub1)).Should(And(
 			HaveField("Labels", HaveKeyWithValue("team", "neco")),
@@ -457,7 +456,7 @@ var _ = Describe("Namespace controller", func() {
 
 		By("returning the parent of sub2")
 		Expect(komega.Update(sub2, func() {
-			sub2.Labels[constants.LabelParent] = "sub1"
+			sub2.Labels[accuratev2.LabelParent] = "sub1"
 		})()).To(Succeed())
 		Eventually(komega.Object(sub2)).Should(And(
 			HaveField("Labels", HaveKeyWithValue("team", "neco")),
@@ -488,15 +487,15 @@ var _ = Describe("Namespace controller", func() {
 			tmpl := &corev1.Namespace{}
 			tmpl.GenerateName = "tmpl"
 			tmpl.Labels = map[string]string{
-				constants.LabelType: constants.NSTypeTemplate,
-				"team":              "label",
+				accuratev2.LabelType: accuratev2.NSTypeTemplate,
+				"team":               "label",
 			}
 			tmpl.Annotations = map[string]string{"memo": "annot"}
 			Expect(k8sClient.Create(ctx, tmpl)).To(Succeed())
 
 			ns1 = &corev1.Namespace{}
 			ns1.GenerateName = "ns1"
-			ns1.Labels = map[string]string{constants.LabelTemplate: tmpl.Name}
+			ns1.Labels = map[string]string{accuratev2.LabelTemplate: tmpl.Name}
 			Expect(k8sClient.Create(ctx, ns1)).To(Succeed())
 
 			Eventually(komega.Object(ns1)).Should(HaveField("Labels", HaveKeyWithValue("team", "label")))
@@ -516,15 +515,15 @@ var _ = Describe("Namespace controller", func() {
 			root := &corev1.Namespace{}
 			root.GenerateName = "root"
 			root.Labels = map[string]string{
-				constants.LabelType: constants.NSTypeRoot,
-				"team":              "label",
+				accuratev2.LabelType: accuratev2.NSTypeRoot,
+				"team":               "label",
 			}
 			root.Annotations = map[string]string{"memo": "annot"}
 			Expect(k8sClient.Create(ctx, root)).To(Succeed())
 
 			sub1 = &corev1.Namespace{}
 			sub1.GenerateName = "sub1"
-			sub1.Labels = map[string]string{constants.LabelParent: root.Name}
+			sub1.Labels = map[string]string{accuratev2.LabelParent: root.Name}
 			Expect(k8sClient.Create(ctx, sub1)).To(Succeed())
 
 			Eventually(komega.Object(sub1)).Should(HaveField("Labels", HaveKeyWithValue("team", "label")))

@@ -11,7 +11,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
-	"github.com/cybozu-go/accurate/pkg/constants"
 )
 
 var _ = Describe("Webhook allow cascade delete", func() {
@@ -25,7 +24,7 @@ var _ = Describe("Webhook allow cascade delete", func() {
 
 		root = &corev1.Namespace{}
 		root.GenerateName = "cascade-root-"
-		root.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
+		root.Labels = map[string]string{accuratev2.LabelType: accuratev2.NSTypeRoot}
 		Expect(k8sClient.Create(ctx, root)).To(Succeed())
 	})
 
@@ -33,7 +32,7 @@ var _ = Describe("Webhook allow cascade delete", func() {
 		It("should ALLOW deleting a root with children", func() {
 			sub := &corev1.Namespace{}
 			sub.GenerateName = "cascade-sub-"
-			sub.Labels = map[string]string{constants.LabelParent: root.Name}
+			sub.Labels = map[string]string{accuratev2.LabelParent: root.Name}
 			Expect(k8sClient.Create(ctx, sub)).To(Succeed())
 
 			Expect(k8sClient.Delete(ctx, root)).To(Succeed())
@@ -42,12 +41,12 @@ var _ = Describe("Webhook allow cascade delete", func() {
 		It("should ALLOW deleting a sub-namespace with children", func() {
 			sub := &corev1.Namespace{}
 			sub.GenerateName = "cascade-sub-"
-			sub.Labels = map[string]string{constants.LabelParent: root.Name}
+			sub.Labels = map[string]string{accuratev2.LabelParent: root.Name}
 			Expect(k8sClient.Create(ctx, sub)).To(Succeed())
 
 			subSub := &corev1.Namespace{}
 			subSub.GenerateName = "cascade-sub-sub-"
-			subSub.Labels = map[string]string{constants.LabelParent: sub.Name}
+			subSub.Labels = map[string]string{accuratev2.LabelParent: sub.Name}
 			Expect(k8sClient.Create(ctx, subSub)).To(Succeed())
 
 			Expect(k8sClient.Delete(ctx, sub)).To(Succeed())
@@ -56,10 +55,10 @@ var _ = Describe("Webhook allow cascade delete", func() {
 		It("should DENY deleting a template with children", func() {
 			tmpl := &corev1.Namespace{}
 			tmpl.GenerateName = "cascade-tmpl-"
-			tmpl.Labels = map[string]string{constants.LabelType: constants.NSTypeTemplate}
+			tmpl.Labels = map[string]string{accuratev2.LabelType: accuratev2.NSTypeTemplate}
 			Expect(k8sClient.Create(ctx, tmpl)).To(Succeed())
 
-			root.Labels[constants.LabelTemplate] = tmpl.Name
+			root.Labels[accuratev2.LabelTemplate] = tmpl.Name
 			Expect(k8sClient.Update(ctx, root)).To(Succeed())
 
 			err := k8sClient.Delete(ctx, tmpl)
@@ -77,12 +76,12 @@ var _ = Describe("Webhook allow cascade delete", func() {
 			// Create sub-namespace since no controllers present in this test setup
 			subNS := &corev1.Namespace{}
 			subNS.Name = sub.Name
-			subNS.Labels = map[string]string{constants.LabelParent: root.Name}
+			subNS.Labels = map[string]string{accuratev2.LabelParent: root.Name}
 			Expect(k8sClient.Create(ctx, subNS)).To(Succeed())
 
 			ns := &corev1.Namespace{}
 			ns.GenerateName = "cascade-sub-sub-"
-			ns.Labels = map[string]string{constants.LabelParent: subNS.Name}
+			ns.Labels = map[string]string{accuratev2.LabelParent: subNS.Name}
 			Expect(k8sClient.Create(ctx, ns)).To(Succeed())
 
 			Expect(k8sClient.Delete(ctx, sub)).To(Succeed())

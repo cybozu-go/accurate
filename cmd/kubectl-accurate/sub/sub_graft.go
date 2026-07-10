@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
-	"github.com/cybozu-go/accurate/pkg/constants"
+
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
@@ -64,16 +64,16 @@ func (o *subGraftOpts) Run(ctx context.Context) error {
 		return fmt.Errorf("failed to get namespace %s: %w", o.name, err)
 	}
 
-	if _, ok := ns.Labels[constants.LabelParent]; ok {
+	if _, ok := ns.Labels[accuratev2.LabelParent]; ok {
 		return fmt.Errorf("%s is a sub-namespace", o.name)
 	}
 
 	if ns.Labels == nil {
 		ns.Labels = make(map[string]string)
 	}
-	delete(ns.Labels, constants.LabelType)
-	delete(ns.Labels, constants.LabelTemplate)
-	ns.Labels[constants.LabelParent] = o.parent
+	delete(ns.Labels, accuratev2.LabelType)
+	delete(ns.Labels, accuratev2.LabelTemplate)
+	ns.Labels[accuratev2.LabelParent] = o.parent
 	if err := o.client.Update(ctx, ns); err != nil {
 		return fmt.Errorf("failed to update namespace %s: %w", o.name, err)
 	}

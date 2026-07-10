@@ -8,7 +8,6 @@ import (
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	accuratev2ac "github.com/cybozu-go/accurate/internal/applyconfigurations/accurate/v2"
 	"github.com/cybozu-go/accurate/internal/indexing"
-	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -78,7 +77,7 @@ func (r *SubNamespaceReconciler) finalize(ctx context.Context, sn *accuratev2.Su
 		return r.removeFinalizer(ctx, sn)
 	}
 
-	if parent := ns.Labels[constants.LabelParent]; parent != sn.Namespace {
+	if parent := ns.Labels[accuratev2.LabelParent]; parent != sn.Namespace {
 		logger.Info("finalization: ignored non-child namespace", "parent", parent)
 		return r.removeFinalizer(ctx, sn)
 	}
@@ -95,12 +94,12 @@ func (r *SubNamespaceReconciler) finalize(ctx context.Context, sn *accuratev2.Su
 }
 
 func (r *SubNamespaceReconciler) removeFinalizer(ctx context.Context, sn *accuratev2.SubNamespace) error {
-	if !controllerutil.ContainsFinalizer(sn, constants.Finalizer) {
+	if !controllerutil.ContainsFinalizer(sn, accuratev2.Finalizer) {
 		return nil
 	}
 
 	sn = sn.DeepCopy()
-	controllerutil.RemoveFinalizer(sn, constants.Finalizer)
+	controllerutil.RemoveFinalizer(sn, accuratev2.Finalizer)
 
 	// We'll use a JSON Merge Patch here to avoid removal of finalizers added by other controllers
 	patch := map[string]any{
@@ -128,8 +127,8 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2
 		ns = &corev1.Namespace{}
 		ns.Name = sn.Name
 		ns.Labels = map[string]string{
-			constants.LabelCreatedBy: constants.CreatedBy,
-			constants.LabelParent:    sn.Namespace,
+			accuratev2.LabelCreatedBy: accuratev2.CreatedBy,
+			accuratev2.LabelParent:    sn.Namespace,
 		}
 		if err := r.Create(ctx, ns); err != nil {
 			return fmt.Errorf("failed to create namespace %s: %w", ns.Name, err)
@@ -143,7 +142,7 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2
 				WithObservedGeneration(sn.Generation),
 		)
 
-	if ns.Labels[constants.LabelParent] != sn.Namespace {
+	if ns.Labels[accuratev2.LabelParent] != sn.Namespace {
 		logger.Info("a conflicting namespace already exists")
 		ac.Status.WithConditions(
 			conditionPatch(sn.Status.Conditions,
@@ -163,7 +162,7 @@ func (r *SubNamespaceReconciler) reconcileNS(ctx context.Context, sn *accuratev2
 // SetupWithManager sets up the controller with the Manager.
 func (r *SubNamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	nsHandler := func(ctx context.Context, o client.Object) (requests []reconcile.Request) {
-		parent := o.GetLabels()[constants.LabelParent]
+		parent := o.GetLabels()[accuratev2.LabelParent]
 		if parent != "" {
 			requests = append(requests, reconcile.Request{NamespacedName: types.NamespacedName{
 				Namespace: parent,
