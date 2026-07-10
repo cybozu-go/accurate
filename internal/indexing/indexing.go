@@ -16,7 +16,7 @@ func SetupIndexForResource(ctx context.Context, mgr manager.Manager, res client.
 		if val == "" {
 			return nil
 		}
-		return []string{val, accuratev2.PropagateAny}
+		return []string{val, PropagateAny}
 	})
 }
 
