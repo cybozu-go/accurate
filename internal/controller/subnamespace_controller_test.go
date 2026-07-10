@@ -5,8 +5,7 @@ import (
 	"time"
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
-	"github.com/cybozu-go/accurate/pkg/constants"
-	"github.com/cybozu-go/accurate/pkg/indexing"
+	"github.com/cybozu-go/accurate/internal/indexing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -66,15 +65,15 @@ var _ = Describe("SubNamespace controller", func() {
 		sn := &accuratev2.SubNamespace{}
 		sn.Namespace = "test1"
 		sn.Name = "test1-sub1"
-		sn.Finalizers = []string{constants.Finalizer}
+		sn.Finalizers = []string{accuratev2.Finalizer}
 		Expect(k8sClient.Create(ctx, sn)).To(Succeed())
 
 		sub1 := &corev1.Namespace{}
 		sub1.Name = "test1-sub1"
 		Eventually(komega.Get(sub1)).Should(Succeed())
 
-		Expect(sub1.Labels).To(HaveKeyWithValue(constants.LabelCreatedBy, "accurate"))
-		Expect(sub1.Labels).To(HaveKeyWithValue(constants.LabelParent, "test1"))
+		Expect(sub1.Labels).To(HaveKeyWithValue(accuratev2.LabelCreatedBy, "accurate"))
+		Expect(sub1.Labels).To(HaveKeyWithValue(accuratev2.LabelParent, "test1"))
 		Eventually(komega.Object(sn)).Should(HaveField("Status.ObservedGeneration", BeNumerically(">", 0)))
 		Expect(sn.Status.Conditions).To(BeEmpty())
 
@@ -115,7 +114,7 @@ var _ = Describe("SubNamespace controller", func() {
 		sn := &accuratev2.SubNamespace{}
 		sn.Namespace = "test3"
 		sn.Name = "test3-sub1"
-		sn.Finalizers = []string{constants.Finalizer}
+		sn.Finalizers = []string{accuratev2.Finalizer}
 		Expect(k8sClient.Create(ctx, sn)).To(Succeed())
 
 		sub1 := &corev1.Namespace{}
@@ -123,7 +122,7 @@ var _ = Describe("SubNamespace controller", func() {
 		Eventually(komega.Get(sub1)).Should(Succeed())
 
 		Expect(komega.Update(sub1, func() {
-			sub1.Labels[constants.LabelParent] = "foo"
+			sub1.Labels[accuratev2.LabelParent] = "foo"
 		})()).To(Succeed())
 
 		Eventually(komega.Object(sn)).Should(HaveField("Status.Conditions", HaveLen(1)))

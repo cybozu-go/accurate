@@ -1,4 +1,4 @@
-package hooks
+package v2
 
 import (
 	"context"
@@ -16,8 +16,8 @@ import (
 	admissionv1beta1 "k8s.io/api/admission/v1beta1"
 	//+kubebuilder:scaffold:imports
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	"github.com/cybozu-go/accurate/internal/indexing"
 	"github.com/cybozu-go/accurate/pkg/config"
-	"github.com/cybozu-go/accurate/pkg/indexing"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -67,7 +67,7 @@ var _ = BeforeSuite(func() {
 		Scheme: scheme,
 		CRDs:   loadCRDs(),
 		WebhookInstallOptions: envtest.WebhookInstallOptions{
-			Paths: []string{filepath.Join("..", "config", "webhook")},
+			Paths: []string{filepath.Join("..", "..", "..", "config", "webhook")},
 		},
 	}
 
@@ -168,7 +168,7 @@ var _ = AfterSuite(func() {
 func loadCRDs() []*apiextensionsv1.CustomResourceDefinition {
 	kOpts := krusty.MakeDefaultOptions()
 	k := krusty.MakeKustomizer(kOpts)
-	m, err := k.Run(filesys.FileSystemOrOnDisk{}, filepath.Join("..", "config", "crd"))
+	m, err := k.Run(filesys.FileSystemOrOnDisk{}, filepath.Join("..", "..", "..", "config", "crd"))
 	Expect(err).To(Succeed())
 	resources := m.Resources()
 

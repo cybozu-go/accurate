@@ -1,11 +1,12 @@
-package hooks
+package v2
 
 import (
 	"context"
 	"fmt"
 	"net/http"
 
-	"github.com/cybozu-go/accurate/pkg/constants"
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	"github.com/cybozu-go/accurate/internal/indexing"
 	admissionv1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -77,10 +78,10 @@ func (v *namespaceValidator) checkParent(ctx context.Context, name, typ string) 
 		return &resp
 	}
 
-	if parent.Labels[constants.LabelType] == typ {
+	if parent.Labels[accuratev2.LabelType] == typ {
 		return nil
 	}
-	if parent.Labels[constants.LabelParent] != "" {
+	if parent.Labels[accuratev2.LabelParent] != "" {
 		return nil
 	}
 
@@ -89,25 +90,25 @@ func (v *namespaceValidator) checkParent(ctx context.Context, name, typ string) 
 }
 
 func (v *namespaceValidator) handleCreate(ctx context.Context, ns *corev1.Namespace) admission.Response {
-	if p := ns.Labels[constants.LabelParent]; p != "" {
+	if p := ns.Labels[accuratev2.LabelParent]; p != "" {
 		if ns.Name == p {
 			return admission.Denied("circular reference is not permitted")
 		}
-		if _, ok := ns.Labels[constants.LabelTemplate]; ok {
+		if _, ok := ns.Labels[accuratev2.LabelTemplate]; ok {
 			return admission.Denied("a sub-namespace cannot have a template")
 		}
-		if _, ok := ns.Labels[constants.LabelType]; ok {
+		if _, ok := ns.Labels[accuratev2.LabelType]; ok {
 			return admission.Denied("a sub-namespace cannot be a root or a template")
 		}
-		if resp := v.checkParent(ctx, p, constants.NSTypeRoot); resp != nil {
+		if resp := v.checkParent(ctx, p, accuratev2.NSTypeRoot); resp != nil {
 			return *resp
 		}
 	}
-	if t := ns.Labels[constants.LabelTemplate]; t != "" {
+	if t := ns.Labels[accuratev2.LabelTemplate]; t != "" {
 		if ns.Name == t {
 			return admission.Denied("circular reference is not permitted")
 		}
-		if resp := v.checkParent(ctx, t, constants.NSTypeTemplate); resp != nil {
+		if resp := v.checkParent(ctx, t, accuratev2.NSTypeTemplate); resp != nil {
 			return *resp
 		}
 	}
@@ -115,10 +116,10 @@ func (v *namespaceValidator) handleCreate(ctx context.Context, ns *corev1.Namesp
 }
 
 func (v *namespaceValidator) getParent(ns *corev1.Namespace) string {
-	if p := ns.Labels[constants.LabelParent]; p != "" {
+	if p := ns.Labels[accuratev2.LabelParent]; p != "" {
 		return p
 	}
-	return ns.Labels[constants.LabelTemplate]
+	return ns.Labels[accuratev2.LabelTemplate]
 }
 
 func (v *namespaceValidator) handleUpdate(ctx context.Context, nsNew, nsOld *corev1.Namespace) admission.Response {
@@ -139,22 +140,22 @@ func (v *namespaceValidator) handleUpdate(ctx context.Context, nsNew, nsOld *cor
 		pp = v.getParent(parent)
 	}
 
-	oldType := nsOld.Labels[constants.LabelType]
-	newType := nsNew.Labels[constants.LabelType]
+	oldType := nsOld.Labels[accuratev2.LabelType]
+	newType := nsNew.Labels[accuratev2.LabelType]
 
 	if oldType != newType {
-		if oldType == constants.NSTypeRoot {
+		if oldType == accuratev2.NSTypeRoot {
 			children := &corev1.NamespaceList{}
-			if err := v.List(ctx, children, client.MatchingFields{constants.NamespaceParentKey: nsNew.Name}); err != nil {
+			if err := v.List(ctx, children, client.MatchingFields{indexing.NamespaceParentKey: nsNew.Name}); err != nil {
 				return admission.Errored(http.StatusInternalServerError, err)
 			}
 			if len(children.Items) > 0 {
 				return admission.Denied("there are sub-namespaces under " + nsNew.Name)
 			}
 		}
-		if oldType == constants.NSTypeTemplate {
+		if oldType == accuratev2.NSTypeTemplate {
 			children := &corev1.NamespaceList{}
-			if err := v.List(ctx, children, client.MatchingFields{constants.NamespaceTemplateKey: nsNew.Name}); err != nil {
+			if err := v.List(ctx, children, client.MatchingFields{indexing.NamespaceTemplateKey: nsNew.Name}); err != nil {
 				return admission.Errored(http.StatusInternalServerError, err)
 			}
 			if len(children.Items) > 0 {
@@ -163,9 +164,9 @@ func (v *namespaceValidator) handleUpdate(ctx context.Context, nsNew, nsOld *cor
 		}
 	}
 
-	if p == "" && nsOld.Labels[constants.LabelParent] != "" && newType != constants.NSTypeRoot {
+	if p == "" && nsOld.Labels[accuratev2.LabelParent] != "" && newType != accuratev2.NSTypeRoot {
 		children := &corev1.NamespaceList{}
-		if err := v.List(ctx, children, client.MatchingFields{constants.NamespaceParentKey: nsNew.Name}); err != nil {
+		if err := v.List(ctx, children, client.MatchingFields{indexing.NamespaceParentKey: nsNew.Name}); err != nil {
 			return admission.Errored(http.StatusInternalServerError, err)
 		}
 		if len(children.Items) > 0 {
@@ -177,12 +178,12 @@ func (v *namespaceValidator) handleUpdate(ctx context.Context, nsNew, nsOld *cor
 }
 
 func (v *namespaceValidator) handleDelete(ctx context.Context, ns *corev1.Namespace) admission.Response {
-	key := constants.NamespaceParentKey
+	key := indexing.NamespaceParentKey
 	switch {
-	case ns.Labels[constants.LabelType] == constants.NSTypeRoot && !v.allowCascadingDeletion:
-	case ns.Labels[constants.LabelType] == constants.NSTypeTemplate:
-		key = constants.NamespaceTemplateKey
-	case ns.Labels[constants.LabelParent] != "" && !v.allowCascadingDeletion:
+	case ns.Labels[accuratev2.LabelType] == accuratev2.NSTypeRoot && !v.allowCascadingDeletion:
+	case ns.Labels[accuratev2.LabelType] == accuratev2.NSTypeTemplate:
+		key = indexing.NamespaceTemplateKey
+	case ns.Labels[accuratev2.LabelParent] != "" && !v.allowCascadingDeletion:
 	default:
 		return admission.Allowed("")
 	}

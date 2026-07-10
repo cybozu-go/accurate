@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
-	"github.com/cybozu-go/accurate/pkg/constants"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -68,7 +67,7 @@ func (o *subMoveOpts) Run(ctx context.Context) error {
 		return fmt.Errorf("failed to get namespace %s: %w", o.name, err)
 	}
 
-	orig, ok := ns.Labels[constants.LabelParent]
+	orig, ok := ns.Labels[accuratev2.LabelParent]
 	if !ok {
 		return fmt.Errorf("%s is not a sub-namespace", o.name)
 	}
@@ -78,7 +77,7 @@ func (o *subMoveOpts) Run(ctx context.Context) error {
 		return nil
 	}
 
-	ns.Labels[constants.LabelParent] = o.parent
+	ns.Labels[accuratev2.LabelParent] = o.parent
 	if err := o.client.Update(ctx, ns); err != nil {
 		return fmt.Errorf("failed to update namespace %s: %w", o.name, err)
 	}

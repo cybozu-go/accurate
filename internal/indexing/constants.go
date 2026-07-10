@@ -1,4 +1,4 @@
-package constants
+package indexing
 
 // Keys for indexing objects
 const (
@@ -6,4 +6,5 @@ const (
 	NamespaceTemplateKey = "namespace.template"
 	PropagateKey         = "resource.propagate"
 	SubNamespaceNameKey  = "subnamespace.name"
+	PropagateAny         = "any" // defined as an in-memory index value
 )

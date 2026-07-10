@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	"github.com/cybozu-go/accurate/internal/indexing"
 	utilerrors "github.com/cybozu-go/accurate/internal/util/errors"
-	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -35,7 +36,7 @@ func (rc *ResourceCloner) cloneResource(res *unstructured.Unstructured, ns strin
 		}
 		labels[k] = v
 	}
-	labels[constants.LabelCreatedBy] = constants.CreatedBy
+	labels[accuratev2.LabelCreatedBy] = accuratev2.CreatedBy
 	c.SetLabels(labels)
 	annotations := make(map[string]string)
 	for k, v := range res.GetAnnotations() {
@@ -44,7 +45,7 @@ func (rc *ResourceCloner) cloneResource(res *unstructured.Unstructured, ns strin
 		}
 		annotations[k] = v
 	}
-	annotations[constants.AnnFrom] = res.GetNamespace()
+	annotations[accuratev2.AnnFrom] = res.GetNamespace()
 	c.SetAnnotations(annotations)
 
 	// special treatment for ServiceAccount
@@ -96,14 +97,14 @@ func (r *PropagateController) Reconcile(ctx context.Context, req ctrl.Request) (
 	}
 
 	ann := obj.GetAnnotations()
-	if from := ann[constants.AnnFrom]; from != "" {
+	if from := ann[accuratev2.AnnFrom]; from != "" {
 		p := r.res.DeepCopy()
 		if err := r.Get(ctx, client.ObjectKey{Namespace: from, Name: req.Name}, p); err != nil {
 			if !apierrors.IsNotFound(err) {
 				return ctrl.Result{}, fmt.Errorf("failed to lookup the parent resource in %s: %w", from, err)
 			}
 
-			if ann[constants.AnnPropagate] == constants.PropagateUpdate {
+			if ann[accuratev2.AnnPropagate] == accuratev2.PropagateUpdate {
 				if err := r.Delete(ctx, obj); err != nil {
 					logger.Error(err, "failed to delete")
 					return ctrl.Result{}, err
@@ -112,7 +113,7 @@ func (r *PropagateController) Reconcile(ctx context.Context, req ctrl.Request) (
 				return ctrl.Result{}, nil
 			}
 		} else {
-			if p.GetAnnotations()[constants.AnnPropagate] == constants.PropagateUpdate {
+			if p.GetAnnotations()[accuratev2.AnnPropagate] == accuratev2.PropagateUpdate {
 				if err := r.propagateUpdate(ctx, obj, p); err != nil {
 					logger.Error(err, "failed to propagate an object", "mode", "update", "parent", "exist")
 					return ctrl.Result{}, err
@@ -122,13 +123,13 @@ func (r *PropagateController) Reconcile(ctx context.Context, req ctrl.Request) (
 		}
 	}
 
-	switch ann[constants.AnnPropagate] {
-	case constants.PropagateCreate:
+	switch ann[accuratev2.AnnPropagate] {
+	case accuratev2.PropagateCreate:
 		if err := r.propagateCreate(ctx, obj); err != nil {
 			logger.Error(err, "failed to propagate an object", "mode", "create")
 			return ctrl.Result{}, err
 		}
-	case constants.PropagateUpdate:
+	case accuratev2.PropagateUpdate:
 		if err := r.propagateUpdate(ctx, obj, nil); err != nil {
 			logger.Error(err, "failed to propagate an object", "mode", "update", "parent", "none")
 			return ctrl.Result{}, err
@@ -145,9 +146,9 @@ func (r *PropagateController) getChildren(ctx context.Context, name string) (*co
 	}
 
 	children := &corev1.NamespaceList{}
-	mf := client.MatchingFields{constants.NamespaceTemplateKey: name}
-	if ns.Labels[constants.LabelType] == constants.NSTypeRoot || ns.Labels[constants.LabelParent] != "" {
-		mf = client.MatchingFields{constants.NamespaceParentKey: name}
+	mf := client.MatchingFields{indexing.NamespaceTemplateKey: name}
+	if ns.Labels[accuratev2.LabelType] == accuratev2.NSTypeRoot || ns.Labels[accuratev2.LabelParent] != "" {
+		mf = client.MatchingFields{indexing.NamespaceParentKey: name}
 	}
 	if err := r.List(ctx, children, mf); err != nil {
 		return nil, fmt.Errorf("failed to list children namespaces: %w", err)
@@ -167,9 +168,9 @@ func (r *PropagateController) handleDelete(ctx context.Context, req ctrl.Request
 	}
 
 	// re-create it if there is a parent resource
-	p, ok := ns.Labels[constants.LabelParent]
+	p, ok := ns.Labels[accuratev2.LabelParent]
 	if !ok {
-		p = ns.Labels[constants.LabelTemplate]
+		p = ns.Labels[accuratev2.LabelTemplate]
 	}
 	if p != "" {
 		parent := &corev1.Namespace{}
@@ -187,8 +188,8 @@ func (r *PropagateController) handleDelete(ctx context.Context, req ctrl.Request
 				return fmt.Errorf("failed to get %s/%s: %w", p, req.Name, err)
 			}
 		} else {
-			switch obj.GetAnnotations()[constants.AnnPropagate] {
-			case constants.PropagateCreate, constants.PropagateUpdate:
+			switch obj.GetAnnotations()[accuratev2.AnnPropagate] {
+			case accuratev2.PropagateCreate, accuratev2.PropagateUpdate:
 				if err := r.Create(ctx, r.cloneResource(obj, req.Namespace)); err != nil {
 					if utilerrors.IsNamespaceTerminating(err) {
 						return nil
@@ -215,7 +216,7 @@ func (r *PropagateController) handleDelete(ctx context.Context, req ctrl.Request
 			return fmt.Errorf("failed to look up %s/%s: %w", child.Name, req.Name, err)
 		}
 
-		if obj.GetAnnotations()[constants.AnnPropagate] != constants.PropagateUpdate {
+		if obj.GetAnnotations()[accuratev2.AnnPropagate] != accuratev2.PropagateUpdate {
 			continue
 		}
 
@@ -322,10 +323,10 @@ func (r *PropagateController) propagateUpdate(ctx context.Context, obj, parent *
 func (r *PropagateController) SetupWithManager(mgr ctrl.Manager) error {
 	pred := func(obj client.Object) bool {
 		ann := obj.GetAnnotations()
-		if _, ok := ann[constants.AnnFrom]; ok {
+		if _, ok := ann[accuratev2.AnnFrom]; ok {
 			return true
 		}
-		if _, ok := ann[constants.AnnPropagate]; ok {
+		if _, ok := ann[accuratev2.AnnPropagate]; ok {
 			return true
 		}
 		return false
