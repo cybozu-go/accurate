@@ -5,8 +5,8 @@ import (
 	"time"
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	"github.com/cybozu-go/accurate/internal/indexing"
 	"github.com/cybozu-go/accurate/pkg/constants"
-	"github.com/cybozu-go/accurate/pkg/indexing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
