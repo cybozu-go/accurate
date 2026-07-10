@@ -10,7 +10,7 @@ import (
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/cybozu-go/accurate/controllers"
-	"github.com/cybozu-go/accurate/hooks"
+	hooks "github.com/cybozu-go/accurate/internal/webhook/v2"
 	"github.com/cybozu-go/accurate/pkg/config"
 	"github.com/cybozu-go/accurate/pkg/indexing"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
