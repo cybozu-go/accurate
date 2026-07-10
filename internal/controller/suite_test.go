@@ -20,7 +20,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
-	"github.com/cybozu-go/accurate/pkg/constants"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -77,32 +76,32 @@ var _ = BeforeSuite(func() {
 	// prepare resources
 	ns := &corev1.Namespace{}
 	ns.Name = "prop-root"
-	ns.Labels = map[string]string{constants.LabelType: constants.NSTypeRoot}
+	ns.Labels = map[string]string{accuratev2.LabelType: accuratev2.NSTypeRoot}
 	Expect(k8sClient.Create(context.Background(), ns)).To(Succeed())
 
 	ns = &corev1.Namespace{}
 	ns.Name = "prop-sub1"
-	ns.Labels = map[string]string{constants.LabelParent: "prop-root"}
+	ns.Labels = map[string]string{accuratev2.LabelParent: "prop-root"}
 	Expect(k8sClient.Create(context.Background(), ns)).To(Succeed())
 
 	ns = &corev1.Namespace{}
 	ns.Name = "prop-sub2"
-	ns.Labels = map[string]string{constants.LabelParent: "prop-root"}
+	ns.Labels = map[string]string{accuratev2.LabelParent: "prop-root"}
 	Expect(k8sClient.Create(context.Background(), ns)).To(Succeed())
 
 	ns = &corev1.Namespace{}
 	ns.Name = "prop-sub1-sub"
-	ns.Labels = map[string]string{constants.LabelParent: "prop-sub1"}
+	ns.Labels = map[string]string{accuratev2.LabelParent: "prop-sub1"}
 	Expect(k8sClient.Create(context.Background(), ns)).To(Succeed())
 
 	ns = &corev1.Namespace{}
 	ns.Name = "prop-tmpl"
-	ns.Labels = map[string]string{constants.LabelType: constants.NSTypeTemplate}
+	ns.Labels = map[string]string{accuratev2.LabelType: accuratev2.NSTypeTemplate}
 	Expect(k8sClient.Create(context.Background(), ns)).To(Succeed())
 
 	ns = &corev1.Namespace{}
 	ns.Name = "prop-instance"
-	ns.Labels = map[string]string{constants.LabelTemplate: "prop-tmpl"}
+	ns.Labels = map[string]string{accuratev2.LabelTemplate: "prop-tmpl"}
 	Expect(k8sClient.Create(context.Background(), ns)).To(Succeed())
 })
 

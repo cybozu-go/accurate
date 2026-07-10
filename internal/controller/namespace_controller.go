@@ -8,7 +8,6 @@ import (
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/cybozu-go/accurate/internal/indexing"
 	utilerrors "github.com/cybozu-go/accurate/internal/util/errors"
-	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -59,11 +58,11 @@ func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 }
 
 func (r *NamespaceReconciler) reconcile(ctx context.Context, ns *corev1.Namespace) error {
-	if parent, ok := ns.Labels[constants.LabelParent]; ok {
+	if parent, ok := ns.Labels[accuratev2.LabelParent]; ok {
 		return r.reconcileSubNamespace(ctx, ns, parent)
 	}
 
-	if tmpl, ok := ns.Labels[constants.LabelTemplate]; ok {
+	if tmpl, ok := ns.Labels[accuratev2.LabelTemplate]; ok {
 		if err := r.reconcileInstanceNamespace(ctx, ns, tmpl); err != nil {
 			return err
 		}
@@ -77,10 +76,10 @@ func (r *NamespaceReconciler) reconcile(ctx context.Context, ns *corev1.Namespac
 		}
 	}
 
-	switch ns.Labels[constants.LabelType] {
-	case constants.NSTypeTemplate:
+	switch ns.Labels[accuratev2.LabelType] {
+	case accuratev2.NSTypeTemplate:
 		return r.reconcileTemplateNamespace(ctx, ns)
-	case constants.NSTypeRoot:
+	case accuratev2.NSTypeRoot:
 		return r.reconcileRootNamespace(ctx, ns)
 	}
 
@@ -102,7 +101,7 @@ func (r *NamespaceReconciler) propagateMeta(ctx context.Context, ns, parent *cor
 		}
 	}
 
-	if _, ok := ns.Labels[constants.LabelParent]; ok {
+	if _, ok := ns.Labels[accuratev2.LabelParent]; ok {
 		subNS := &accuratev2.SubNamespace{}
 		err := r.Get(ctx, types.NamespacedName{Name: ns.Name, Namespace: parent.Name}, subNS)
 		if err != nil {
@@ -122,8 +121,8 @@ func (r *NamespaceReconciler) propagateMeta(ctx context.Context, ns, parent *cor
 			}
 		}
 		// Must ensure we set all fields we care for, also labels added when creating namespace
-		labels[constants.LabelCreatedBy] = constants.CreatedBy
-		labels[constants.LabelParent] = parent.Name
+		labels[accuratev2.LabelCreatedBy] = accuratev2.CreatedBy
+		labels[accuratev2.LabelParent] = parent.Name
 	}
 
 	ac := corev1ac.Namespace(ns.Name).
@@ -161,7 +160,7 @@ func (r *NamespaceReconciler) propagateResource(ctx context.Context, res *unstru
 	l.SetGroupVersionKind(gvk)
 
 	cl := l.DeepCopy()
-	if err := r.List(ctx, cl, client.MatchingFields{indexing.PropagateKey: constants.PropagateCreate}, client.InNamespace(parent)); err != nil {
+	if err := r.List(ctx, cl, client.MatchingFields{indexing.PropagateKey: accuratev2.PropagateCreate}, client.InNamespace(parent)); err != nil {
 		return fmt.Errorf("failed to list %s in %s with propagate=create: %w", gvkStr, parent, err)
 	}
 	for i := range cl.Items {
@@ -172,7 +171,7 @@ func (r *NamespaceReconciler) propagateResource(ctx context.Context, res *unstru
 	}
 
 	ul := l.DeepCopy()
-	if err := r.List(ctx, ul, client.MatchingFields{indexing.PropagateKey: constants.PropagateUpdate}, client.InNamespace(parent)); err != nil {
+	if err := r.List(ctx, ul, client.MatchingFields{indexing.PropagateKey: accuratev2.PropagateUpdate}, client.InNamespace(parent)); err != nil {
 		return fmt.Errorf("failed to list %s in %s with propagate=update: %w", gvkStr, parent, err)
 	}
 	presNames := make(map[string]bool)
@@ -185,12 +184,12 @@ func (r *NamespaceReconciler) propagateResource(ctx context.Context, res *unstru
 	}
 
 	ul2 := l.DeepCopy()
-	if err := r.List(ctx, ul2, client.MatchingFields{indexing.PropagateKey: constants.PropagateUpdate}, client.InNamespace(ns)); err != nil {
+	if err := r.List(ctx, ul2, client.MatchingFields{indexing.PropagateKey: accuratev2.PropagateUpdate}, client.InNamespace(ns)); err != nil {
 		return fmt.Errorf("failed to list %s in %s with propagate=update: %w", gvkStr, ns, err)
 	}
 	for i := range ul2.Items {
 		cres := &ul2.Items[i]
-		from := cres.GetAnnotations()[constants.AnnFrom]
+		from := cres.GetAnnotations()[accuratev2.AnnFrom]
 		if from == "" {
 			// don't delete origins
 			continue
@@ -272,13 +271,13 @@ func (r *NamespaceReconciler) deleteResource(ctx context.Context, res *unstructu
 	l := &unstructured.UnstructuredList{}
 	l.SetGroupVersionKind(gvk)
 
-	if err := r.List(ctx, l, client.MatchingFields{indexing.PropagateKey: constants.PropagateUpdate}, client.InNamespace(ns)); err != nil {
+	if err := r.List(ctx, l, client.MatchingFields{indexing.PropagateKey: accuratev2.PropagateUpdate}, client.InNamespace(ns)); err != nil {
 		return fmt.Errorf("failed to list %s in %s: %w", gvkStr, ns, err)
 	}
 	for i := range l.Items {
 		obj := &l.Items[i]
 
-		from := obj.GetAnnotations()[constants.AnnFrom]
+		from := obj.GetAnnotations()[accuratev2.AnnFrom]
 		if from == "" {
 			// don't delete origins
 			continue

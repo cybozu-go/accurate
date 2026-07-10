@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cybozu-go/accurate/pkg/constants"
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
@@ -61,7 +61,7 @@ func (o *templateSetOpts) Run(ctx context.Context) error {
 	if ns.Labels == nil {
 		ns.Labels = make(map[string]string)
 	}
-	ns.Labels[constants.LabelTemplate] = o.template
+	ns.Labels[accuratev2.LabelTemplate] = o.template
 	if err := o.client.Update(ctx, ns); err != nil {
 		return fmt.Errorf("failed to update namespace %s: %w", o.name, err)
 	}

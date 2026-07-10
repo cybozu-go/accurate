@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cybozu-go/accurate/pkg/constants"
+	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
@@ -52,7 +52,7 @@ func (o *nsSetTypeOpts) Fill(streams genericiooptions.IOStreams, config *generic
 	o.typ = args[1]
 
 	switch o.typ {
-	case constants.NSTypeRoot, constants.NSTypeTemplate:
+	case accuratev2.NSTypeRoot, accuratev2.NSTypeTemplate:
 	case "none":
 	default:
 		return fmt.Errorf("invalid type: %s", o.typ)
@@ -66,13 +66,13 @@ func (o *nsSetTypeOpts) Run(ctx context.Context) error {
 		return fmt.Errorf("failed to get namespace %s: %w", o.name, err)
 	}
 
-	current, ok := ns.Labels[constants.LabelType]
+	current, ok := ns.Labels[accuratev2.LabelType]
 	if o.typ == "none" {
 		if !ok {
 			fmt.Fprintln(o.streams.Out, "nothing to do")
 			return nil
 		}
-		delete(ns.Labels, constants.LabelType)
+		delete(ns.Labels, accuratev2.LabelType)
 	} else {
 		if current == o.typ {
 			fmt.Fprintln(o.streams.Out, "nothing to do")
@@ -81,7 +81,7 @@ func (o *nsSetTypeOpts) Run(ctx context.Context) error {
 		if ns.Labels == nil {
 			ns.Labels = make(map[string]string)
 		}
-		ns.Labels[constants.LabelType] = o.typ
+		ns.Labels[accuratev2.LabelType] = o.typ
 	}
 
 	if err := o.client.Update(ctx, ns); err != nil {
