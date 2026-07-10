@@ -8,6 +8,7 @@ import (
 	"regexp"
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	"github.com/cybozu-go/accurate/internal/indexing"
 	"github.com/cybozu-go/accurate/pkg/config"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	admissionv1 "k8s.io/api/admission/v1"
@@ -130,7 +131,7 @@ func (v *subNamespaceValidator) handleDelete(ctx context.Context, sn *accuratev2
 	}
 
 	children := &corev1.NamespaceList{}
-	if err := v.List(ctx, children, client.MatchingFields{constants.NamespaceParentKey: ns.Name}); err != nil {
+	if err := v.List(ctx, children, client.MatchingFields{indexing.NamespaceParentKey: ns.Name}); err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
 	if len(children.Items) > 0 {

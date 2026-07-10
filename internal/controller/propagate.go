@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/cybozu-go/accurate/internal/indexing"
 	utilerrors "github.com/cybozu-go/accurate/internal/util/errors"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
@@ -145,9 +146,9 @@ func (r *PropagateController) getChildren(ctx context.Context, name string) (*co
 	}
 
 	children := &corev1.NamespaceList{}
-	mf := client.MatchingFields{constants.NamespaceTemplateKey: name}
+	mf := client.MatchingFields{indexing.NamespaceTemplateKey: name}
 	if ns.Labels[constants.LabelType] == constants.NSTypeRoot || ns.Labels[constants.LabelParent] != "" {
-		mf = client.MatchingFields{constants.NamespaceParentKey: name}
+		mf = client.MatchingFields{indexing.NamespaceParentKey: name}
 	}
 	if err := r.List(ctx, children, mf); err != nil {
 		return nil, fmt.Errorf("failed to list children namespaces: %w", err)

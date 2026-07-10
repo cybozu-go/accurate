@@ -12,7 +12,7 @@ import (
 
 // SetupIndexForResource sets up an indexer for a watched resource.
 func SetupIndexForResource(ctx context.Context, mgr manager.Manager, res client.Object) error {
-	return mgr.GetFieldIndexer().IndexField(ctx, res, constants.PropagateKey, func(rawObj client.Object) []string {
+	return mgr.GetFieldIndexer().IndexField(ctx, res, PropagateKey, func(rawObj client.Object) []string {
 		val := rawObj.GetAnnotations()[constants.AnnPropagate]
 		if val == "" {
 			return nil
@@ -24,7 +24,7 @@ func SetupIndexForResource(ctx context.Context, mgr manager.Manager, res client.
 // SetupIndexForNamespace sets up indexers for namespaces.
 func SetupIndexForNamespace(ctx context.Context, mgr manager.Manager) error {
 	ns := &corev1.Namespace{}
-	err := mgr.GetFieldIndexer().IndexField(ctx, ns, constants.NamespaceParentKey, func(rawObj client.Object) []string {
+	err := mgr.GetFieldIndexer().IndexField(ctx, ns, NamespaceParentKey, func(rawObj client.Object) []string {
 		parent := rawObj.GetLabels()[constants.LabelParent]
 		if parent == "" {
 			return nil
@@ -35,7 +35,7 @@ func SetupIndexForNamespace(ctx context.Context, mgr manager.Manager) error {
 		return err
 	}
 
-	return mgr.GetFieldIndexer().IndexField(ctx, ns, constants.NamespaceTemplateKey, func(rawObj client.Object) []string {
+	return mgr.GetFieldIndexer().IndexField(ctx, ns, NamespaceTemplateKey, func(rawObj client.Object) []string {
 		tmpl := rawObj.GetLabels()[constants.LabelTemplate]
 		if tmpl == "" {
 			return nil
@@ -46,7 +46,7 @@ func SetupIndexForNamespace(ctx context.Context, mgr manager.Manager) error {
 
 // SetupIndexForSubNamespace sets up indexers for subnamespaces.
 func SetupIndexForSubNamespace(ctx context.Context, mgr manager.Manager) error {
-	return mgr.GetFieldIndexer().IndexField(ctx, &accuratev2.SubNamespace{}, constants.SubNamespaceNameKey, func(rawObj client.Object) []string {
+	return mgr.GetFieldIndexer().IndexField(ctx, &accuratev2.SubNamespace{}, SubNamespaceNameKey, func(rawObj client.Object) []string {
 		return []string{rawObj.GetName()}
 	})
 }

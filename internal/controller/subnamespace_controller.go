@@ -7,6 +7,7 @@ import (
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
 	accuratev2ac "github.com/cybozu-go/accurate/internal/applyconfigurations/accurate/v2"
+	"github.com/cybozu-go/accurate/internal/indexing"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -173,7 +174,7 @@ func (r *SubNamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			// The namespace is in terminating state.
 			// Let's find all subnamespaces that might want to recreate it.
 			snList := &accuratev2.SubNamespaceList{}
-			err := r.List(ctx, snList, client.MatchingFields{constants.SubNamespaceNameKey: o.GetName()})
+			err := r.List(ctx, snList, client.MatchingFields{indexing.SubNamespaceNameKey: o.GetName()})
 			if err != nil {
 				logger := log.FromContext(ctx)
 				logger.Error(err, "failed to list subnamespaces")

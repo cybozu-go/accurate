@@ -1,4 +1,4 @@
-package constants
+package indexing
 
 // Keys for indexing objects
 const (
