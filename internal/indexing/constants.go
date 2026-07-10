@@ -6,4 +6,5 @@ const (
 	NamespaceTemplateKey = "namespace.template"
 	PropagateKey         = "resource.propagate"
 	SubNamespaceNameKey  = "subnamespace.name"
+	PropagateAny         = "any" // defined as an in-memory index value
 )

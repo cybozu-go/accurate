@@ -27,5 +27,4 @@ const (
 	NSTypeRoot      = "root"
 	PropagateCreate = "create"
 	PropagateUpdate = "update"
-	PropagateAny    = "any" // defined as an in-memory index value
 )
