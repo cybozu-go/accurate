@@ -6,6 +6,7 @@ import (
 	"path"
 
 	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	"github.com/cybozu-go/accurate/internal/indexing"
 	utilerrors "github.com/cybozu-go/accurate/internal/util/errors"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	corev1 "k8s.io/api/core/v1"
@@ -160,7 +161,7 @@ func (r *NamespaceReconciler) propagateResource(ctx context.Context, res *unstru
 	l.SetGroupVersionKind(gvk)
 
 	cl := l.DeepCopy()
-	if err := r.List(ctx, cl, client.MatchingFields{constants.PropagateKey: constants.PropagateCreate}, client.InNamespace(parent)); err != nil {
+	if err := r.List(ctx, cl, client.MatchingFields{indexing.PropagateKey: constants.PropagateCreate}, client.InNamespace(parent)); err != nil {
 		return fmt.Errorf("failed to list %s in %s with propagate=create: %w", gvkStr, parent, err)
 	}
 	for i := range cl.Items {
@@ -171,7 +172,7 @@ func (r *NamespaceReconciler) propagateResource(ctx context.Context, res *unstru
 	}
 
 	ul := l.DeepCopy()
-	if err := r.List(ctx, ul, client.MatchingFields{constants.PropagateKey: constants.PropagateUpdate}, client.InNamespace(parent)); err != nil {
+	if err := r.List(ctx, ul, client.MatchingFields{indexing.PropagateKey: constants.PropagateUpdate}, client.InNamespace(parent)); err != nil {
 		return fmt.Errorf("failed to list %s in %s with propagate=update: %w", gvkStr, parent, err)
 	}
 	presNames := make(map[string]bool)
@@ -184,7 +185,7 @@ func (r *NamespaceReconciler) propagateResource(ctx context.Context, res *unstru
 	}
 
 	ul2 := l.DeepCopy()
-	if err := r.List(ctx, ul2, client.MatchingFields{constants.PropagateKey: constants.PropagateUpdate}, client.InNamespace(ns)); err != nil {
+	if err := r.List(ctx, ul2, client.MatchingFields{indexing.PropagateKey: constants.PropagateUpdate}, client.InNamespace(ns)); err != nil {
 		return fmt.Errorf("failed to list %s in %s with propagate=update: %w", gvkStr, ns, err)
 	}
 	for i := range ul2.Items {
@@ -271,7 +272,7 @@ func (r *NamespaceReconciler) deleteResource(ctx context.Context, res *unstructu
 	l := &unstructured.UnstructuredList{}
 	l.SetGroupVersionKind(gvk)
 
-	if err := r.List(ctx, l, client.MatchingFields{constants.PropagateKey: constants.PropagateUpdate}, client.InNamespace(ns)); err != nil {
+	if err := r.List(ctx, l, client.MatchingFields{indexing.PropagateKey: constants.PropagateUpdate}, client.InNamespace(ns)); err != nil {
 		return fmt.Errorf("failed to list %s in %s: %w", gvkStr, ns, err)
 	}
 	for i := range l.Items {
@@ -310,7 +311,7 @@ func (r *NamespaceReconciler) reconcileSubNamespace(ctx context.Context, ns *cor
 	}
 
 	children := &corev1.NamespaceList{}
-	if err := r.List(ctx, children, client.MatchingFields{constants.NamespaceParentKey: ns.Name}); err != nil {
+	if err := r.List(ctx, children, client.MatchingFields{indexing.NamespaceParentKey: ns.Name}); err != nil {
 		return fmt.Errorf("failed to list the children: %w", err)
 	}
 	for i := range children.Items {
@@ -331,7 +332,7 @@ func (r *NamespaceReconciler) reconcileSubNamespace(ctx context.Context, ns *cor
 
 func (r *NamespaceReconciler) reconcileRootNamespace(ctx context.Context, ns *corev1.Namespace) error {
 	subs := &corev1.NamespaceList{}
-	if err := r.List(ctx, subs, client.MatchingFields{constants.NamespaceParentKey: ns.Name}); err != nil {
+	if err := r.List(ctx, subs, client.MatchingFields{indexing.NamespaceParentKey: ns.Name}); err != nil {
 		return fmt.Errorf("failed to list sub namespaces: %w", err)
 	}
 
@@ -365,7 +366,7 @@ func (r *NamespaceReconciler) reconcileInstanceNamespace(ctx context.Context, ns
 
 func (r *NamespaceReconciler) reconcileTemplateNamespace(ctx context.Context, ns *corev1.Namespace) error {
 	instances := &corev1.NamespaceList{}
-	if err := r.List(ctx, instances, client.MatchingFields{constants.NamespaceTemplateKey: ns.Name}); err != nil {
+	if err := r.List(ctx, instances, client.MatchingFields{indexing.NamespaceTemplateKey: ns.Name}); err != nil {
 		return fmt.Errorf("failed to list instance namespaces: %w", err)
 	}
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/cybozu-go/accurate/internal/indexing"
 	"github.com/cybozu-go/accurate/pkg/constants"
 	admissionv1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -145,7 +146,7 @@ func (v *namespaceValidator) handleUpdate(ctx context.Context, nsNew, nsOld *cor
 	if oldType != newType {
 		if oldType == constants.NSTypeRoot {
 			children := &corev1.NamespaceList{}
-			if err := v.List(ctx, children, client.MatchingFields{constants.NamespaceParentKey: nsNew.Name}); err != nil {
+			if err := v.List(ctx, children, client.MatchingFields{indexing.NamespaceParentKey: nsNew.Name}); err != nil {
 				return admission.Errored(http.StatusInternalServerError, err)
 			}
 			if len(children.Items) > 0 {
@@ -154,7 +155,7 @@ func (v *namespaceValidator) handleUpdate(ctx context.Context, nsNew, nsOld *cor
 		}
 		if oldType == constants.NSTypeTemplate {
 			children := &corev1.NamespaceList{}
-			if err := v.List(ctx, children, client.MatchingFields{constants.NamespaceTemplateKey: nsNew.Name}); err != nil {
+			if err := v.List(ctx, children, client.MatchingFields{indexing.NamespaceTemplateKey: nsNew.Name}); err != nil {
 				return admission.Errored(http.StatusInternalServerError, err)
 			}
 			if len(children.Items) > 0 {
@@ -165,7 +166,7 @@ func (v *namespaceValidator) handleUpdate(ctx context.Context, nsNew, nsOld *cor
 
 	if p == "" && nsOld.Labels[constants.LabelParent] != "" && newType != constants.NSTypeRoot {
 		children := &corev1.NamespaceList{}
-		if err := v.List(ctx, children, client.MatchingFields{constants.NamespaceParentKey: nsNew.Name}); err != nil {
+		if err := v.List(ctx, children, client.MatchingFields{indexing.NamespaceParentKey: nsNew.Name}); err != nil {
 			return admission.Errored(http.StatusInternalServerError, err)
 		}
 		if len(children.Items) > 0 {
@@ -177,11 +178,11 @@ func (v *namespaceValidator) handleUpdate(ctx context.Context, nsNew, nsOld *cor
 }
 
 func (v *namespaceValidator) handleDelete(ctx context.Context, ns *corev1.Namespace) admission.Response {
-	key := constants.NamespaceParentKey
+	key := indexing.NamespaceParentKey
 	switch {
 	case ns.Labels[constants.LabelType] == constants.NSTypeRoot && !v.allowCascadingDeletion:
 	case ns.Labels[constants.LabelType] == constants.NSTypeTemplate:
-		key = constants.NamespaceTemplateKey
+		key = indexing.NamespaceTemplateKey
 	case ns.Labels[constants.LabelParent] != "" && !v.allowCascadingDeletion:
 	default:
 		return admission.Allowed("")
