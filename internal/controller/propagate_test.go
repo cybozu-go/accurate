@@ -1,10 +1,12 @@
+//go:build envtest
+
 package controllers
 
 import (
 	"context"
 	"time"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	accuratev2 "github.com/cybozu-go/accurate/api/v2"
 	"github.com/cybozu-go/accurate/internal/indexing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

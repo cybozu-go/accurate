@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sort"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	accuratev2 "github.com/cybozu-go/accurate/api/v2"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"

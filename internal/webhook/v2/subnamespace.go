@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"regexp"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	accuratev2 "github.com/cybozu-go/accurate/api/v2"
 	"github.com/cybozu-go/accurate/internal/indexing"
 	"github.com/cybozu-go/accurate/pkg/config"
 	admissionv1 "k8s.io/api/admission/v1"

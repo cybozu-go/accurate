@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	accuratev2 "github.com/cybozu-go/accurate/api/v2"
 	"github.com/cybozu-go/accurate/internal/indexing"
 	admissionv1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"

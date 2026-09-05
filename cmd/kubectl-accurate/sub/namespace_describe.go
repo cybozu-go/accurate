@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	accuratev2 "github.com/cybozu-go/accurate/api/v2"
 	"github.com/cybozu-go/accurate/pkg/config"
 	"github.com/spf13/cobra"
 	appsv1 "k8s.io/api/apps/v1"

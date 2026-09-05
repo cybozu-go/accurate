@@ -1,3 +1,5 @@
+//go:build envtest
+
 package hooks_allow_cascade_delete
 
 import (
@@ -28,7 +30,7 @@ import (
 	"sigs.k8s.io/kustomize/api/krusty"
 	"sigs.k8s.io/kustomize/kyaml/filesys"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	accuratev2 "github.com/cybozu-go/accurate/api/v2"
 	"github.com/cybozu-go/accurate/internal/indexing"
 	hooks "github.com/cybozu-go/accurate/internal/webhook/v2"
 )

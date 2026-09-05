@@ -3,7 +3,7 @@ package indexing
 import (
 	"context"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	accuratev2 "github.com/cybozu-go/accurate/api/v2"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -16,7 +16,7 @@ func SetupIndexForResource(ctx context.Context, mgr manager.Manager, res client.
 		if val == "" {
 			return nil
 		}
-		return []string{val, PropagateAny}
+		return []string{val, propagateAny}
 	})
 }
 

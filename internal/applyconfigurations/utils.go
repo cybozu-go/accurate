@@ -3,7 +3,7 @@
 package applyconfigurations
 
 import (
-	v2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	v2 "github.com/cybozu-go/accurate/api/v2"
 	accuratev2 "github.com/cybozu-go/accurate/internal/applyconfigurations/accurate/v2"
 	internal "github.com/cybozu-go/accurate/internal/applyconfigurations/internal"
 	runtime "k8s.io/apimachinery/pkg/runtime"

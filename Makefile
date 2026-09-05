@@ -55,7 +55,7 @@ generate: setup generate-applyconfigurations generate-conversion ## Generate cod
 	controller-gen object:headerFile="hack/boilerplate.go.txt" paths="{./api/...}"
 
 GO_MODULE = $(shell go list -m)
-API_DIRS = $(shell find api -mindepth 2 -type d | sed "s|^|$(shell go list -m)/|" | paste -sd " ")
+API_DIRS = $(shell go list ./api/...)
 AC_PKG = internal/applyconfigurations
 
 .PHONY: generate-applyconfigurations
@@ -76,7 +76,7 @@ generate-conversion: setup ## Generate conversion functions to support API conve
 
 .PHONY: apidoc
 apidoc: setup $(wildcard api/*/*_types.go)
-	crd-to-markdown --links docs/links.csv -f api/accurate/v2/subnamespace_types.go -n SubNamespace > docs/crd_subnamespace.md
+	crd-to-markdown --links docs/links.csv -f api/v2/subnamespace_types.go -n SubNamespace > docs/crd_subnamespace.md
 
 .PHONY: book
 book: setup
@@ -91,11 +91,11 @@ check-generate:
 .PHONY: envtest
 envtest: setup
 	source <(setup-envtest use -p env); \
-		TEST_CONFIG=1 go test -v -count 1 -race ./pkg/config -ginkgo.show-node-events -ginkgo.v -ginkgo.fail-fast
+		go test -tags=envtest -v -count 1 -race ./internal/controller -ginkgo.show-node-events -ginkgo.v -ginkgo.fail-fast
 	source <(setup-envtest use -p env); \
-		go test -v -count 1 -race ./internal/controller -ginkgo.show-node-events -ginkgo.v -ginkgo.fail-fast
+		go test -tags=envtest -v -count 1 -race ./internal/webhook/... -ginkgo.show-node-events -ginkgo.v
 	source <(setup-envtest use -p env); \
-		go test -v -count 1 -race ./internal/webhook/... -ginkgo.show-node-events -ginkgo.v
+		go test -tags=envtest -v -count 1 -race ./pkg/config -ginkgo.show-node-events -ginkgo.v -ginkgo.fail-fast
 
 .PHONY: lint
 lint: setup
@@ -106,7 +106,7 @@ lint-fix: setup
 	golangci-lint run ./... -v --fix
 
 .PHONY: test
-test: 
+test:
 	go test -v -count 1 -race ./api/... ./internal/... ./pkg/...
 	go install ./...
 	go vet ./...
