@@ -1,7 +1,8 @@
+//go:build envtest
+
 package config
 
 import (
-	"os"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -27,10 +28,6 @@ var fullAccessClient client.Client
 var noAccessClient client.Client
 
 func TestAPIs(t *testing.T) {
-	if os.Getenv("TEST_CONFIG") != "1" {
-		t.Skip("skip")
-	}
-
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Config Suite")
 }

@@ -5,8 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
-	"github.com/cybozu-go/accurate/pkg/constants"
+	accuratev2 "github.com/cybozu-go/accurate/api/v2"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -196,7 +195,7 @@ var _ = Describe("kubectl accurate", func() {
 			if err := json.Unmarshal(out, ns); err != nil {
 				return err
 			}
-			if ns.Labels[constants.LabelParent] != "subroot1" {
+			if ns.Labels[accuratev2.LabelParent] != "subroot1" {
 				return errors.New("wrong parent")
 			}
 			return nil
@@ -214,7 +213,7 @@ var _ = Describe("kubectl accurate", func() {
 			if err := json.Unmarshal(out, ns); err != nil {
 				return err
 			}
-			if ns.Labels[constants.LabelParent] != "sn1" {
+			if ns.Labels[accuratev2.LabelParent] != "sn1" {
 				return errors.New("wrong parent")
 			}
 			return nil
@@ -234,7 +233,7 @@ var _ = Describe("kubectl accurate", func() {
 		sn1 := &corev1.Namespace{}
 		err = json.Unmarshal(out, sn1)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(sn1.Labels[constants.LabelParent]).To(Equal("subroot2"))
+		Expect(sn1.Labels[accuratev2.LabelParent]).To(Equal("subroot2"))
 
 		kubectlSafe(nil, "accurate", "sub", "move", "--leave-original", "sn1", "subroot1")
 		kubectlSafe(nil, "get", "subnamespaces", "-n", "subroot2", "sn1")
@@ -265,7 +264,7 @@ var _ = Describe("kubectl accurate", func() {
 		sn2 := &corev1.Namespace{}
 		err = json.Unmarshal(out, sn2)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(sn2.Labels).NotTo(HaveKey(constants.LabelParent))
+		Expect(sn2.Labels).NotTo(HaveKey(accuratev2.LabelParent))
 
 		kubectlSafe(nil, "accurate", "sub", "graft", "sn2", "subroot2")
 		out, err = kubectl(nil, "get", "ns", "sn2", "-o", "json")
@@ -273,7 +272,7 @@ var _ = Describe("kubectl accurate", func() {
 		sn2 = &corev1.Namespace{}
 		err = json.Unmarshal(out, sn2)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(sn2.Labels).To(HaveKeyWithValue(constants.LabelParent, "subroot2"))
+		Expect(sn2.Labels).To(HaveKeyWithValue(accuratev2.LabelParent, "subroot2"))
 		kubectlSafe(nil, "get", "-n", "subroot2", "subnamespaces", "sn2")
 
 		kubectlSafe(nil, "accurate", "sub", "delete", "sn2")
@@ -328,7 +327,7 @@ var _ = Describe("kubectl accurate", func() {
 		sn := &corev1.Namespace{}
 		err = json.Unmarshal(out, sn)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(sn.Labels).To(HaveKeyWithValue(constants.LabelParent, "conflict-root1"))
+		Expect(sn.Labels).To(HaveKeyWithValue(accuratev2.LabelParent, "conflict-root1"))
 	})
 
 	It("should (re)create sub-namespace when conflicting sub-namespace deleted", func() {
@@ -351,7 +350,7 @@ var _ = Describe("kubectl accurate", func() {
 			}
 			return ns.Labels, nil
 		}
-		Eventually(subNsLabelsFn).Should(HaveKeyWithValue(constants.LabelParent, "sub-conflict-root1"))
+		Eventually(subNsLabelsFn).Should(HaveKeyWithValue(accuratev2.LabelParent, "sub-conflict-root1"))
 
 		By("creating conflicting subnamespace")
 		// Cannot use "kubectl accurate" here, since conflict is validated client-side.
@@ -381,7 +380,7 @@ metadata:
 		By("deleting subnamespace")
 		kubectlSafe(nil, "accurate", "sub", "delete", "sub-conflict-sn1")
 		Eventually(sn1ConditionsFn).Should(BeEmpty())
-		Eventually(subNsLabelsFn).Should(HaveKeyWithValue(constants.LabelParent, "sub-conflict-root2"))
+		Eventually(subNsLabelsFn).Should(HaveKeyWithValue(accuratev2.LabelParent, "sub-conflict-root2"))
 	})
 
 	It("should propagate ServiceAccount w/o secrets field", func() {

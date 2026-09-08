@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 
+	accuratev2 "github.com/cybozu-go/accurate/api/v2"
 	authv1 "k8s.io/api/authorization/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -14,8 +15,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
-
-	"github.com/cybozu-go/accurate/pkg/constants"
 )
 
 // NamingPolicy represents naming policies for Namespaces created from SubNamespaces.
@@ -49,7 +48,7 @@ func (c *Config) Validate(mapper meta.RESTMapper) error {
 		if _, err := path.Match(key, ""); err != nil {
 			return fmt.Errorf("malformed pattern for labelKeys %s: %w", key, err)
 		}
-		if strings.HasPrefix(key, constants.MetaPrefix) {
+		if strings.HasPrefix(key, accuratev2.MetaPrefix) {
 			return fmt.Errorf("misconfigured labelKey: %s is not allowed", key)
 		}
 	}
@@ -59,7 +58,7 @@ func (c *Config) Validate(mapper meta.RESTMapper) error {
 		if _, err := path.Match(key, ""); err != nil {
 			return fmt.Errorf("malformed pattern for annotationKeys %s: %w", key, err)
 		}
-		if strings.HasPrefix(key, constants.MetaPrefix) {
+		if strings.HasPrefix(key, accuratev2.MetaPrefix) {
 			return fmt.Errorf("misconfigured annotationKey: %s is not allowed", key)
 		}
 	}
@@ -69,7 +68,7 @@ func (c *Config) Validate(mapper meta.RESTMapper) error {
 		if _, err := path.Match(key, ""); err != nil {
 			return fmt.Errorf("malformed pattern for subNamespaceLabelKeys %s: %w", key, err)
 		}
-		if strings.HasPrefix(key, constants.MetaPrefix) {
+		if strings.HasPrefix(key, accuratev2.MetaPrefix) {
 			return fmt.Errorf("misconfigured subNamespaceLabelKey: %s is not allowed", key)
 		}
 	}
@@ -79,7 +78,7 @@ func (c *Config) Validate(mapper meta.RESTMapper) error {
 		if _, err := path.Match(key, ""); err != nil {
 			return fmt.Errorf("malformed pattern for subNamespaceAnnotationKeys %s: %w", key, err)
 		}
-		if strings.HasPrefix(key, constants.MetaPrefix) {
+		if strings.HasPrefix(key, accuratev2.MetaPrefix) {
 			return fmt.Errorf("misconfigured subNamespaceAnnotationKey: %s is not allowed", key)
 		}
 	}

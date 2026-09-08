@@ -1,3 +1,5 @@
+//go:build envtest
+
 package hooks_allow_cascade_delete
 
 import (
@@ -28,9 +30,9 @@ import (
 	"sigs.k8s.io/kustomize/api/krusty"
 	"sigs.k8s.io/kustomize/kyaml/filesys"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
-	"github.com/cybozu-go/accurate/hooks"
-	"github.com/cybozu-go/accurate/pkg/indexing"
+	accuratev2 "github.com/cybozu-go/accurate/api/v2"
+	"github.com/cybozu-go/accurate/internal/indexing"
+	hooks "github.com/cybozu-go/accurate/internal/webhook/v2"
 )
 
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
@@ -67,7 +69,7 @@ var _ = BeforeSuite(func() {
 		Scheme: scheme,
 		CRDs:   loadCRDs(),
 		WebhookInstallOptions: envtest.WebhookInstallOptions{
-			Paths: []string{filepath.Join("..", "..", "config", "webhook")},
+			Paths: []string{filepath.Join("..", "..", "..", "..", "config", "webhook")},
 		},
 	}
 
@@ -134,7 +136,7 @@ var _ = AfterSuite(func() {
 func loadCRDs() []*apiextensionsv1.CustomResourceDefinition {
 	kOpts := krusty.MakeDefaultOptions()
 	k := krusty.MakeKustomizer(kOpts)
-	m, err := k.Run(filesys.FileSystemOrOnDisk{}, filepath.Join("..", "..", "config", "crd"))
+	m, err := k.Run(filesys.FileSystemOrOnDisk{}, filepath.Join("..", "..", "..", "..", "config", "crd"))
 	Expect(err).To(Succeed())
 	resources := m.Resources()
 

@@ -1,4 +1,4 @@
-package hooks
+package v2
 
 import (
 	"context"
@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"regexp"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
+	accuratev2 "github.com/cybozu-go/accurate/api/v2"
+	"github.com/cybozu-go/accurate/internal/indexing"
 	"github.com/cybozu-go/accurate/pkg/config"
-	"github.com/cybozu-go/accurate/pkg/constants"
 	admissionv1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -42,7 +42,7 @@ func (m *subNamespaceMutator) Handle(ctx context.Context, req admission.Request)
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
-	sn.Finalizers = []string{constants.Finalizer}
+	sn.Finalizers = []string{accuratev2.Finalizer}
 	data, err := json.Marshal(sn)
 	if err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)
@@ -87,7 +87,7 @@ func (v *subNamespaceValidator) handleCreate(ctx context.Context, sn *accuratev2
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
 
-	if ns.Labels[constants.LabelType] != constants.NSTypeRoot && ns.Labels[constants.LabelParent] == "" {
+	if ns.Labels[accuratev2.LabelType] != accuratev2.NSTypeRoot && ns.Labels[accuratev2.LabelParent] == "" {
 		return admission.Denied(fmt.Sprintf("namespace %s is neither a root nor a sub namespace", ns.Name))
 	}
 
@@ -125,12 +125,12 @@ func (v *subNamespaceValidator) handleDelete(ctx context.Context, sn *accuratev2
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
 
-	if ns.Labels[constants.LabelParent] != sn.Namespace {
+	if ns.Labels[accuratev2.LabelParent] != sn.Namespace {
 		return admission.Allowed("")
 	}
 
 	children := &corev1.NamespaceList{}
-	if err := v.List(ctx, children, client.MatchingFields{constants.NamespaceParentKey: ns.Name}); err != nil {
+	if err := v.List(ctx, children, client.MatchingFields{indexing.NamespaceParentKey: ns.Name}); err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
 	if len(children.Items) > 0 {
@@ -141,16 +141,16 @@ func (v *subNamespaceValidator) handleDelete(ctx context.Context, sn *accuratev2
 }
 
 func (v *subNamespaceValidator) getRootNamespace(ctx context.Context, ns *corev1.Namespace) (*corev1.Namespace, error) {
-	if ns.Labels[constants.LabelType] == constants.NSTypeRoot {
+	if ns.Labels[accuratev2.LabelType] == accuratev2.NSTypeRoot {
 		return ns, nil
 	}
 
 	parent := &corev1.Namespace{}
-	if err := v.Get(ctx, client.ObjectKey{Name: ns.Labels[constants.LabelParent]}, parent); err != nil {
+	if err := v.Get(ctx, client.ObjectKey{Name: ns.Labels[accuratev2.LabelParent]}, parent); err != nil {
 		if !apierrors.IsNotFound(err) {
-			return nil, fmt.Errorf("failed to get namespace %s: %w", ns.Labels[constants.LabelParent], err)
+			return nil, fmt.Errorf("failed to get namespace %s: %w", ns.Labels[accuratev2.LabelParent], err)
 		}
-		return nil, fmt.Errorf("namespace %s is not found", ns.Labels[constants.LabelParent])
+		return nil, fmt.Errorf("namespace %s is not found", ns.Labels[accuratev2.LabelParent])
 	}
 	return v.getRootNamespace(ctx, parent)
 }

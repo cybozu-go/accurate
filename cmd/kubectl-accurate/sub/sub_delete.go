@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
-	"github.com/cybozu-go/accurate/pkg/constants"
+	accuratev2 "github.com/cybozu-go/accurate/api/v2"
+
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
@@ -56,7 +56,7 @@ func (o *subDeleteOpts) Run(ctx context.Context) error {
 		return fmt.Errorf("failed to get namespace %s: %w", o.name, err)
 	}
 
-	parent, ok := ns.Labels[constants.LabelParent]
+	parent, ok := ns.Labels[accuratev2.LabelParent]
 	if !ok {
 		return fmt.Errorf("namespace %s is not a sub-namespace", o.name)
 	}

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/cybozu-go/accurate/pkg/constants"
+	accuratev2 "github.com/cybozu-go/accurate/api/v2"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
@@ -71,7 +71,7 @@ func (o *templateListOpts) Run(ctx context.Context) error {
 	for i := range allNamespaces.Items {
 		ns := &allNamespaces.Items[i]
 		nsMap[ns.Name] = ns
-		if parent, ok := ns.Labels[constants.LabelTemplate]; ok {
+		if parent, ok := ns.Labels[accuratev2.LabelTemplate]; ok {
 			childMap[parent] = append(childMap[parent], ns)
 		}
 	}
@@ -85,8 +85,8 @@ func (o *templateListOpts) Run(ctx context.Context) error {
 		}
 	} else {
 		for _, ns := range allNamespaces.Items {
-			if ns.Labels[constants.LabelType] == constants.NSTypeTemplate {
-				if _, hasParent := ns.Labels[constants.LabelTemplate]; !hasParent {
+			if ns.Labels[accuratev2.LabelType] == accuratev2.NSTypeTemplate {
+				if _, hasParent := ns.Labels[accuratev2.LabelTemplate]; !hasParent {
 					roots = append(roots, &ns)
 				}
 			}
