@@ -13,7 +13,7 @@ import (
 //
 // SubNamespace is the Schema for the subnamespaces API
 type SubNamespaceApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Spec is the spec of SubNamespace.
 	Spec *SubNamespaceSpecApplyConfiguration `json:"spec,omitempty"`
