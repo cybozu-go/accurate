@@ -43,19 +43,28 @@ jobs:
       - name: Run chart-testing (lint)
         run: ct lint --config ct.yaml
 
+      - name: Load dependency versions
+        id: versions
+        shell: bash
+        run: |
+          source versions.env
+          {
+            echo "kubernetes=${KUBERNETES_VERSION}"
+            echo "cert-manager=${CERT_MANAGER_VERSION}"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Create kind cluster
         id: kind
         uses: helm/kind-action@06c1ae10762d3b9c1644e7fe69596ae519e015a2 # v1.15.0
         if: steps.list-changed.outputs.changed == 'true'
         with:
-          node_image: kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5 # renovate: kindest/node
+          node_image: kindest/node:${{ steps.versions.outputs.kubernetes }}
           registry: true
           registry_name: kind-registry
           registry_port: 5000
       - name: Apply cert-manager
         env:
-          # renovate: datasource=helm registryUrl=https://charts.jetstack.io depName=cert-manager
-          CERT_MANAGER_VERSION: v1.20.2
+          CERT_MANAGER_VERSION: ${{ steps.versions.outputs.cert-manager }}
           CERT_MANAGER_GPG_KEY_URL: https://cert-manager.io/public-keys/cert-manager-keyring-2021-09-20-1020CF3C033D4F35BAE1C19E1226061C665DF13E.gpg
         run: |
           curl -fsSL -o cert-manager-keyring.gpg "${CERT_MANAGER_GPG_KEY_URL}"

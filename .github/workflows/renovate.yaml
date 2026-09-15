@@ -1,22 +1,17 @@
 name: Renovate
 on:
   workflow_dispatch:
-# No permissions are required for this workflow because the GitHub App has its own permissions.
-permissions: {}
 jobs:
   renovate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      statuses: write
     steps:
-      - name: Generate GitHub App Token
-        id: app-token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
-        with:
-          client-id: ${{ vars.RENOVATE_CLIENT_ID }}
-          private-key: ${{ secrets.RENOVATE_APP_PRIVATE_KEY }}
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          token: ${{ steps.app-token.outputs.token }}
       - uses: ./.github/actions/aqua
       - name: Resolve the installation path of `aqua`
         id: resolve-aqua-path
@@ -25,7 +20,7 @@ jobs:
         uses: renovatebot/github-action@68a3ea99af6ad249940b5a9fdf44fc6d7f14378b # v46.1.6
         with:
           configurationFile: config.json
-          token: ${{ steps.app-token.outputs.token }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           # Mount the aqua installed on the runner into the renovate container so that `aqua update-checksum` can be executed within it.
           docker-volumes: |
             /tmp:/tmp ;

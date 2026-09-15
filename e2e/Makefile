@@ -1,7 +1,5 @@
-# renovate:
-KUBERNETES_VERSION = v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5
-# renovate: datasource=helm registryUrl=https://charts.jetstack.io depName=cert-manager
-CERT_MANAGER_VERSION = v1.20.2
+include ../versions.env
+
 CERT_MANAGER_GPG_KEY_URL = https://cert-manager.io/public-keys/cert-manager-keyring-2021-09-20-1020CF3C033D4F35BAE1C19E1226061C665DF13E.gpg
 
 PROJECT_DIR := $(CURDIR)/../
