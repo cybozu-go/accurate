@@ -1,7 +1,7 @@
 [![GitHub release](https://img.shields.io/github/release/cybozu-go/accurate.svg?maxAge=60)][releases]
 [![CI](https://github.com/cybozu-go/accurate/actions/workflows/ci.yaml/badge.svg)](https://github.com/cybozu-go/accurate/actions/workflows/ci.yaml)
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/cybozu-go/accurate?tab=overview)](https://pkg.go.dev/github.com/cybozu-go/accurate?tab=overview)
-[![Go Report Card](https://goreportcard.com/badge/github.com/cybozu-go/accurate)](https://goreportcard.com/report/github.com/cybozu-go/accurate)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/cybozu-go/accurate/v2?tab=overview)](https://pkg.go.dev/github.com/cybozu-go/accurate/v2?tab=overview)
+[![Go Report Card](https://goreportcard.com/badge/github.com/cybozu-go/accurate/v2)](https://goreportcard.com/report/github.com/cybozu-go/accurate/v2)
 
 # Accurate
 

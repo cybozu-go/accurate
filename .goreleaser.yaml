@@ -11,7 +11,7 @@ builds:
       - amd64
       - arm64
     ldflags:
-      - -X github.com/cybozu-go/accurate.Version={{.Version}}
+      - -X github.com/cybozu-go/accurate/v2.Version={{.Version}}
     env:
       - CGO_ENABLED=0
     ignore: # ref: https://goreleaser.com/deprecations/#builds-for-windowsarm64

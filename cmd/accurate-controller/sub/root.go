@@ -8,8 +8,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/cybozu-go/accurate"
-	"github.com/cybozu-go/accurate/pkg/config"
+	"github.com/cybozu-go/accurate/v2"
+	"github.com/cybozu-go/accurate/v2/pkg/config"
 	"github.com/spf13/cobra"
 	klog "k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"

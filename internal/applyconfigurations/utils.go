@@ -3,9 +3,9 @@
 package applyconfigurations
 
 import (
-	v2 "github.com/cybozu-go/accurate/api/v2"
-	apiv2 "github.com/cybozu-go/accurate/internal/applyconfigurations/api/v2"
-	internal "github.com/cybozu-go/accurate/internal/applyconfigurations/internal"
+	v2 "github.com/cybozu-go/accurate/v2/api/v2"
+	apiv2 "github.com/cybozu-go/accurate/v2/internal/applyconfigurations/api/v2"
+	internal "github.com/cybozu-go/accurate/v2/internal/applyconfigurations/internal"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"

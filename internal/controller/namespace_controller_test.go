@@ -6,8 +6,8 @@ import (
 	"context"
 	"time"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/v2"
-	"github.com/cybozu-go/accurate/internal/indexing"
+	accuratev2 "github.com/cybozu-go/accurate/v2/api/v2"
+	"github.com/cybozu-go/accurate/v2/internal/indexing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"

@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"regexp"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/v2"
-	"github.com/cybozu-go/accurate/internal/indexing"
-	"github.com/cybozu-go/accurate/pkg/config"
+	accuratev2 "github.com/cybozu-go/accurate/v2/api/v2"
+	"github.com/cybozu-go/accurate/v2/internal/indexing"
+	"github.com/cybozu-go/accurate/v2/pkg/config"
 	admissionv1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"

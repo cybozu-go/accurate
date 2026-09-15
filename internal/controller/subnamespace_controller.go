@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/v2"
-	accuratev2ac "github.com/cybozu-go/accurate/internal/applyconfigurations/api/v2"
-	"github.com/cybozu-go/accurate/internal/indexing"
+	accuratev2 "github.com/cybozu-go/accurate/v2/api/v2"
+	accuratev2ac "github.com/cybozu-go/accurate/v2/internal/applyconfigurations/api/v2"
+	"github.com/cybozu-go/accurate/v2/internal/indexing"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
