@@ -1,0 +1,40 @@
+name: Setup Go with Takumi Guard
+description: ''
+inputs:
+  cache:
+    description: "enabling go cache"
+    required: false
+    default: false
+  bot-id:
+    description: "Takumi Guard bot ID"
+    required: false
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+      with:
+        go-version-file: go.mod
+        cache: ${{ inputs.cache }}
+
+    - name: Check if Fork PR
+      id: check-fork
+      shell: bash
+      run: |
+        if [ "${{ github.event_name }}" = "pull_request" ] && \
+           [ "${GITHUB_EVENT_PULL_REQUEST_HEAD_REPO_FULL_NAME}" != "${{ github.repository }}" ]; then
+          echo "is_fork=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "is_fork=false" >> "$GITHUB_OUTPUT"
+        fi
+      env:
+        GITHUB_EVENT_PULL_REQUEST_HEAD_REPO_FULL_NAME: ${{ github.event.pull_request.head.repo.full_name }}
+
+    - name: Setup Takumi Guard (Organization)
+      if: steps.check-fork.outputs.is_fork == 'false'
+      uses: flatt-security/setup-takumi-guard-golang@37631ecffa6faf06754444a4807451b7a55c64b5 # v1.2.0
+      with:
+        bot-id: ${{ inputs.bot-id }}
+
+    - name: Setup Takumi Guard (Anonymous)
+      if: steps.check-fork.outputs.is_fork == 'true'
+      uses: flatt-security/setup-takumi-guard-golang@37631ecffa6faf06754444a4807451b7a55c64b5 # v1.2.0
