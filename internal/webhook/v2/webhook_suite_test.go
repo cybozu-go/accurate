@@ -17,9 +17,9 @@ import (
 
 	admissionv1 "k8s.io/api/admission/v1"
 	//+kubebuilder:scaffold:imports
-	accuratev2 "github.com/cybozu-go/accurate/api/v2"
-	"github.com/cybozu-go/accurate/internal/indexing"
-	"github.com/cybozu-go/accurate/pkg/config"
+	accuratev2 "github.com/cybozu-go/accurate/v2/api/v2"
+	"github.com/cybozu-go/accurate/v2/internal/indexing"
+	"github.com/cybozu-go/accurate/v2/pkg/config"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"

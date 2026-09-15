@@ -1,4 +1,4 @@
-module github.com/cybozu-go/accurate
+module github.com/cybozu-go/accurate/v2
 
 go 1.26.3
 
