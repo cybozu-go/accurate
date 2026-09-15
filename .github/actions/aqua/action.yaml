@@ -1,9 +1,5 @@
 name: "Setup tools"
 description: "Setup tools with aqua"
-inputs:
-  github_token:
-    description: "GitHub Token"
-    required: true
 runs:
   using: composite
   steps:
@@ -11,4 +7,3 @@ runs:
       with:
         aqua_version: v2.59.1
         policy_allow: "true"
-        github_token: ${{ inputs.github_token }}
