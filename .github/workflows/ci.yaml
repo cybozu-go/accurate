@@ -4,17 +4,18 @@ on:
   push:
     branches:
     - 'main'
-permissions:
-  contents: read
 jobs:
   build:
     name: Build binaries
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-    - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+    - uses: ./.github/actions/setup-go
       with:
-        go-version-file: go.mod
+        bot-id: ${{ vars.TAKUMI_GUARD_BOT_ID }}
     - uses: ./.github/actions/aqua
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -22,11 +23,14 @@ jobs:
   test:
     name: Small tests
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-    - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+    - uses: ./.github/actions/setup-go
       with:
-        go-version-file: go.mod
+        bot-id: ${{ vars.TAKUMI_GUARD_BOT_ID }}
     - uses: ./.github/actions/aqua
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -43,12 +47,15 @@ jobs:
         - v1.35.5@sha256:ce977ae6d65918d0b58a5f8b5e940429c2ce42fa3a5619ec2bbc60b949c0ac95 # renovate: kindest/node
         - v1.34.8@sha256:02722c2dedddcfc00febf5d27fbeb9b7b2c14294c82109ff4a85d89ac9ba3256 # renovate: kindest/node
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-    - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+    - uses: ./.github/actions/setup-go
       with:
-        go-version-file: go.mod
         cache: true
+        bot-id: ${{ vars.TAKUMI_GUARD_BOT_ID }}
     - uses: ./.github/actions/aqua
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
