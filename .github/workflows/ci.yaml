@@ -17,8 +17,6 @@ jobs:
       with:
         bot-id: ${{ vars.TAKUMI_GUARD_BOT_ID }}
     - uses: ./.github/actions/aqua
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
     - run: make release-build
   test:
     name: Small tests
@@ -32,8 +30,6 @@ jobs:
       with:
         bot-id: ${{ vars.TAKUMI_GUARD_BOT_ID }}
     - uses: ./.github/actions/aqua
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
     - run: make lint
     - run: make test
     - run: make check-generate
@@ -57,8 +53,6 @@ jobs:
         cache: true
         bot-id: ${{ vars.TAKUMI_GUARD_BOT_ID }}
     - uses: ./.github/actions/aqua
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
     - run: make start KUBERNETES_VERSION=${{ matrix.k8s-version }}
       working-directory: e2e
     - run: make test
