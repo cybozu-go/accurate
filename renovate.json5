@@ -19,7 +19,6 @@
     'custom.regex',
     'dockerfile',
     'gomod',
-    'github-actions',
     'renovate-config',
   ],
   packageRules: [
@@ -41,12 +40,10 @@
     {
       description: 'Group all dependencies updates',
       groupName: 'all dependencies updates',
-      groupSlug: 'all-dependencies-updates',
       matchManagers: [
         'custom.regex',
         'dockerfile',
         'gomod',
-        'github-actions',
       ],
       separateMajorMinor: true,
     },
@@ -59,7 +56,7 @@
       ],
       matchPackageNames: [
         '/^k8s\\.io\\/.*/',
-        '/^sigs\\.k8s\\.io\\/.*/',
+        'sigs.k8s.io/controller-runtime',
       ],
       separateMajorMinor: true,
       separateMinorPatch: true,
@@ -92,7 +89,7 @@
       description: 'Disable major/minor updates for Kubernetes related dependencies',
       matchPackageNames: [
         '/^k8s\\.io\\/.*/',
-        '/^sigs\\.k8s\\.io\\/.*/',
+        'sigs.k8s.io/controller-runtime',
         '/^kubernetes-sigs\\/.*/',
         '/^kubernetes\\/.*/',
         'kindest/node',
@@ -119,25 +116,23 @@
       datasourceTemplate: 'docker',
       depNameTemplate: 'kindest/node',
       managerFilePatterns: [
-        '/^\\.github\\/workflows\\/.+\\.ya?ml$/',
-        'e2e/Makefile',
+        '/^versions\\.env$/',
       ],
       matchStrings: [
-        '- (?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+) # renovate: kindest\\/node',
-        '# renovate:\\n+KUBERNETES_VERSION\\s*:?=\\s*["\']?(?<currentValue>[^@"\'\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)["\']?',
-      ],
+          'KUBERNETES_VERSION=(?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)',
+          'KUBERNETES_PREVIOUS_VERSION=(?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)',
+          'KUBERNETES_OLDEST_VERSION=(?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)',
+        ],
     },
     {
       customType: 'regex',
       datasourceTemplate: 'helm',
       registryUrlTemplate: 'https://charts.jetstack.io',
       managerFilePatterns: [
-        '/^e2e\/Makefile$/',
-        '/^\\.github\\/workflows\\/.+\\.ya?ml$/',
+        '/^versions\\.env$/',
       ],
       matchStrings: [
-        '# renovate: datasource=helm registryUrl=https://charts.jetstack.io depName=(?<depName>[^\\s]+)\\nCERT_MANAGER_VERSION = (?<currentValue>v[^\\s]+)',
-        '# renovate: datasource=helm registryUrl=https://charts.jetstack.io depName=(?<depName>[^\\s]+)\\n\\s+CERT_MANAGER_VERSION: (?<currentValue>v[^\\s]+)',
+        'CERT_MANAGER_VERSION=(?<currentValue>v[^\\s]+)',
       ],
     },
   ],
