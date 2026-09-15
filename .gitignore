@@ -15,6 +15,7 @@
 /.vscode
 /.idea
 /*.iml
+/.zed
 
 # Binaries
 /bin

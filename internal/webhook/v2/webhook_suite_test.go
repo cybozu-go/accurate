@@ -1,4 +1,6 @@
-package hooks_allow_cascade_delete
+//go:build envtest
+
+package v2
 
 import (
 	"context"
@@ -13,7 +15,11 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	admissionv1beta1 "k8s.io/api/admission/v1beta1"
+	admissionv1 "k8s.io/api/admission/v1"
+	//+kubebuilder:scaffold:imports
+	accuratev2 "github.com/cybozu-go/accurate/api/v2"
+	"github.com/cybozu-go/accurate/internal/indexing"
+	"github.com/cybozu-go/accurate/pkg/config"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -27,10 +33,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 	"sigs.k8s.io/kustomize/api/krusty"
 	"sigs.k8s.io/kustomize/kyaml/filesys"
-
-	accuratev2 "github.com/cybozu-go/accurate/api/accurate/v2"
-	"github.com/cybozu-go/accurate/hooks"
-	"github.com/cybozu-go/accurate/pkg/indexing"
 )
 
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
@@ -57,7 +59,7 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	err = clientgoscheme.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())
-	err = admissionv1beta1.AddToScheme(scheme)
+	err = admissionv1.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())
 
 	//+kubebuilder:scaffold:scheme
@@ -67,7 +69,7 @@ var _ = BeforeSuite(func() {
 		Scheme: scheme,
 		CRDs:   loadCRDs(),
 		WebhookInstallOptions: envtest.WebhookInstallOptions{
-			Paths: []string{filepath.Join("..", "..", "config", "webhook")},
+			Paths: []string{filepath.Join("..", "..", "..", "config", "webhook")},
 		},
 	}
 
@@ -79,6 +81,7 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
 
+	// start webhook server using Manager
 	webhookInstallOptions := &testEnv.WebhookInstallOptions
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
 		Scheme: scheme,
@@ -96,10 +99,43 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 
 	dec := admission.NewDecoder(scheme)
-	hooks.SetupNamespaceWebhook(mgr, dec, true)
+	SetupNamespaceWebhook(mgr, dec, false)
 
+	conf := config.Config{
+		NamingPolicies: []config.NamingPolicy{
+			{
+				Root:  "naming-policy-root-1",
+				Match: "naming-policy-root-1-child",
+			},
+			{
+				Root:  "naming-policy-root-2",
+				Match: "naming-policy-root-2-child",
+			},
+			{
+				Root:  ".+-match-.+",
+				Match: ".+-match-.+",
+			},
+			{
+				Root:  "^ns-root.+",
+				Match: "^ns-root.+",
+			},
+			{
+				Root:  "^app-(?P<team>.*)",
+				Match: "^app-${team}-.*",
+			},
+			{
+				Root:  "^app-(?P<team>[^-]*)-(?P<app>[^-]*)",
+				Match: "^app-$team-$app-.*",
+			},
+			{
+				Root:  "^unuse-naming-group-(?P<team>.*)",
+				Match: "^unuse-naming-group-child1",
+			},
+		},
+	}
+	err = conf.Validate(mgr.GetRESTMapper())
 	Expect(err).NotTo(HaveOccurred())
-	err = hooks.SetupSubNamespaceWebhook(mgr, dec, nil, true)
+	err = SetupSubNamespaceWebhook(mgr, dec, conf.NamingPolicyRegexps, false)
 	Expect(err).NotTo(HaveOccurred())
 
 	go func() {
@@ -134,7 +170,7 @@ var _ = AfterSuite(func() {
 func loadCRDs() []*apiextensionsv1.CustomResourceDefinition {
 	kOpts := krusty.MakeDefaultOptions()
 	k := krusty.MakeKustomizer(kOpts)
-	m, err := k.Run(filesys.FileSystemOrOnDisk{}, filepath.Join("..", "..", "config", "crd"))
+	m, err := k.Run(filesys.FileSystemOrOnDisk{}, filepath.Join("..", "..", "..", "config", "crd"))
 	Expect(err).To(Succeed())
 	resources := m.Resources()
 

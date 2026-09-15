@@ -1,4 +1,7 @@
 version: "2"
+run:
+  build-tags:
+    - envtest
 linters:
   default: standard
   enable:
