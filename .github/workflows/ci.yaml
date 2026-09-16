@@ -42,7 +42,10 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - id: versions
         run: |
-          source versions.env
+          KUBERNETES_VERSION="$(awk -F= '$1 == "KUBERNETES_VERSION" {print $2}' versions.env)"
+          KUBERNETES_PREVIOUS_VERSION="$(awk -F= '$1 == "KUBERNETES_PREVIOUS_VERSION" {print $2}' versions.env)"
+          KUBERNETES_OLDEST_VERSION="$(awk -F= '$1 == "KUBERNETES_OLDEST_VERSION" {print $2}' versions.env)"
+
           printf 'kubernetes=["%s","%s","%s"]\n' \
             "$KUBERNETES_VERSION" \
             "$KUBERNETES_PREVIOUS_VERSION" \

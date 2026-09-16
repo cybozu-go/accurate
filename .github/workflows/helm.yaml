@@ -47,7 +47,9 @@ jobs:
         id: versions
         shell: bash
         run: |
-          source versions.env
+          KUBERNETES_VERSION="$(awk -F= '$1 == "KUBERNETES_VERSION" {print $2}' versions.env)"
+          CERT_MANAGER_VERSION="$(awk -F= '$1 == "CERT_MANAGER_VERSION" {print $2}' versions.env)"
+
           {
             echo "kubernetes=${KUBERNETES_VERSION}"
             echo "cert-manager=${CERT_MANAGER_VERSION}"
