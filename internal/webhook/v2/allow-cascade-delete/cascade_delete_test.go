@@ -12,7 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/v2"
+	accuratev2 "github.com/cybozu-go/accurate/v2/api/v2"
 )
 
 var _ = Describe("Webhook allow cascade delete", func() {

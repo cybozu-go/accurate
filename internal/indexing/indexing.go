@@ -3,7 +3,7 @@ package indexing
 import (
 	"context"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/v2"
+	accuratev2 "github.com/cybozu-go/accurate/v2/api/v2"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"

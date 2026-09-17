@@ -2,7 +2,7 @@ domain: cybozu.com
 layout:
 - go.kubebuilder.io/v4
 projectName: accurate
-repo: github.com/cybozu-go/accurate
+repo: github.com/cybozu-go/accurate/v2
 resources:
 - api:
     crdVersion: v1
@@ -11,7 +11,7 @@ resources:
   domain: cybozu.com
   group: accurate
   kind: SubNamespace
-  path: github.com/cybozu-go/accurate/api/v2
+  path: github.com/cybozu-go/accurate/v2/api/v2
   version: v2
   webhooks:
     defaulting: true

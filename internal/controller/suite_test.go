@@ -21,7 +21,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	accuratev2 "github.com/cybozu-go/accurate/api/v2"
+	accuratev2 "github.com/cybozu-go/accurate/v2/api/v2"
 	//+kubebuilder:scaffold:imports
 )
 
