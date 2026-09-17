@@ -17,4 +17,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pinact run --check --verify-comment
+          pinact run --check --verify-comment --min-age 14

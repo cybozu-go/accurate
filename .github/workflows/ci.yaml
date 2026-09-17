@@ -34,14 +34,29 @@ jobs:
     - run: make test
     - run: make check-generate
     - run: make envtest
+  versions:
+    runs-on: ubuntu-24.04
+    outputs:
+      kubernetes: ${{ steps.versions.outputs.kubernetes }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: versions
+        run: |
+          KUBERNETES_VERSION="$(awk -F= '$1 == "KUBERNETES_VERSION" {print $2}' versions.env)"
+          KUBERNETES_PREVIOUS_VERSION="$(awk -F= '$1 == "KUBERNETES_PREVIOUS_VERSION" {print $2}' versions.env)"
+          KUBERNETES_OLDEST_VERSION="$(awk -F= '$1 == "KUBERNETES_OLDEST_VERSION" {print $2}' versions.env)"
+
+          printf 'kubernetes=["%s","%s","%s"]\n' \
+            "$KUBERNETES_VERSION" \
+            "$KUBERNETES_PREVIOUS_VERSION" \
+            "$KUBERNETES_OLDEST_VERSION" \
+            >> "$GITHUB_OUTPUT"
   e2e:
     name: End-to-End Tests
+    needs: versions
     strategy:
       matrix:
-        k8s-version:
-        - v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5 # renovate: kindest/node
-        - v1.36.4@sha256:099e049362a1526b2db71494e1947aae99bd16290d7c895f2b7ea312e3cbfaed # renovate: kindest/node
-        - v1.35.8@sha256:07b2536e30b803ed61d1677a79df6115f798ce64c80f9e22f6ed45afd09323c0 # renovate: kindest/node
+        k8s-version: ${{ fromJSON(needs.versions.outputs.kubernetes) }}
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
