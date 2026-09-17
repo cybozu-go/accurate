@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-b6fecc05.js";
+            window.path_to_searchindex_js = "searchindex-214cbf63.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-ff269338.js"></script>
@@ -185,7 +185,7 @@
 <p>Accurate supports the three latest Kubernetes versions.
 If a new Kubernetes is released, please update the following files.</p>
 <ul>
-<li>Update Kubernetes version in <code>e2e/Makefile</code> and <code>.github/workflows/ci.yaml</code>.</li>
+<li>Update Kubernetes version in <code>versions.env</code>.</li>
 <li>Update kubectl version in <code>aqua.yaml</code>.</li>
 <li>Update <code>k8s.io/*</code> and <code>sigs.k8s.io/controller-runtime</code> packages version in <code>go.mod</code>.</li>
 </ul>
@@ -193,6 +193,9 @@ If a new Kubernetes is released, please update the following files.</p>
 <h2 id="how-to-update-dependencies"><a class="header" href="#how-to-update-dependencies">How to update dependencies</a></h2>
 <p>Renovate will create PRs that update dependencies when you <a href="https://github.com/cybozu-go/accurate/actions/workflows/renovate.yaml">trigger the workflow with <code>workflow_dispatch</code></a>.
 However, Kubernetes is only updated with patched versions.</p>
+<p>Update GitHub Actions dependencies using pinact.</p>
+<pre><code class="language-sh">GITHUB_TOKEN="$(gh auth token)" pinact run --update --min-age 14
+</code></pre>
 
                     </main>
 
