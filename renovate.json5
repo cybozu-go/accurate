@@ -25,53 +25,63 @@
   ],
   packageRules: [
     {
-        description: 'Enable tools in aqua.yaml',
-        enabled: true,
-        matchDatasources: ['github-tags'],
-        matchDepNames: [
+      description: 'Enable tools in aqua.yaml',
+      enabled: true,
+      matchDatasources: [
+        'github-tags',
+      ],
+      matchDepNames: [
         'kubernetes/code-generator/applyconfiguration-gen',
         'kubernetes/code-generator/conversion-gen',
-        ],
-        matchFileNames: ['aqua.yaml'],
+      ],
+      matchFileNames: [
+        'aqua.yaml',
+      ],
     },
     {
-        description: 'Disable major/minor updates for Kubernetes related dependencies',
-        matchPackageNames: [
+      description: 'Disable major/minor updates for Kubernetes related dependencies',
+      matchPackageNames: [
         '/^k8s\\.io\\/.*/',
-        'sigs.k8s.io/controller-runtime',
-        '/^kubernetes-sigs\\/.*/',
         '/^kubernetes\\/.*/',
+        '/^kubernetes-sigs\\/.*/',
         'kindest/node',
-        ],
-        matchUpdateTypes: ['major', 'minor'],
-        enabled: false,
+        'sigs.k8s.io/controller-runtime',
+      ],
+      matchUpdateTypes: [
+        'major',
+        'minor',
+      ],
+      enabled: false,
     },
     {
-        description: 'Group Kubernetes patch updates',
-        groupName: 'Kubernetes patch dependencies',
-        groupSlug: 'kubernetes-patch-dependencies',
-        matchPackageNames: [
+      description: 'Group Kubernetes patch updates',
+      groupName: 'Kubernetes patch dependencies',
+      groupSlug: 'kubernetes-patch-dependencies',
+      matchPackageNames: [
         '/^k8s\\.io\\/.*/',
-        'sigs.k8s.io/controller-runtime',
-        '/^kubernetes-sigs\\/.*/',
         '/^kubernetes\\/.*/',
+        '/^kubernetes-sigs\\/.*/',
         'kindest/node',
-        ],
-        matchUpdateTypes: ['patch'],
+        'sigs.k8s.io/controller-runtime',
+      ],
+      matchUpdateTypes: [
+        'patch',
+      ],
     },
-
     {
-        description: 'Group non-Kubernetes patch updates',
-        groupName: 'patch dependencies',
-        groupSlug: 'patch-dependencies',
-        matchPackageNames: [
+      description: 'Group non-Kubernetes patch updates',
+      groupName: 'patch dependencies',
+      groupSlug: 'patch-dependencies',
+      matchPackageNames: [
         '!/^k8s\\.io\\/.*/',
-        '!sigs.k8s.io/controller-runtime',
-        '!/^kubernetes-sigs\\/.*/',
         '!/^kubernetes\\/.*/',
+        '!/^kubernetes-sigs\\/.*/',
         '!kindest/node',
-        ],
-        matchUpdateTypes: ['patch'],
+        '!sigs.k8s.io/controller-runtime',
+      ],
+      matchUpdateTypes: [
+        'patch',
+      ],
     },
   ],
   postUpdateOptions: [
@@ -79,9 +89,13 @@
     'gomodUpdateImportPaths',
   ],
   postUpgradeTasks: {
-    "commands": ["/usr/local/bin/aqua update-checksum --prune"],
-    "fileFilters": ["aqua-checksums.json"],
-    "executionMode": "branch"
+    commands: [
+      '/usr/local/bin/aqua update-checksum --prune',
+    ],
+    fileFilters: [
+      'aqua-checksums.json',
+    ],
+    executionMode: 'branch',
   },
   customManagers: [
     {
@@ -92,10 +106,10 @@
         '/^versions\\.env$/',
       ],
       matchStrings: [
-          'KUBERNETES_VERSION=(?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)',
-          'KUBERNETES_PREVIOUS_VERSION=(?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)',
-          'KUBERNETES_OLDEST_VERSION=(?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)',
-        ],
+        'KUBERNETES_VERSION=(?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)',
+        'KUBERNETES_PREVIOUS_VERSION=(?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)',
+        'KUBERNETES_OLDEST_VERSION=(?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)',
+      ],
     },
     {
       customType: 'regex',
