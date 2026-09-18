@@ -1,0 +1,15 @@
+name: Setup Go with Takumi Guard
+description: ''
+inputs:
+  cache:
+    description: "enabling go cache"
+    required: false
+    default: false
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+      with:
+        go-version-file: go.mod
+        cache: ${{ inputs.cache }}
+    - uses: flatt-security/setup-takumi-guard-golang@37631ecffa6faf06754444a4807451b7a55c64b5 # v1.2.0
