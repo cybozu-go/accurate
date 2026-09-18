@@ -13,9 +13,7 @@ jobs:
       id-token: write
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-    - uses: ./.github/actions/setup-go
-      with:
-        bot-id: ${{ vars.TAKUMI_GUARD_BOT_ID }}
+    - uses: ./.github/actions/setup-go-with-takumi-guard
     - uses: ./.github/actions/aqua
     - run: make release-build
   test:
@@ -26,9 +24,7 @@ jobs:
       id-token: write
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-    - uses: ./.github/actions/setup-go
-      with:
-        bot-id: ${{ vars.TAKUMI_GUARD_BOT_ID }}
+    - uses: ./.github/actions/setup-go-with-takumi-guard
     - uses: ./.github/actions/aqua
     - run: make lint
     - run: make test
@@ -48,10 +44,9 @@ jobs:
       id-token: write
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-    - uses: ./.github/actions/setup-go
+    - uses: ./.github/actions/setup-go-with-takumi-guard
       with:
         cache: true
-        bot-id: ${{ vars.TAKUMI_GUARD_BOT_ID }}
     - uses: ./.github/actions/aqua
     - run: make start KUBERNETES_VERSION=${{ matrix.k8s-version }}
       working-directory: e2e
