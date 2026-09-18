@@ -3,5 +3,8 @@
   "platform": "github",
   "onboarding": false,
   "repositories": ["cybozu-go/accurate"],
-  "allowedCommands": ["^aqua update-checksum --prune$"]
+  "allowedCommands":[
+    "^aqua update-checksum --prune$",
+    "^/usr/local/bin/aqua update-checksum --prune$"
+  ]
 }
