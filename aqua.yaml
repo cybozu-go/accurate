@@ -18,11 +18,11 @@ packages:
   - name: kubernetes-sigs/kubebuilder@v4.16.0
   - name: kubernetes-sigs/kustomize@kustomize/v5.8.1
   - name: kubernetes-sigs/kind@v0.33.0
-  - name: rust-lang/mdBook@v0.5.3
-  - name: mikefarah/yq@v4.53.2
+  - name: rust-lang/mdBook@v0.5.4
+  - name: mikefarah/yq@v4.53.6
   - name: clamoriniere/crd-to-markdown@v0.0.3
   - name: kubernetes-sigs/controller-tools/controller-gen@v0.22.0
-  - name: helm/helm@v4.2.0
+  - name: helm/helm@v4.2.4
   - name: goreleaser/goreleaser@v2.16.0
   - name: kubernetes/code-generator/applyconfiguration-gen@v0.37.0
     registry: local
@@ -30,5 +30,5 @@ packages:
     registry: local
   - name: golangci/golangci-lint@v2.12.2
   - name: suzuki-shunsuke/pinact@v4.0.0
-  - name: oras-project/oras@v1.3.2
-  - name: sigstore/cosign@v3.1.1
+  - name: oras-project/oras@v1.3.4
+  - name: sigstore/cosign@v3.1.3
