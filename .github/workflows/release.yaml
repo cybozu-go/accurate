@@ -80,9 +80,9 @@ jobs:
           tag_version=${GITHUB_REF##*/v}
 
           # replace placeholder with new version
-          sed --in-place "s/app-version-placeholder/$tag_version/g" charts/accurate/Chart.yaml
-          sed --in-place "s/chart-version-placeholder/$tag_version/g" charts/accurate/Chart.yaml
-          sed --in-place "s/app-version-placeholder/$tag_version/g" charts/accurate/values.yaml
+          sed --in-place "s/0.0.0-app-version-placeholder/$tag_version/g" charts/accurate/Chart.yaml
+          sed --in-place "s/0.0.0-chart-version-placeholder/$tag_version/g" charts/accurate/Chart.yaml
+          sed --in-place "s/0.0.0-app-version-placeholder/$tag_version/g" charts/accurate/values.yaml
 
       - name: Create chart release notes
         run: |
