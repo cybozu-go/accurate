@@ -67,7 +67,7 @@ jobs:
       - uses: ./.github/actions/aqua
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Login to ghcr.io
         run: |
           printf '%s' "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io --username "${GITHUB_ACTOR}" --password-stdin
@@ -75,29 +75,13 @@ jobs:
           printf '%s' "${{ secrets.GITHUB_TOKEN }}" | cosign login ghcr.io --username "${GITHUB_ACTOR}" --password-stdin
 
       - name: Set chart version
-        run: |          
-          oras repo tags "ghcr.io/cybozu-go/charts/accurate" --exclude-digest-tags --format json > .oci-tags.json
-          
+        run: |
           # get the release tag version
           tag_version=${GITHUB_REF##*/v}
 
-          # get the latest chart version
-          chart_version="$(
-            jq -r '.tags[]?' .oci-tags.json |
-              grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' |
-              sort -V |
-              tail -n 1 || true
-          )"
-          chart_patch_version=${chart_version##*.}
-          new_patch_version=$(($chart_patch_version+1))
-
-          # if minor or major version changed, reset new patch version
-          local_version=$(cat charts/accurate/Chart.yaml | yq .version | sed "s/0-chart-patch-version-placeholder/$chart_patch_version/g")
-          [ "$local_version" != "$chart_version" ] && new_patch_version=0
-
           # replace placeholder with new version
           sed --in-place "s/app-version-placeholder/$tag_version/g" charts/accurate/Chart.yaml
-          sed --in-place "s/0-chart-patch-version-placeholder/$new_patch_version/g" charts/accurate/Chart.yaml
+          sed --in-place "s/chart-version-placeholder/$tag_version/g" charts/accurate/Chart.yaml
           sed --in-place "s/app-version-placeholder/$tag_version/g" charts/accurate/values.yaml
 
       - name: Create chart release notes
