@@ -224,8 +224,10 @@ var _ = Describe("kubectl accurate", func() {
 		Expect(err).To(HaveOccurred())
 
 		kubectlSafe(nil, "accurate", "sub", "move", "sn1", "subroot2")
-		_, err = kubectl(nil, "get", "subnamespaces", "-n", "subroot1", "sn1")
-		Expect(err).To(HaveOccurred())
+		Eventually(func() error {
+			_, err := kubectl(nil, "get", "subnamespaces", "-n", "subroot1", "sn1")
+			return err
+		}).Should(HaveOccurred())
 		kubectlSafe(nil, "get", "subnamespaces", "-n", "subroot2", "sn1")
 		out, err := kubectl(nil, "get", "ns", "sn1", "-o", "json")
 		Expect(err).NotTo(HaveOccurred())
@@ -257,8 +259,10 @@ var _ = Describe("kubectl accurate", func() {
 		Expect(conditions[0].Status).To(Equal(metav1.ConditionTrue))
 
 		kubectlSafe(nil, "accurate", "sub", "cut", "sn2")
-		_, err = kubectl(nil, "get", "-n", "sn1", "subnamespaces", "sn2")
-		Expect(err).To(HaveOccurred())
+		Eventually(func() error {
+			_, err := kubectl(nil, "get", "-n", "sn1", "subnamespaces", "sn2")
+			return err
+		}).Should(HaveOccurred())
 		out, err = kubectl(nil, "get", "ns", "sn2", "-o", "json")
 		Expect(err).NotTo(HaveOccurred())
 		sn2 := &corev1.Namespace{}
@@ -281,8 +285,10 @@ var _ = Describe("kubectl accurate", func() {
 			return err
 		}).ShouldNot(Succeed())
 
-		_, err = kubectl(nil, "get", "-n", "subroot2", "subnamespaces", "sn2")
-		Expect(err).To(HaveOccurred())
+		Eventually(func() error {
+			_, err := kubectl(nil, "get", "-n", "subroot2", "subnamespaces", "sn2")
+			return err
+		}).Should(HaveOccurred())
 	})
 
 	It("should (re)create sub-namespace when conflicting namespace deleted", func() {
