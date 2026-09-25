@@ -131,73 +131,73 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/mikefarah/yq/v4.53.2/yq_darwin_amd64",
-      "checksum": "CCFA38F3BC01C1BAC61C39E3AD7C64BEC7F3FAC0613040075ED81D42EE22413DDD0ADDD144AB0162C11DD44A389CF97AD9017187EC94A26F7CA8F6AA22DAA230",
+      "id": "github_release/github.com/mikefarah/yq/v4.53.6/yq_darwin_amd64",
+      "checksum": "FEE88439D5BB53467D1A2B6FEF4291AFB805260FD1078D089B036C764BF82114C3469F6BBB620AFA719E6F7D05DB4B948218A8BFC60C3AD866D45607A8B05D23",
       "algorithm": "sha512"
     },
     {
-      "id": "github_release/github.com/mikefarah/yq/v4.53.2/yq_darwin_arm64",
-      "checksum": "7279EC7D15F72EFDEACE8300310F5FABBEEF78871349EB34B151F53A0B28360F73AF4D5BC22D4FFDD6D3C9195C2945DBCDF225B60BA6DFDFB783D43D1932EDCC",
+      "id": "github_release/github.com/mikefarah/yq/v4.53.6/yq_darwin_arm64",
+      "checksum": "A1E235EA619810E2F741F970C26A5139452D509AF0A61B3FAFCFE2ACE5A89304B6EE17CDB3CE3CED7E43B6A744D080E3CB0B83F8022DBB81F590BC6968A8FD9E",
       "algorithm": "sha512"
     },
     {
-      "id": "github_release/github.com/mikefarah/yq/v4.53.2/yq_linux_amd64",
-      "checksum": "95D5755266C77627E6FACC9B443174F17B94AB3B2C427B860232C7B79F56F1F534ED2E0B5A79B41DFCC8246A05DB987D9AEB39913F36563784258EBE1D6BE763",
+      "id": "github_release/github.com/mikefarah/yq/v4.53.6/yq_linux_amd64",
+      "checksum": "508F4EE34C6D093D136FF3C1B36DB4105E686C3D68D435C064448BA16E2616D528EFAFB2CB0A1890B7724890373A226A38B7DA27E6796396EE759BED39A8C671",
       "algorithm": "sha512"
     },
     {
-      "id": "github_release/github.com/mikefarah/yq/v4.53.2/yq_linux_arm64",
-      "checksum": "A4FFC2DC4F8C1C43E1EE687205248D361A16D0A0C6A7CEAB17C443746B9D5D014DBCCFF5C34883BCA9115979037EE2D992AA0E6D9A485A7184136DF275F6729F",
+      "id": "github_release/github.com/mikefarah/yq/v4.53.6/yq_linux_arm64",
+      "checksum": "D7B42B08F3CC2CF115CEB0579C143A7FCCCEEE9E496075004BCBC34E173CFD0A4DACC0BDC6FC502C2869586B9FC949116DB5FE9BEF973C1A14568F4BD625EDFA",
       "algorithm": "sha512"
     },
     {
-      "id": "github_release/github.com/oras-project/oras/v1.3.2/oras_1.3.2_darwin_amd64.tar.gz",
-      "checksum": "2621F6B252B222F6FBF4E114D2FCAA0CEC6B632624FFAF73143F66E4E0994F86",
+      "id": "github_release/github.com/oras-project/oras/v1.3.4/oras_1.3.4_darwin_amd64.tar.gz",
+      "checksum": "5E964F3D5A36EB9499A9D3E252A86B09E7ADF3E6F6447EEC56FD249C6702AF7E",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/oras-project/oras/v1.3.2/oras_1.3.2_darwin_arm64.tar.gz",
-      "checksum": "7929F792CF272268412375ECAD6F0FB3C20F164368D5B57966E67AD6D36ECA53",
+      "id": "github_release/github.com/oras-project/oras/v1.3.4/oras_1.3.4_darwin_arm64.tar.gz",
+      "checksum": "217761A9500242FF473DE8656B5ACA21136FF39E17E9E61FD8936BBFD902704C",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/oras-project/oras/v1.3.2/oras_1.3.2_linux_amd64.tar.gz",
-      "checksum": "9229CCC6D17BB282039AD4A69ABB16DCB887A5BCE567C075D731D9B3C7AD8EAF",
+      "id": "github_release/github.com/oras-project/oras/v1.3.4/oras_1.3.4_linux_amd64.tar.gz",
+      "checksum": "F27ADB935022D94DF8DC77719C322DDA592C78A0D57A6F7DCDD8D900B248C454",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/oras-project/oras/v1.3.2/oras_1.3.2_linux_arm64.tar.gz",
-      "checksum": "8DB4A223BD6034DEFF198E791EA7CB3AF0840DF25B7E9F370E2F1F3FD20D389B",
+      "id": "github_release/github.com/oras-project/oras/v1.3.4/oras_1.3.4_linux_arm64.tar.gz",
+      "checksum": "15702C6E3A4A56A8BD8AC5C17EFDBCAB56D9BADA661CCBCF017F5B10C1D89399",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rust-lang/mdBook/v0.5.3/mdbook-v0.5.3-x86_64-apple-darwin.tar.gz",
-      "checksum": "9B74591168F8DBF19FCDF2386B68031FECC4B847B2E81E2DE2D23ED502618875",
+      "id": "github_release/github.com/rust-lang/mdBook/v0.5.4/mdbook-v0.5.4-x86_64-apple-darwin.tar.gz",
+      "checksum": "A47D7BF0D5D670CFF9EE6CCE95537CBEB62DC10704D9E7131FFBD13E2B59A5DE",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rust-lang/mdBook/v0.5.3/mdbook-v0.5.3-x86_64-unknown-linux-musl.tar.gz",
-      "checksum": "DFB86D8E20A3FED91BF549AA450B9D7F46A275B700292E050CDFD3171732E7FD",
+      "id": "github_release/github.com/rust-lang/mdBook/v0.5.4/mdbook-v0.5.4-x86_64-unknown-linux-musl.tar.gz",
+      "checksum": "5222BEABD3E37DC5BE0D18FF99B79058469354DB5C220153A1B92DB5BA12BE89",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/sigstore/cosign/v3.1.1/cosign-darwin-amd64",
-      "checksum": "14D2678DFBFDE18798151E86FBD91EBDADBB7424B18412A42A155DD8A2DF4C7A",
+      "id": "github_release/github.com/sigstore/cosign/v3.1.3/cosign-darwin-amd64",
+      "checksum": "2347488E5D5B25336644024DFECA5601B190E91197A71A917BDA44744AFF106C",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/sigstore/cosign/v3.1.1/cosign-darwin-arm64",
-      "checksum": "94B42A9E697BE95675F6160AB031A9A5F1EC1E646D6F648D7B2F5CD59ECECBC5",
+      "id": "github_release/github.com/sigstore/cosign/v3.1.3/cosign-darwin-arm64",
+      "checksum": "5CF948C2F4DFE59687BDD0B8523709067383E03982CC543475C8A7DC70E92A76",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/sigstore/cosign/v3.1.1/cosign-linux-amd64",
-      "checksum": "AE1ECD212663F3693AD9EDF8B1A183900C9A52D3155BA6E354237F9A0F6463FC",
+      "id": "github_release/github.com/sigstore/cosign/v3.1.3/cosign-linux-amd64",
+      "checksum": "4629C757B7618056F8DDD7E2625AE9FDD94C0372A65049520BC7D9DF9EFC7F71",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/sigstore/cosign/v3.1.1/cosign-linux-arm64",
-      "checksum": "2EC865872E331C32FD12B08DAE15332D3F92C0AA029219589684A4903CA85D11",
+      "id": "github_release/github.com/sigstore/cosign/v3.1.3/cosign-linux-arm64",
+      "checksum": "C5D324E091826B0D7A78EB16FEF316450B4EB9AAEC045611C08BA06F5E73220A",
       "algorithm": "sha256"
     },
     {
@@ -241,23 +241,23 @@
       "algorithm": "sha256"
     },
     {
-      "id": "http/get.helm.sh/helm-v4.2.0-darwin-amd64.tar.gz",
-      "checksum": "1376EA697140E4DB316736E760D5A47D12AFC1524DCE704476EF06FD7FDEDDC6",
+      "id": "http/get.helm.sh/helm-v4.2.4-darwin-amd64.tar.gz",
+      "checksum": "6C163D687CA03C3B5C01928E53BBBCF9518278F47CE7A2F249A5A08E8BDAA2BC",
       "algorithm": "sha256"
     },
     {
-      "id": "http/get.helm.sh/helm-v4.2.0-darwin-arm64.tar.gz",
-      "checksum": "F13F959015447B6BC309F9FD506509926543988A39035C088B52522EC95E2ACB",
+      "id": "http/get.helm.sh/helm-v4.2.4-darwin-arm64.tar.gz",
+      "checksum": "D747EB4E28BD2727173D15B759FA0A17822291EC09DB7CED3D55AF290A3661A2",
       "algorithm": "sha256"
     },
     {
-      "id": "http/get.helm.sh/helm-v4.2.0-linux-amd64.tar.gz",
-      "checksum": "97DBEB971BE4AC4B27E3839976D9564C0FB35C6F3B1DA89DD1E292D236AF4096",
+      "id": "http/get.helm.sh/helm-v4.2.4-linux-amd64.tar.gz",
+      "checksum": "C306B46F719B0A4DA32D0F78EE21BF90CE8D602F15B22AB753F0674D1670A7F3",
       "algorithm": "sha256"
     },
     {
-      "id": "http/get.helm.sh/helm-v4.2.0-linux-arm64.tar.gz",
-      "checksum": "1F8DE130DFBD04DE64978E7B852A7A547BE1404956A366608276D2520B678670",
+      "id": "http/get.helm.sh/helm-v4.2.4-linux-arm64.tar.gz",
+      "checksum": "564DE2191B881E9F71B5606B25345821EA1682F06AB90499D3AB22B530176DA1",
       "algorithm": "sha256"
     },
     {
