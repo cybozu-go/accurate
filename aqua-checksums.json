@@ -36,18 +36,18 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/goreleaser/goreleaser/v2.16.0/goreleaser_Darwin_all.tar.gz",
-      "checksum": "6A102E4D588FD3553A9AC7321CA6023A9F205843F4861CA35BD337DFA9E72ECE",
+      "id": "github_release/github.com/goreleaser/goreleaser/v2.18.1/goreleaser_Darwin_all.tar.gz",
+      "checksum": "D0AF1F86C439A59AB06C54C505F66FEA1A166093DC91A7C0C8AEBE3DA1CC13B7",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/goreleaser/goreleaser/v2.16.0/goreleaser_Linux_arm64.tar.gz",
-      "checksum": "0102D974373FCDEB77042D1F5897CAFFA193BE36620FDC6C1DA43A01EF8E10D3",
+      "id": "github_release/github.com/goreleaser/goreleaser/v2.18.1/goreleaser_Linux_arm64.tar.gz",
+      "checksum": "93DBA7614308E167158BD26978E8275971FD4B9147E7F3C687A64F5939D42D27",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/goreleaser/goreleaser/v2.16.0/goreleaser_Linux_x86_64.tar.gz",
-      "checksum": "EAAE05B5EBA07533BD0F06846B68C808399504784DF00C62EB219541FC04E5E2",
+      "id": "github_release/github.com/goreleaser/goreleaser/v2.18.1/goreleaser_Linux_x86_64.tar.gz",
+      "checksum": "0C6122AF0AD8FD65638889BF7D3757148B2F80EEFF9F079682F0655DF66EC8E8",
       "algorithm": "sha256"
     },
     {
