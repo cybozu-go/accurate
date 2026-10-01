@@ -38,8 +38,6 @@ jobs:
       with:
         cache: true
     - uses: ./.github/actions/aqua
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Set previous release tag for GoReleaser
       run: |
         export TAG=$(curl -s "https://api.github.com/repos/cybozu-go/accurate/releases/latest" | jq -r .tag_name)
@@ -65,9 +63,7 @@ jobs:
           fetch-depth: 0
 
       - uses: ./.github/actions/aqua
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
+      
       - name: Login to ghcr.io
         run: |
           printf '%s' "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io --username "${GITHUB_ACTOR}" --password-stdin
