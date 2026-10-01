@@ -1,6 +1,8 @@
 # Build the manager binary. This always executes in the native architecture of the building machine.
 FROM --platform=$BUILDPLATFORM ghcr.io/cybozu/golang:1.26.3.1_noble@sha256:0da22bb6f9a876d774654892d411131272ae3dd14c530b6b4ad9598b0a74d1da AS builder
 
+ENV GOPROXY=https://golang.flatt.tech
+
 COPY ./ .
 
 # Build the binary, cross-compiling if necessary
