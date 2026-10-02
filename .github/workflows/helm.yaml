@@ -12,6 +12,9 @@ permissions:
 jobs:
   lint-test:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - name: Checkout
@@ -21,6 +24,9 @@ jobs:
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: 3.14
+      - uses: ./.github/actions/setup-go-with-takumi-guard
+        with:
+          bot-id: ${{ vars.TAKUMI_GUARD_BOT_ID }}
 
       - name: set up a buildkit builder
         # --driver docker-container is required to get a builder that can build multi-arch.
@@ -81,6 +87,7 @@ jobs:
         run: |
           docker buildx build \
             --platform arm64,amd64 \
+            $([ -s ~/.netrc ] && echo "--secret id=netrc,src=$HOME/.netrc") \
             --output type=registry,name=${{ steps.kind.outputs.LOCAL_REGISTRY }}/accurate:dev,push=true,registry.insecure=true,compression=zstd \
             .
           mkdir -p charts/accurate/ci/

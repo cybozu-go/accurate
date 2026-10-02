@@ -10,8 +10,12 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+    - uses: ./.github/actions/setup-go-with-takumi-guard
+      with:
+        bot-id: ${{ vars.TAKUMI_GUARD_BOT_ID }}
     - name: Setup
       run: |
         docker buildx create --name=b --driver docker-container
@@ -19,27 +23,27 @@ jobs:
         echo "TAG=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
     - name: Build images
       run: |
-        docker buildx build --platform=arm64,amd64 -t ghcr.io/cybozu-go/accurate:$TAG .
+        docker buildx build --platform=arm64,amd64 --secret "id=netrc,src=$HOME/.netrc" \
+          -t ghcr.io/cybozu-go/accurate:$TAG .
     - name: Login to ghcr.io
       run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
     - name: Push images
       run: |
-        docker buildx build --platform=arm64,amd64 -t ghcr.io/cybozu-go/accurate:$TAG . --push
+        docker buildx build --platform=arm64,amd64 --secret "id=netrc,src=$HOME/.netrc" \
+          -t ghcr.io/cybozu-go/accurate:$TAG . --push
   release:
     name: Release on GitHub
     needs: image
     runs-on: ubuntu-24.04
     permissions:
       contents: write
+      id-token: write
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-    - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+    - uses: ./.github/actions/setup-go-with-takumi-guard
       with:
-        go-version-file: go.mod
-        cache: true
+        bot-id: ${{ vars.TAKUMI_GUARD_BOT_ID }}
     - uses: ./.github/actions/aqua
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Set previous release tag for GoReleaser
       run: |
         export TAG=$(curl -s "https://api.github.com/repos/cybozu-go/accurate/releases/latest" | jq -r .tag_name)
@@ -65,8 +69,6 @@ jobs:
           fetch-depth: 0
 
       - uses: ./.github/actions/aqua
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Login to ghcr.io
         run: |
