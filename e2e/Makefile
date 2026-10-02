@@ -10,7 +10,7 @@ KUBECONFIG := $(shell pwd)/.kubeconfig
 KIND_CONFIG = kind-config.yaml
 export KUBECTL KUBECONFIG
 
-PATH := $(shell aqua root-dir)/bin:$(PATH)"
+PATH := $(shell aqua root-dir)/bin:$(PATH)
 export PATH
 
 .PHONY: help
@@ -25,7 +25,10 @@ help:
 .PHONY: start
 start: setup $(KUBECTL_ACCURATE) $(CHART_DIR)/cert-manager/Chart.yaml
 	kind create cluster --name=accurate --config=$(KIND_CONFIG) --image=kindest/node:$(KUBERNETES_VERSION) --wait 1m
-	cd ..; docker build --no-cache -t accurate:dev .
+
+	export TAKUMI_NETRC="$$(grep -sF golang.flatt.tech "$${NETRC:-$$HOME/.netrc}")"; \
+	cd .. && docker build --no-cache $${TAKUMI_NETRC:+--secret id=netrc,env=TAKUMI_NETRC} -t accurate:dev .
+
 	kind load docker-image accurate:dev --name=accurate
 	helm install cert-manager $(CHART_DIR)/cert-manager \
 		--namespace cert-manager --create-namespace --set crds.enabled=true

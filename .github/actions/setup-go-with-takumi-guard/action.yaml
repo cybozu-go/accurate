@@ -1,5 +1,5 @@
 name: Setup Go with Takumi Guard
-description: ''
+description: 'Set up Go and route module downloads through Takumi Guard (anonymous for fork PRs)'
 inputs:
   cache:
     description: "enabling go cache"
