@@ -6,6 +6,7 @@
 ### Sub Resources
 
 * [SubNamespaceList](#subnamespacelist)
+* [SubNamespaceMoveSpec](#subnamespacemovespec)
 * [SubNamespaceSpec](#subnamespacespec)
 * [SubNamespaceStatus](#subnamespacestatus)
 
@@ -32,6 +33,17 @@ SubNamespaceList contains a list of SubNamespace
 
 [Back to Custom Resources](#custom-resources)
 
+#### SubNamespaceMoveSpec
+
+SubNamespaceMoveSpec defines a move between parent namespaces.
+
+| Field | Description | Scheme | Required |
+| ----- | ----------- | ------ | -------- |
+| sourceParent | SourceParent is the current parent namespace of the sub-namespace. | string | false |
+| targetParent | TargetParent is the desired parent namespace of the sub-namespace. | string | false |
+
+[Back to Custom Resources](#custom-resources)
+
 #### SubNamespaceSpec
 
 SubNamespaceSpec defines the desired state of SubNamespace
@@ -40,6 +52,7 @@ SubNamespaceSpec defines the desired state of SubNamespace
 | ----- | ----------- | ------ | -------- |
 | labels | Labels are the labels to be propagated to the sub-namespace | map[string]string | false |
 | annotations | Annotations are the annotations to be propagated to the sub-namespace. | map[string]string | false |
+| move | Move specifies a requested or accepted move of this SubNamespace. | *[SubNamespaceMoveSpec](#subnamespacemovespec) | false |
 
 [Back to Custom Resources](#custom-resources)
 
