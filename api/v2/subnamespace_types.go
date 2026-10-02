@@ -92,7 +92,8 @@ func (s *SubNamespace) IsMoveRequested() bool {
 func (s *SubNamespace) IsAcceptingMove() bool {
 	return s.Spec.Move != nil &&
 		s.Spec.Move.SourceParent != "" &&
-		s.Spec.Move.SourceParent != s.Namespace
+		s.Spec.Move.SourceParent != s.Namespace &&
+		!s.IsMoveRequested()
 }
 
 // AcceptsMoveFrom returns true if this SubNamespace accepts a move from the given parent.
