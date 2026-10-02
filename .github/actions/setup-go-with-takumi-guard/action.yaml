@@ -4,7 +4,7 @@ inputs:
   cache:
     description: "enabling go cache"
     required: false
-    default: false
+    default: true
   bot-id:
     description: "Takumi Guard bot ID"
     required: false
