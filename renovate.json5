@@ -69,9 +69,9 @@
       ],
     },
     {
-      description: 'Group non-Kubernetes patch updates',
-      groupName: 'patch dependencies',
-      groupSlug: 'patch-dependencies',
+      description: 'Group non-Kubernetes minor and patch updates',
+      groupName: 'non-Kubernetes dependencies',
+      groupSlug: 'non-kubernetes-dependencies',
       matchPackageNames: [
         '!/^k8s\\.io\\/.*/',
         '!/^kubernetes\\/.*/',
@@ -80,6 +80,24 @@
         '!sigs.k8s.io/controller-runtime',
       ],
       matchUpdateTypes: [
+        'minor',
+        'patch',
+      ],
+    },
+    {
+      description: 'Group non-Kubernetes tools in aqua.yaml',
+      groupName: 'aqua tools',
+      groupSlug: 'aqua-tools',
+      matchFileNames: [
+        'aqua.yaml',
+      ],
+      matchDepNames: [
+        '!/^kubernetes\\/.*/',
+        '!/^kubernetes-sigs\\/.*/',
+        '!aquaproj/aqua-registry',
+      ],
+      matchUpdateTypes: [
+        'minor',
         'patch',
       ],
     },
