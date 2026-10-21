@@ -1,5 +1,5 @@
 # Build the manager binary. This always executes in the native architecture of the building machine.
-FROM --platform=$BUILDPLATFORM ghcr.io/cybozu/golang:1.26.3.1_noble@sha256:0da22bb6f9a876d774654892d411131272ae3dd14c530b6b4ad9598b0a74d1da AS builder
+FROM --platform=$BUILDPLATFORM ghcr.io/cybozu/golang:1.26.10.2_noble@sha256:8d900a9ee78c02dbe4e2d2e23800c4d21714dfaf8c679935afa668ca0993a0e4 AS builder
 
 ENV GOPROXY=https://golang.flatt.tech
 ENV NETRC=/run/secrets/netrc
