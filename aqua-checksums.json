@@ -36,18 +36,18 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/goreleaser/goreleaser/v2.18.2/goreleaser_Darwin_all.tar.gz",
-      "checksum": "4BFD26942AA0F78E275CAD3E49144A7C5CE2E8A34F7D0E9D34C718125766BA12",
+      "id": "github_release/github.com/goreleaser/goreleaser/v2.18.3/goreleaser_Darwin_all.tar.gz",
+      "checksum": "156F425536D40CE282B79C637CA00EB943792DE6AD1E2482A4B21CC4B5421F4F",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/goreleaser/goreleaser/v2.18.2/goreleaser_Linux_arm64.tar.gz",
-      "checksum": "A71681B29194F08F057A68CFCAA5C6B15D907A83A2622C51900C4FAFF828F322",
+      "id": "github_release/github.com/goreleaser/goreleaser/v2.18.3/goreleaser_Linux_arm64.tar.gz",
+      "checksum": "FA7011A7F8DE3B504326B8552CF21C708ED3089519B01D372DA32EF4E8D298D7",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/goreleaser/goreleaser/v2.18.2/goreleaser_Linux_x86_64.tar.gz",
-      "checksum": "0A96EDC9D9BC594E4A41CC4D59467C182062910AB24D9D1F6DD7B667D32606D3",
+      "id": "github_release/github.com/goreleaser/goreleaser/v2.18.3/goreleaser_Linux_x86_64.tar.gz",
+      "checksum": "B8DEE4728BCA1ABA0D71A832A17CD0A3799F75372878E7FFA36AEF2343BCE0BC",
       "algorithm": "sha256"
     },
     {
@@ -241,23 +241,23 @@
       "algorithm": "sha256"
     },
     {
-      "id": "http/get.helm.sh/helm-v4.3.0-darwin-amd64.tar.gz",
-      "checksum": "347A784877E0E20EAC865E8D1C36A80F6BB0861D6F29ABD34DEFB6570EF95D92",
+      "id": "http/get.helm.sh/helm-v4.3.1-darwin-amd64.tar.gz",
+      "checksum": "34BEC4EBA761BA5C16D1965EE6B8F5B0ABE5993974A802274E2A4F0418893D89",
       "algorithm": "sha256"
     },
     {
-      "id": "http/get.helm.sh/helm-v4.3.0-darwin-arm64.tar.gz",
-      "checksum": "D3870437E1E95B67F8EDBDE964156C84A26503F560821D40C542441658934FBA",
+      "id": "http/get.helm.sh/helm-v4.3.1-darwin-arm64.tar.gz",
+      "checksum": "6B4E61C8CD27D99E5A801E63FF25DD5C70B36875C2CD659D3E9CE6B76FC23198",
       "algorithm": "sha256"
     },
     {
-      "id": "http/get.helm.sh/helm-v4.3.0-linux-amd64.tar.gz",
-      "checksum": "86584A54DEF73570558F66F5111CC53DFED56689637AE32C1201205D494F54FB",
+      "id": "http/get.helm.sh/helm-v4.3.1-linux-amd64.tar.gz",
+      "checksum": "0403A88AE20913D11B10A2467B50087721FEA7581736DA6B9D3992F5357FE54B",
       "algorithm": "sha256"
     },
     {
-      "id": "http/get.helm.sh/helm-v4.3.0-linux-arm64.tar.gz",
-      "checksum": "31C5794DD55C66A51E6B7D2E2AC7A114AE8B1DE41FF1D9BA51748AC973B06A08",
+      "id": "http/get.helm.sh/helm-v4.3.1-linux-arm64.tar.gz",
+      "checksum": "8CF8F66ECBC252AC8F7F06CCA68ABA88508DDFDE3A6A34FEB1678AD1694B4F88",
       "algorithm": "sha256"
     },
     {
