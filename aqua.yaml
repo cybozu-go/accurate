@@ -14,20 +14,20 @@ registries:
     path: registry.yaml
 packages:
   # Kubernetes related dependencies'
-  - name: kubernetes/kubectl@v1.37.0
-  - name: kubernetes-sigs/controller-runtime/setup-envtest@v0.25.1
+  - name: kubernetes/kubectl@v1.37.1
+  - name: kubernetes-sigs/controller-runtime/setup-envtest@v0.25.2
   - name: kubernetes-sigs/kind@v0.33.0
   - name: kubernetes-sigs/kubebuilder@v4.16.0
-  - name: kubernetes-sigs/kustomize@kustomize/v5.8.1
+  - name: kubernetes-sigs/kustomize@kustomize/v5.8.3
   - name: kubernetes-sigs/controller-tools/controller-gen@v0.22.0
   # tools
   - name: clamoriniere/crd-to-markdown@v0.0.3
   - name: golangci/golangci-lint@v2.13.2
   - name: goreleaser/goreleaser@v2.18.2
   - name: helm/helm@v4.3.0
-  - name: kubernetes/code-generator/applyconfiguration-gen@v0.37.0
+  - name: kubernetes/code-generator/applyconfiguration-gen@v0.37.1
     registry: local
-  - name: kubernetes/code-generator/conversion-gen@v0.37.0
+  - name: kubernetes/code-generator/conversion-gen@v0.37.1
     registry: local
   - name: mikefarah/yq@v4.53.6
   - name: oras-project/oras@v1.3.4
