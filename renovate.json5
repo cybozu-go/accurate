@@ -72,6 +72,7 @@
       description: 'Group non-Kubernetes minor and patch updates',
       groupName: 'non-Kubernetes dependencies',
       groupSlug: 'non-kubernetes-dependencies',
+      separateMinorPatch: false,
       matchPackageNames: [
         '!/^k8s\\.io\\/.*/',
         '!/^kubernetes\\/.*/',
@@ -88,6 +89,7 @@
       description: 'Group non-Kubernetes tools in aqua.yaml',
       groupName: 'aqua tools',
       groupSlug: 'aqua-tools',
+      separateMinorPatch: false,
       matchFileNames: [
         'aqua.yaml',
       ],

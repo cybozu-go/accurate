@@ -13,7 +13,11 @@ registries:
     type: local
     path: registry.yaml
 packages:
-  # Kubernetes related dependencies'
+  # Kubernetes related dependencies
+  - name: kubernetes/code-generator/applyconfiguration-gen@v0.37.1
+    registry: local
+  - name: kubernetes/code-generator/conversion-gen@v0.37.1
+    registry: local
   - name: kubernetes/kubectl@v1.37.1
   - name: kubernetes-sigs/controller-runtime/setup-envtest@v0.25.2
   - name: kubernetes-sigs/kind@v0.33.0
@@ -25,10 +29,6 @@ packages:
   - name: golangci/golangci-lint@v2.15.0
   - name: goreleaser/goreleaser@v2.18.2
   - name: helm/helm@v4.3.0
-  - name: kubernetes/code-generator/applyconfiguration-gen@v0.37.1
-    registry: local
-  - name: kubernetes/code-generator/conversion-gen@v0.37.1
-    registry: local
   - name: mikefarah/yq@v4.54.1
   - name: oras-project/oras@v1.3.4
   - name: rust-lang/mdBook@v0.5.4
