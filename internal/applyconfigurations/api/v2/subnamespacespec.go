@@ -11,6 +11,8 @@ type SubNamespaceSpecApplyConfiguration struct {
 	Labels map[string]string `json:"labels,omitempty"`
 	// Annotations are the annotations to be propagated to the sub-namespace.
 	Annotations map[string]string `json:"annotations,omitempty"`
+	// Move specifies a requested or accepted move of this SubNamespace.
+	Move *SubNamespaceMoveSpecApplyConfiguration `json:"move,omitempty"`
 }
 
 // SubNamespaceSpecApplyConfiguration constructs a declarative configuration of the SubNamespaceSpec type for use with
@@ -44,5 +46,13 @@ func (b *SubNamespaceSpecApplyConfiguration) WithAnnotations(entries map[string]
 	for k, v := range entries {
 		b.Annotations[k] = v
 	}
+	return b
+}
+
+// WithMove sets the Move field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Move field is set to the value of the last call.
+func (b *SubNamespaceSpecApplyConfiguration) WithMove(value *SubNamespaceMoveSpecApplyConfiguration) *SubNamespaceSpecApplyConfiguration {
+	b.Move = value
 	return b
 }
