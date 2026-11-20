@@ -1,0 +1,23 @@
+name: Dockerfile Pin
+on:
+  pull_request:
+    paths:
+      - 'Dockerfile'
+      - '.github/workflows/dockerfile-pin.yaml'
+      - '.github/actions/aqua/action.yaml'
+      - 'aqua.yaml'
+      - 'aqua-checksums.json'
+      - 'aqua-policy.yaml'
+jobs:
+  verify-dockerfile-pin:
+    name: Verify Dockerfile image tags and digests
+    runs-on: ubuntu-slim
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/aqua
+      - name: Verify tags resolve to the pinned digests
+        run: dockerfile-pin check --verify-tag -f Dockerfile
