@@ -1,6 +1,26 @@
 {
   "checksums": [
     {
+      "id": "github_release/github.com/azu/dockerfile-pin/v1.6.0/dockerfile-pin_darwin_amd64.tar.gz",
+      "checksum": "3D022C8833F4F62D8FD6FD9DF13B84043E7931985DE8F233B1C3AF49496881A1",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/azu/dockerfile-pin/v1.6.0/dockerfile-pin_darwin_arm64.tar.gz",
+      "checksum": "A34D315738EFF10A2A8C4BD6DD49429ECEBF587AC4D4467DF6B0AEFCAB6CA237",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/azu/dockerfile-pin/v1.6.0/dockerfile-pin_linux_amd64.tar.gz",
+      "checksum": "413A6AF72B16C191C21D508C5B0F292F84A5D87E60B5D1ACE1BA689565D45131",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/azu/dockerfile-pin/v1.6.0/dockerfile-pin_linux_arm64.tar.gz",
+      "checksum": "ED3B708C4A8EDFF3915D20472F855FB986F5A22C03BD20CE112293115C59D7E6",
+      "algorithm": "sha256"
+    },
+    {
       "id": "github_release/github.com/clamoriniere/crd-to-markdown/v0.0.3/crd-to-markdown_Darwin_x86_64",
       "checksum": "90FBC1E0625C1A7F765EC658849F07A78DFF5A3CA469A1734F6DD23B313F7ECD",
       "algorithm": "sha256"
