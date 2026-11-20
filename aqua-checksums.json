@@ -1,23 +1,23 @@
 {
   "checksums": [
     {
-      "id": "github_release/github.com/azu/dockerfile-pin/v1.6.0/dockerfile-pin_darwin_amd64.tar.gz",
-      "checksum": "3D022C8833F4F62D8FD6FD9DF13B84043E7931985DE8F233B1C3AF49496881A1",
+      "id": "github_release/github.com/azu/dockerfile-pin/v1.7.0/dockerfile-pin_darwin_amd64.tar.gz",
+      "checksum": "5BA9D6AA2F098848C90792864DAF6D8B7E4C61513F7757A49D4862A3F76B9736",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/azu/dockerfile-pin/v1.6.0/dockerfile-pin_darwin_arm64.tar.gz",
-      "checksum": "A34D315738EFF10A2A8C4BD6DD49429ECEBF587AC4D4467DF6B0AEFCAB6CA237",
+      "id": "github_release/github.com/azu/dockerfile-pin/v1.7.0/dockerfile-pin_darwin_arm64.tar.gz",
+      "checksum": "D2A86D872BCBA4C7D871CFDD1029FF345624F30D0E42EEF3DC8C22F803E0EB59",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/azu/dockerfile-pin/v1.6.0/dockerfile-pin_linux_amd64.tar.gz",
-      "checksum": "413A6AF72B16C191C21D508C5B0F292F84A5D87E60B5D1ACE1BA689565D45131",
+      "id": "github_release/github.com/azu/dockerfile-pin/v1.7.0/dockerfile-pin_linux_amd64.tar.gz",
+      "checksum": "2341BE0470AB1C6766E7548158DBEEAD089242BA5F5ADC6F7CB9B08FAA5782B4",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/azu/dockerfile-pin/v1.6.0/dockerfile-pin_linux_arm64.tar.gz",
-      "checksum": "ED3B708C4A8EDFF3915D20472F855FB986F5A22C03BD20CE112293115C59D7E6",
+      "id": "github_release/github.com/azu/dockerfile-pin/v1.7.0/dockerfile-pin_linux_arm64.tar.gz",
+      "checksum": "E8C63842611A339419068A65D2C9BE0A8E64B316CB496C7DBBE283ECE839EF4B",
       "algorithm": "sha256"
     },
     {
