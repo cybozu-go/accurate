@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-742207b0.js";
+            window.path_to_searchindex_js = "searchindex-a217c98d.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-ff269338.js"></script>
@@ -196,6 +196,14 @@ However, Kubernetes is only updated with patched versions.</p>
 <p>Update GitHub Actions dependencies using pinact.</p>
 <pre><code class="language-sh">GITHUB_TOKEN="$(gh auth token)" pinact run --update --min-age 14
 </code></pre>
+<h2 id="verifying-dockerfile-image-pins"><a class="header" href="#verifying-dockerfile-image-pins">Verifying Dockerfile image pins</a></h2>
+<p>The Dockerfile Pin workflow checks that each pinned tag in <a href="./Dockerfile">Dockerfile</a>
+currently resolves to its recorded digest. To run the same check locally with aqua:</p>
+<pre><code class="language-bash">aqua exec -- dockerfile-pin check --verify-tag -f Dockerfile
+</code></pre>
+<p>An upstream rebuild can move a tag even if the Dockerfile has not changed.
+If the check fails, confirm that the tag and image are the ones you intend to use
+before updating the pinned digest.</p>
 
                     </main>
 
